@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from records.views import UserViewSet, RecordViewSet, TagViewSet
+from records.views import UserViewSet, RecordViewSet, TagViewSet, RecordList
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet)
 router.register(r'api/records', RecordViewSet)
+router.register(r'api/recs', RecordList, basename='record')
 router.register(r'api/tags', TagViewSet)
 
 # Wire up our API using automatic URL routing.

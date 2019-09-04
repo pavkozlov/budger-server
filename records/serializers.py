@@ -5,21 +5,30 @@ from records.models import Record, Tag
 
 
 # Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'is_staff')
+        fields = ('id', 'username', 'email')
 
 
-# Serializers define the API representation.
-class RecordSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'title')
+
+
+class RecordSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+    user = UserSerializer()
+
     class Meta:
         model = Record
         fields = ('id', 'title', 'description', 'created', 'updated', 'user', 'tags')
 
 
-# Serializers define the API representation.
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class RecordSerializerListItem(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+
     class Meta:
-        model = Tag
-        fields = ('id', 'title')
+        model = Record
+        fields = ('id', 'title', 'created', 'tags')
