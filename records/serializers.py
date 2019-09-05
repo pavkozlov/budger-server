@@ -23,12 +23,4 @@ class RecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Record
-        fields = ('id', 'title', 'description', 'created', 'updated', 'user', 'tags')
-
-
-class RecordSerializerListItem(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
-
-    class Meta:
-        model = Record
-        fields = ('id', 'title', 'created', 'tags')
+        fields = ('id', 'title', 'description', 'amount', 'created', 'updated', 'user', 'tags')
