@@ -24,3 +24,10 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = ('id', 'title', 'description', 'amount', 'created', 'updated', 'user', 'tags')
+
+
+class TokenSerializer(serializers.Serializer):
+    """
+    Serializes the token data
+    """
+    token = serializers.CharField(max_length=255)

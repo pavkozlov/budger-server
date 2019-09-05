@@ -5,12 +5,12 @@ from rest_framework.views import status
 def validate_request_data(fn):
     def decorated(*args, **kwargs):
         # args[0] == GenericView Object
-        title = args[0].request.data.get("title", "")
-        artist = args[0].request.data.get("artist", "")
-        if not title and not artist:
+        title = args[0].request.data.get('title', '')
+        amount = args[0].request.data.get('amount', '')
+        if not title or not amount:
             return Response(
                 data={
-                    "message": "Both title and artist are required to add a song"
+                    'message': 'Both title and amount are required to add a record.'
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
