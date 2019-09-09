@@ -44,7 +44,6 @@ def login(request):
 @csrf_exempt
 @api_view(['GET'])
 def user(request):
-    r = request
     return Response(
         UserSerializer(request.user).data,
         status=HTTP_200_OK

@@ -16,6 +16,7 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = ('id', 'title', 'description', 'amount', 'created', 'updated', 'user', 'tags')
+        read_only_fields = ('id', 'created', 'updated')
 
 
 class TokenSerializer(serializers.Serializer):

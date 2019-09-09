@@ -1,5 +1,5 @@
 from rest_framework import generics
-from records.serializers import UserSerializer, RecordSerializer, TokenSerializer
+from records.serializers import RecordSerializer, TokenSerializer
 from django.contrib.auth.models import User
 from records.models import Record, Tag
 from .decorators import validate_request_data
@@ -28,7 +28,6 @@ class RecordListCreateView(generics.ListCreateAPIView):
     """
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     @validate_request_data
     def post(self, request, *args, **kwargs):
@@ -38,6 +37,9 @@ class RecordListCreateView(generics.ListCreateAPIView):
             amount=request.data['amount'],
             user=request.user
         )
+
+        record.tags.set(Tag.objects.filter(id__in=[1, 2]))
+
         return Response(
             data=RecordSerializer(record).data,
             status=status.HTTP_201_CREATED
