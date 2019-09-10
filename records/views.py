@@ -9,6 +9,7 @@ from rest_framework import permissions
 from django.contrib.auth import authenticate, login
 from rest_framework_jwt.settings import api_settings
 
+from rest_framework.permissions import AllowAny
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -19,6 +20,33 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 """
+
+
+class RecordFilterView(generics.ListAPIView):
+    """
+    POST records/filter
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = RecordSerializer
+
+    def get_queryset(self):
+        queryset = Record.objects.all()
+
+        tags = self.request.data.get('tags', None)
+        if tags or True:
+            queryset = queryset.filter(tags__in=tags)
+
+        return queryset
+
+    def get(self, request, *args):
+        return Response(
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
+    def post(self, request):
+        queryset = self.get_queryset()
+        serializer = RecordSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class RecordListCreateView(generics.ListCreateAPIView):
