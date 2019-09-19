@@ -5,3 +5,4 @@ django-cors-headers
 djangorestframework-jwt
 django_heroku
 psycopg2
+gunicorn
