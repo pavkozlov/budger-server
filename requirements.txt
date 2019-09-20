@@ -6,3 +6,4 @@ djangorestframework-jwt
 django_heroku
 psycopg2
 gunicorn
+dj_database_url

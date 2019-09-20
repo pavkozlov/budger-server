@@ -4,7 +4,7 @@ from .views import login, user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/login', login),
-    path('api/user', user),
-    re_path(r'api/', include('records.urls')),
+    # path('api/login', login),
+    # path('api/user', user),
+    re_path(r'api/', include('organization.urls')),
 ]
