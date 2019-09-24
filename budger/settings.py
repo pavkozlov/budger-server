@@ -136,7 +136,26 @@ STATIC_URL = '/static/'
 
 django_heroku.settings(locals())
 
-#try:
-#    del DATABASES['default']['OPTIONS']['sslmode']
-#except Exception:
-#    pass
+"""
+LOGGING = {
+    'version': 1,
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+}
+"""
+
+if 'BUDGER_DEV' in os.environ:
+    try:
+        del DATABASES['default']['OPTIONS']['sslmode']
+    except Exception:
+        pass

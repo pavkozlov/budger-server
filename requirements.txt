@@ -1,6 +1,5 @@
 django
 djangorestframework
-mysqlclient
 django-cors-headers
 djangorestframework-jwt
 django_heroku

@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import OrganizationCommonView
+from .views import OrganizationCommonListView, OrganizationCommonRetrieveView
 
 
 urlpatterns = [
-    path('organization/', OrganizationCommonView.as_view()),
-    # path('records/<int:pk>/', RecordDetailView.as_view(), name="records-detail"),
+    path('organization/', OrganizationCommonListView.as_view()),
+    path('organization/<int:pk>/', OrganizationCommonRetrieveView.as_view()),
 ]

@@ -1,20 +1,26 @@
 from rest_framework import generics
-from .models import OrganizationCommon, OrganizationKso, Employee
-from .serializers import OrganizationCommonSerializer, OrganizationKsoSerializer, EmployeeSerializer
-from rest_framework.response import Response
+from .models import OrganizationCommon
+from .serializers import OrganizationCommonListSerializer, OrganizationCommonRetrieveSerializer
+from rest_framework import filters
 
 
-class OrganizationCommonView(generics.ListAPIView):
+class OrganizationCommonListView(generics.ListAPIView):
     """
     GET Список организаций из ЕГРЮЛ
     """
-    serializer_class = OrganizationCommonSerializer
+    serializer_class = OrganizationCommonListSerializer
+    queryset = OrganizationCommon.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']
+
+
+class OrganizationCommonRetrieveView(generics.RetrieveAPIView):
+    """
+    GET Сведения об организации из ЕГРЮЛ
+    """
+    serializer_class = OrganizationCommonRetrieveSerializer
 
     def get_queryset(self):
         queryset = OrganizationCommon.objects.all()
         return queryset
 
-    def post(self, request):
-        queryset = self.get_queryset()
-        serializer = OrganizationCommonSerializer(queryset, many=True)
-        return Response(serializer.data)
