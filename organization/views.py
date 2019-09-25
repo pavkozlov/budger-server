@@ -1,7 +1,6 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from .models import OrganizationCommon
 from .serializers import OrganizationCommonListSerializer, OrganizationCommonRetrieveSerializer
-from rest_framework import filters
 
 
 class OrganizationCommonListView(generics.ListAPIView):
@@ -11,7 +10,7 @@ class OrganizationCommonListView(generics.ListAPIView):
     serializer_class = OrganizationCommonListSerializer
     queryset = OrganizationCommon.objects.all()
     filter_backends = [filters.SearchFilter]
-    search_fields = ['title']
+    search_fields = ['title_full', 'title_short', 'inn']
 
 
 class OrganizationCommonRetrieveView(generics.RetrieveAPIView):
@@ -19,8 +18,4 @@ class OrganizationCommonRetrieveView(generics.RetrieveAPIView):
     GET Сведения об организации из ЕГРЮЛ
     """
     serializer_class = OrganizationCommonRetrieveSerializer
-
-    def get_queryset(self):
-        queryset = OrganizationCommon.objects.all()
-        return queryset
-
+    queryset = OrganizationCommon.objects.all()
