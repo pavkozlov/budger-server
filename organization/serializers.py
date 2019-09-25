@@ -5,7 +5,7 @@ from .models import OrganizationKso, OrganizationCommon, Employee
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ('id', 'name',)
+        fields = '__all__'
 
 
 class OrganizationKsoSerializer(serializers.ModelSerializer):
@@ -23,14 +23,16 @@ class OrganizationKsoSerializer(serializers.ModelSerializer):
 class OrganizationCommonListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationCommon
-        fields = ('id', 'title',)
+        fields = '__all__'
         read_only_fields = ('id',)
 
 
 class OrganizationCommonRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationCommon
-        fields = ('id', 'title', 'ogrn', 'inn', 'organization_kso')
+        fields = '__all__'
         read_only_fields = ('id',)
 
-    organization_kso = OrganizationKsoSerializer(read_only=True)
+    organization_kso = OrganizationKsoSerializer(
+        read_only=True
+    )
