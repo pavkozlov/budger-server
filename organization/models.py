@@ -87,7 +87,7 @@ class OrganizationCommon(models.Model):
     addr_office = models.CharField(max_length=5)
 
     # Руководитель
-    head_position = models.CharField(max_length=20)
+    head_position = models.CharField(max_length=100)
     head_name_last = models.CharField(max_length=20)
     head_name_first = models.CharField(max_length=20)
     head_name_second = models.CharField(max_length=20)
