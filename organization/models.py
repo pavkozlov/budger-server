@@ -83,8 +83,8 @@ class OrganizationCommon(models.Model):
     addr_locality = models.CharField(max_length=20)
     addr_street = models.CharField(max_length=20)
     addr_building = models.CharField(max_length=5)
-    addr_housing = models.CharField(max_length=5)
-    addr_office = models.CharField(max_length=5)
+    addr_housing = models.CharField(max_length=5, null=True)
+    addr_office = models.CharField(max_length=5, null=True)
 
     # Руководитель
     head_position = models.CharField(max_length=100)
