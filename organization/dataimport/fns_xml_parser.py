@@ -96,7 +96,7 @@ def parse_elem(elem):
 
 
 if __name__ == '__main__':
-    with open('EGRUL_FULL_2019-01-01_385809.XML', 'r') as xml_file:
+    with open('EGRUL_FULL_2019-01-01_385809.XML', 'r', encoding='utf-8') as xml_file:
         doc = xml.dom.minidom.parse(xml_file)
         root_elem = doc.documentElement
         elements = root_elem.getElementsByTagName('СвЮЛ')

@@ -11,7 +11,7 @@ def populate_common_organizations(apps, schema_editor):
     OrganizationCommon.objects.all().delete()
 
     xml_file_path = os.path.join('organization', 'dataimport', 'EGRUL_FULL_2019-01-01_385809.XML')
-    with open(xml_file_path, 'r') as xml_file:
+    with open(xml_file_path, 'r', encoding='utf-8') as xml_file:
         doc = xml.dom.minidom.parse(xml_file)
         elements = doc.documentElement.getElementsByTagName('СвЮЛ')
         for elem in elements:
