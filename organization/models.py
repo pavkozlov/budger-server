@@ -79,8 +79,11 @@ class OrganizationCommon(models.Model):
 
     # Адрес
     addr_index = models.CharField(max_length=6)
-    addr_region = models.CharField(max_length=20)
-    addr_locality = models.CharField(max_length=20)
+    addr_region_code = models.CharField(max_length=2)
+    addr_region_type = models.CharField(max_length=20)
+    addr_region_title = models.CharField(max_length=20)
+    addr_locality_type = models.CharField(max_length=20)
+    addr_locality_title = models.CharField(max_length=20)
     addr_street = models.CharField(max_length=20)
     addr_building = models.CharField(max_length=5)
     addr_housing = models.CharField(max_length=5, null=True)
