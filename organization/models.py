@@ -66,7 +66,7 @@ class OrganizationCommon(models.Model):
 
     # Наименование ОПФ
     opf_full = models.CharField(max_length=100)
-    opf_short = models.CharField(max_length=100)
+    opf_code = models.CharField(max_length=10)
 
     # Наименование ЮЛ
     title_full = models.CharField(max_length=200)
