@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import OrganizationCommon, OrganizationKso, Employee
+from organization.models.organization_common import OrganizationCommon
+from organization.models.organization_kso import OrganizationKso
+from organization.models.employee import Employee
 
 
 admin.site.register(OrganizationCommon)

@@ -1,5 +1,5 @@
 from django.db import models
-from organization.models import OrganizationCommon
+from organization.models.organization_common import OrganizationCommon
 
 
 SCHEDULE_STATUS = [
