@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import OrganizationKso, OrganizationCommon, Employee
+from budger.dyna_fields import DynamicFieldsModelSerializer
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -20,18 +21,16 @@ class OrganizationKsoSerializer(serializers.ModelSerializer):
     )
 
 
-class OrganizationCommonListSerializer(serializers.ModelSerializer):
+class OrganizationCommonListSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = OrganizationCommon
         fields = '__all__'
-        read_only_fields = ('id',)
 
 
 class OrganizationCommonRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationCommon
         fields = '__all__'
-        read_only_fields = ('id',)
 
     organization_kso = OrganizationKsoSerializer(
         read_only=True
