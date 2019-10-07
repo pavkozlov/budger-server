@@ -1,8 +1,8 @@
-django
-djangorestframework
-django-cors-headers
-djangorestframework-jwt
+django==2.2.6
+djangorestframework==3.10.3
+django-cors-headers==3.1.1
+djangorestframework-jwt==1.11.0
 django_heroku
-psycopg2
-gunicorn
-dj_database_url
+psycopg2==2.8.3
+gunicorn==19.9.0
+dj_database_url=0.5.0
