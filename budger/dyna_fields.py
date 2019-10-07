@@ -1,7 +1,7 @@
 from rest_framework import generics, serializers
 
 
-class DynaFieldsListView(generics.ListAPIView):
+class DynaFieldsListAPIView(generics.ListAPIView):
     """
     A ListAPIView that can parse fields query attr
     """
@@ -21,7 +21,10 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
-        fields = kwargs['context'].pop('fields', None) if 'context' in kwargs else None
+        if 'context' in kwargs and kwargs['context']:
+            fields = kwargs['context'].pop('fields', None)
+        else:
+            fields = None
 
         # Instantiate the superclass normally
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)

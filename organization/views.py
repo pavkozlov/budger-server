@@ -1,10 +1,10 @@
 from rest_framework import generics, filters
 from .models import OrganizationCommon
 from .serializers import OrganizationCommonListSerializer, OrganizationCommonRetrieveSerializer
-from budger.dyna_fields import DynaFieldsListView
+from budger.dyna_fields import DynaFieldsListAPIView
 
 
-class OrganizationCommonListView(DynaFieldsListView):
+class OrganizationCommonListView(DynaFieldsListAPIView):
     """
     GET Список организаций из ЕГРЮЛ
     """
