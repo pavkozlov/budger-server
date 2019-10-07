@@ -1,8 +1,14 @@
+"""
+Библиотечка для разбора XML из ФНС.
+"""
+
+
 import xml.dom.minidom
 from datetime import date
 
 
 def str_to_date(s):
+    """ Принимает строку, отдает Date"""
     if s:
         d_int = [int(i) for i in s.split('-')]
         return date(*d_int)
@@ -10,6 +16,13 @@ def str_to_date(s):
 
 
 def x_attr(elem, xpath, **kwargs):
+    """
+    Возвращает атрибут элемента
+    :param elem: Обрабатываемый элемент.
+    :param xpath: XPath до атрибута.
+    :param kwargs: max_len - задается максимальная длина значения атрибута.
+    :return:
+    """
     _elem, _attr_name = None, None
 
     if xpath and len(xpath) >= 2:
@@ -42,57 +55,57 @@ def x_attr(elem, xpath, **kwargs):
 
 
 def parse_elem(elem):
-    """ Returns dict with model data """
+    """ Возвращает dict с данными модели """
 
-    model = {
+    _model = {
         'reg_date': str_to_date(x_attr(elem, 'СвОбрЮЛ/@ДатаОГРН'))
     }
 
-    if not model['reg_date']:
+    if not _model['reg_date']:
         return None
 
-    model['title_full'] = x_attr(elem, 'СвНаимЮЛ/@НаимЮЛПолн')
-    model['title_short'] = x_attr(elem, 'СвНаимЮЛ/@НаимЮЛСокр') or model['title_full']
+    _model['title_full'] = x_attr(elem, 'СвНаимЮЛ/@НаимЮЛПолн')
+    _model['title_short'] = x_attr(elem, 'СвНаимЮЛ/@НаимЮЛСокр') or _model['title_full']
 
-    model['opf_full'] = x_attr(elem, '@ПолнНаимОПФ')
-    model['opf_short'] = x_attr(elem, '@КодОПФ')
+    _model['opf_full'] = x_attr(elem, '@ПолнНаимОПФ')
+    _model['opf_short'] = x_attr(elem, '@КодОПФ')
 
-    model['inn'] = x_attr(elem, '@ИНН')
-    model['kpp'] = x_attr(elem, '@КПП')
-    model['ogrn'] = x_attr(elem, '@ОГРН')
+    _model['inn'] = x_attr(elem, '@ИНН')
+    _model['kpp'] = x_attr(elem, '@КПП')
+    _model['ogrn'] = x_attr(elem, '@ОГРН')
 
-    model['addr_index'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Индекс')
+    _model['addr_index'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Индекс')
 
-    model['addr_region_code'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@КодРегион')
-    model['addr_region_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Регион/@ТипРегион', max_len=50)
-    model['addr_region_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Регион/@НаимРегион', max_len=50)
+    _model['addr_region_code'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@КодРегион')
+    _model['addr_region_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Регион/@ТипРегион', max_len=50)
+    _model['addr_region_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Регион/@НаимРегион', max_len=50)
 
     region_type = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Регион/@ТипРегион', max_len=50)
 
     if region_type == 'ГОРОД':
-        model['addr_locality_type'] = 'ГОРОД'
-        model['addr_locality_title'] = model['addr_region_title']
+        _model['addr_locality_type'] = 'ГОРОД'
+        _model['addr_locality_title'] = _model['addr_region_title']
     else:
-        model['addr_locality_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Город/@ТипГород')
-        model['addr_locality_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Город/@НаимГород', max_len=50)
+        _model['addr_locality_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Город/@ТипГород')
+        _model['addr_locality_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Город/@НаимГород', max_len=50)
 
-    if not model['addr_locality_title']:
-        model['addr_locality_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/НаселПункт/@ТипНаселПункт', max_len=50)
-        model['addr_locality_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/НаселПункт/@НаимНаселПункт', max_len=50)
+    if not _model['addr_locality_title']:
+        _model['addr_locality_type'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/НаселПункт/@ТипНаселПункт', max_len=50)
+        _model['addr_locality_title'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/НаселПункт/@НаимНаселПункт', max_len=50)
 
-    model['addr_street'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Улица/@НаимУлица', max_len=50)
-    model['addr_building'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Дом', max_len=50)
-    model['addr_housing'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Корпус', max_len=50)
-    model['addr_office'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Кварт', max_len=50)
+    _model['addr_street'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/Улица/@НаимУлица', max_len=50)
+    _model['addr_building'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Дом', max_len=50)
+    _model['addr_housing'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Корпус', max_len=50)
+    _model['addr_office'] = x_attr(elem, 'СвАдресЮЛ/АдресРФ/@Кварт', max_len=50)
 
-    model['head_position'] = x_attr(elem, 'СведДолжнФЛ/СвДолжн/@НаимДолжн')
-    model['head_name_last'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Фамилия')
-    model['head_name_first'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Имя')
-    model['head_name_second'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Отчество')
+    _model['head_position'] = x_attr(elem, 'СведДолжнФЛ/СвДолжн/@НаимДолжн')
+    _model['head_name_last'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Фамилия')
+    _model['head_name_first'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Имя')
+    _model['head_name_second'] = x_attr(elem, 'СведДолжнФЛ/СвФЛ/@Отчество')
 
-    model['head_accession_date'] = str_to_date(x_attr(elem, 'СведДолжнФЛ/СвДолжн/ГРНДата/@ДатаЗаписи'))
+    _model['head_accession_date'] = str_to_date(x_attr(elem, 'СведДолжнФЛ/СвДолжн/ГРНДата/@ДатаЗаписи'))
 
-    return model
+    return _model
 
 
 if __name__ == '__main__':
