@@ -10,8 +10,8 @@ class OrganizationKso(models.Model):
         ordering = ['title']
 
     # Ссылка на справочник ЕГРЮЛ
-    organization_common = models.OneToOneField(
-        'OrganizationCommon',
+    organization = models.OneToOneField(
+        'Organization',
         on_delete=models.SET_NULL,
         related_name='organization_kso',
         null=True

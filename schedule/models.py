@@ -1,5 +1,5 @@
 from django.db import models
-from organization.models.organization_common import OrganizationCommon
+from organization.models.organization import Organization
 
 
 SCHEDULE_STATUS = [
@@ -22,7 +22,7 @@ class Schedule(models.Model):
 
 class Event(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
-    organization = models.ForeignKey(OrganizationCommon, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     revision_from = models.DateField()
     revision_to = models.DateField()

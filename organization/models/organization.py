@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class OrganizationCommon(models.Model):
+class Organization(models.Model):
     """
     Справочник ЕГРЮЛ
     """
