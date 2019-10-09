@@ -3,11 +3,10 @@ from django.contrib.auth.models import User as AuthUser, AnonymousUser
 from .models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+
 from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
-    HTTP_200_OK
+    HTTP_400_BAD_REQUEST
 )
 from rest_framework.response import Response
 from .serializers import UserSerializer, TokenSerializer
@@ -17,7 +16,6 @@ class LoginView(views.APIView):
     """
     POST Вход пользователя в систему
     """
-
     permission_classes = (AllowAny,)
 
     @staticmethod
@@ -38,35 +36,26 @@ class LoginView(views.APIView):
 
         if email is None or password is None:
             return Response(
-                {'error': 'Please provide both email and password.'},
+                {'error': 'email-and-password-required'},
                 status=HTTP_400_BAD_REQUEST
             )
 
         auth_user = self.authenticate(email, password)
 
         if not auth_user:
-            return Response(
-                {'error': 'Invalid Credentials.'},
-                status=HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'invalid-credentials'})
 
-        user = User.objects.get(auth_user=auth_user)
-
-        if not user:
-            return Response(
-                {'error': 'User object is not found for given auth user.'},
-                status=HTTP_404_NOT_FOUND
-            )
+        try:
+            user = User.objects.get(auth_user=auth_user)
+        except User.DoesNotExist:
+            return Response({'error': 'user-does-not-exist'})
 
         token, _ = Token.objects.get_or_create(user=auth_user)
 
-        return Response(
-            {
-                'token': TokenSerializer(token).data,
-                'user': UserSerializer(user).data
-            },
-            status=HTTP_200_OK
-        )
+        return Response({
+            'token': TokenSerializer(token).data,
+            'user': UserSerializer(user).data
+        })
 
 
 class LogoutView(views.APIView):
@@ -75,7 +64,7 @@ class LogoutView(views.APIView):
     """
     def post(self, request):
         request.user.auth_token.delete()
-        return Response(status=HTTP_200_OK)
+        return Response()
 
 
 class UserView(views.APIView):
@@ -92,7 +81,6 @@ class UserView(views.APIView):
         # Core user is okay
         user = User.objects.get(auth_user=auth_user)
 
-        return Response(
-            {'user': UserSerializer(user).data},
-            status=HTTP_200_OK
-        )
+        return Response({
+            'user': UserSerializer(user).data
+        })
