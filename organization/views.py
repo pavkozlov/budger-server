@@ -1,7 +1,7 @@
 from rest_framework import generics, filters
 from organization.models.organization import Organization
 from organization.models.organization_kso import OrganizationKso
-from budger.dyna_fields import DynaFieldsListAPIView
+from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from .serializers import OrganizationSerializer
 from .serializers import OrganizationKsoSerializer
 

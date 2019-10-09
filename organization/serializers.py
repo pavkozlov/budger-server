@@ -2,7 +2,7 @@ from rest_framework import serializers
 from organization.models.organization import Organization
 from organization.models.organization_kso import OrganizationKso
 from organization.models.employee import Employee
-from budger.dyna_fields import DynamicFieldsModelSerializer
+from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 
 
 class EmployeeSerializer(serializers.ModelSerializer):

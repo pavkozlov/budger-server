@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'schedule',
-    'organization'
+    'organization',
+    'auth10'
 ]
 
 REST_FRAMEWORK = {
@@ -156,6 +157,9 @@ LOGGING = {
     },
 }
 """
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 if 'BUDGER_DEV' in os.environ:
     try:
