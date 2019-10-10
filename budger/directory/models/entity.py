@@ -1,9 +1,10 @@
 from django.db import models
 
 
-class Organization(models.Model):
+class Entity(models.Model):
     """
-    Справочник ЕГРЮЛ
+    Юридическое лицо.
+    Данные импортируются из справочника ЕГРЮЛ.
     """
 
     class Meta:

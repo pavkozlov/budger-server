@@ -68,7 +68,7 @@ def parse_elem(elem):
     _model['title_short'] = x_attr(elem, 'СвНаимЮЛ/@НаимЮЛСокр') or _model['title_full']
 
     _model['opf_full'] = x_attr(elem, '@ПолнНаимОПФ')
-    _model['opf_short'] = x_attr(elem, '@КодОПФ')
+    _model['opf_code'] = x_attr(elem, '@КодОПФ')
 
     _model['inn'] = x_attr(elem, '@ИНН')
     _model['kpp'] = x_attr(elem, '@КПП')

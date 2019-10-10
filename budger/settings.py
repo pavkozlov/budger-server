@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'schedule',
-    'organization',
-    'auth10'
+    'budger.authentication',
+    'budger.directory',
+    # 'budger.schedule',
 ]
 
 REST_FRAMEWORK = {
