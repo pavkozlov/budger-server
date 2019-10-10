@@ -1,15 +1,14 @@
-from rest_framework import views, generics
-from django.contrib.auth.models import User as AuthUser, AnonymousUser
-from .models import User
+from rest_framework import views
+from django.contrib.auth.models import User, AnonymousUser
+from .models import Profile
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
-
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
     HTTP_400_BAD_REQUEST
 )
 from rest_framework.response import Response
-from .serializers import UserSerializer, TokenSerializer
+from .serializers import ProfileSerializer, TokenSerializer
 
 
 class LoginView(views.APIView):
@@ -24,10 +23,10 @@ class LoginView(views.APIView):
     def authenticate(email, password):
         """ Authenticate user by email/passwords and return User if okay and None if not okay. """
         try:
-            auth_user = AuthUser.objects.get(email=email)
-            if auth_user.check_password(password):
-                return auth_user
-        except AuthUser.DoesNotExist:
+            user = User.objects.get(email=email)
+            if user.check_password(password):
+                return user
+        except User.DoesNotExist:
             pass
 
         return None
@@ -42,21 +41,21 @@ class LoginView(views.APIView):
                 status=HTTP_400_BAD_REQUEST
             )
 
-        auth_user = self.authenticate(email, password)
+        user = self.authenticate(email, password)
 
-        if not auth_user:
+        if not user:
             return Response({'error': 'invalid-credentials'})
 
         try:
-            user = User.objects.get(auth_user=auth_user)
-        except User.DoesNotExist:
+            profile = Profile.objects.get(user=user)
+        except Profile.DoesNotExist:
             return Response({'error': 'user-does-not-exist'})
 
-        token, _ = Token.objects.get_or_create(user=auth_user)
+        token, _ = Token.objects.get_or_create(user=user)
 
         return Response({
             'token': TokenSerializer(token).data,
-            'user': UserSerializer(user).data
+            'profile': ProfileSerializer(profile).data
         })
 
 
@@ -69,7 +68,7 @@ class LogoutView(views.APIView):
         return Response()
 
 
-class UserView(views.APIView):
+class ProfileView(views.APIView):
     """
     GET Сведения о текущем пользователе.
     POST Сохранение данных текущего пользователя:
@@ -83,8 +82,8 @@ class UserView(views.APIView):
 
         if auth_user is not None and type(auth_user) is not AnonymousUser:
             try:
-                return User.objects.get(auth_user=auth_user)
-            except User.DoesNotExist:
+                return Profile.objects.get(auth_user=auth_user)
+            except Profile.DoesNotExist:
                 pass
 
         return None
@@ -94,7 +93,7 @@ class UserView(views.APIView):
 
         if user:
             return Response(
-                {'user': UserSerializer(user).data}
+                {'user': ProfileSerializer(user).data}
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
@@ -111,5 +110,5 @@ class UserView(views.APIView):
             user.save()
 
         return Response(
-            {'user': UserSerializer(user).data}
+            {'user': ProfileSerializer(user).data}
         )
