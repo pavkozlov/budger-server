@@ -1,4 +1,4 @@
-from rest_framework import views
+from rest_framework import views, generics
 from django.contrib.auth.models import User as AuthUser, AnonymousUser
 from .models import User
 from rest_framework.authtoken.models import Token
@@ -15,6 +15,8 @@ from .serializers import UserSerializer, TokenSerializer
 class LoginView(views.APIView):
     """
     POST Вход пользователя в систему
+        @email
+        @password
     """
     permission_classes = (AllowAny,)
 
@@ -60,7 +62,7 @@ class LoginView(views.APIView):
 
 class LogoutView(views.APIView):
     """
-    POST Выход пользователя из системы
+    POST Выход пользователя из системы.
     """
     def post(self, request):
         request.user.auth_token.delete()
@@ -69,18 +71,45 @@ class LogoutView(views.APIView):
 
 class UserView(views.APIView):
     """
-    GET Сведения о текущем пользователе
+    GET Сведения о текущем пользователе.
+    POST Сохранение данных текущего пользователя:
+        @last_name
+        @first_name
+        @second_name
+        @position
     """
-    def get(self, request):
+    def get_user(self, request):
         auth_user = request.user
 
-        # Guard
-        if auth_user is None or type(auth_user) is AnonymousUser:
+        if auth_user is not None and type(auth_user) is not AnonymousUser:
+            try:
+                return User.objects.get(auth_user=auth_user)
+            except User.DoesNotExist:
+                pass
+
+        return None
+
+    def get(self, request):
+        user = self.get_user(request)
+
+        if user:
+            return Response(
+                {'user': UserSerializer(user).data}
+            )
+        else:
             return Response(status=HTTP_403_FORBIDDEN)
 
-        # Core user is okay
-        user = User.objects.get(auth_user=auth_user)
+    def post(self, request):
+        user = self.get_user(request)
 
-        return Response({
-            'user': UserSerializer(user).data
-        })
+        if user and 'user' in request.data:
+            user_data = request.data['user']
+            user.last_name = user_data.get('last_name', '')
+            user.first_name = user_data.get('first_name', '')
+            user.second_name = user_data.get('second_name', '')
+            user.position = user_data.get('position', '')
+            user.save()
+
+        return Response(
+            {'user': UserSerializer(user).data}
+        )

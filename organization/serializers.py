@@ -25,7 +25,3 @@ class OrganizationSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Organization
         fields = '__all__'
-
-    organization_kso = OrganizationKsoSerializer(
-        read_only=True
-    )

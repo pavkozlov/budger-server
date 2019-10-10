@@ -24,11 +24,21 @@ class OrganizationRetrieveView(generics.RetrieveAPIView):
     queryset = Organization.objects.all()
 
 
-class OrganizationKsoView(DynaFieldsListAPIView):
+class OrganizationKsoListView(DynaFieldsListAPIView):
     """
-    GET Список организаций из ЕГРЮЛ
+    GET Список КСО
     """
     serializer_class = OrganizationKsoSerializer
     queryset = OrganizationKso.objects.all()
     filter_backends = [filters.SearchFilter]
-    search_fields = ['title_full', 'title_short', 'inn']
+    search_fields = ['title_full', 'title_short']
+
+
+class OrganizationKsoRetrieveView(generics.RetrieveAPIView):
+    """
+    GET Сведения о выбранном КСО
+    """
+    serializer_class = OrganizationKsoSerializer
+    queryset = OrganizationKso.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title_full', 'title_short']

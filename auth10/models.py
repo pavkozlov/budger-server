@@ -11,6 +11,8 @@ class User(models.Model):
     second_name = models.CharField(max_length=30, null=True)
     position = models.CharField(max_length=100)
 
+    read_only_fields = (auth_user, employee)
+
     def __str__(self):
         return '{} {} {} ({})'.format(
             self.last_name,
@@ -18,3 +20,17 @@ class User(models.Model):
             self.second_name,
             self.auth_user
         )
+
+    def create(self, validated_data):
+        user = User(
+            last_name=validated_data['last_name'],
+            first_name=validated_data['first_name'],
+            second_name=validated_data['second_name'],
+            position=validated_data['position'],
+        )
+        user.save()
+        return user
+
+    def update(self, user, validated_data):
+        user.last_name = validated_data.get('last_name', user.last_name)
+        return user
