@@ -2,6 +2,7 @@ from rest_framework import generics, filters
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
+from budger.libs.pagination import UnlimitedResultsSetPagination
 from .serializers import EntitySerializer
 from .serializers import KsoSerializer
 
@@ -30,6 +31,7 @@ class KsoListView(DynaFieldsListAPIView):
     """
     serializer_class = KsoSerializer
     queryset = Kso.objects.all()
+    pagination_class = UnlimitedResultsSetPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['title_full', 'title_short']
 
