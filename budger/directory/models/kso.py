@@ -42,6 +42,9 @@ class KsoEmployee(models.Model):
     Работник контрольно-счетной организации
     """
 
+    class Meta:
+        ordering = ['name']
+
     # Ссылка на организацию
     kso = models.ForeignKey(
         'Kso',

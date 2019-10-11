@@ -4,9 +4,9 @@ from .models.entity import Entity
 from .models.kso import Kso, KsoEmployee
 
 
-class KsoEmployeeSerializer(serializers.ModelSerializer):
+class EntitySerializer(DynamicFieldsModelSerializer):
     class Meta:
-        model = KsoEmployee
+        model = Entity
         fields = '__all__'
 
 
@@ -15,12 +15,23 @@ class KsoSerializer(DynamicFieldsModelSerializer):
         model = Kso
         fields = '__all__'
 
-    employees = KsoEmployeeSerializer(
-        many=True
-    )
 
-
-class EntitySerializer(DynamicFieldsModelSerializer):
+class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
     class Meta:
-        model = Entity
+        model = KsoEmployee
         fields = '__all__'
+
+    class _KsoSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Kso
+            fields = ['id', 'title_full']
+
+    kso = _KsoSerializer()
+
+
+class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoEmployee
+        fields = '__all__'
+
+    kso = KsoSerializer()
