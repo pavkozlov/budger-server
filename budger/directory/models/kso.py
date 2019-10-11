@@ -50,19 +50,18 @@ class KsoEmployee(models.Model):
     )
 
     # Фамилия, имя, отчество
-    name_last = models.CharField(max_length=20)
-    name_first = models.CharField(max_length=20)
-    name_second = models.CharField(max_length=20)
+    name = models.CharField(max_length=100)
 
     # Должность, отдел
-    department = models.CharField(max_length=30)
-    position = models.CharField(max_length=30)
+    department = models.CharField(max_length=50)
+    position = models.CharField(max_length=50)
 
     # Телефон, эл. почта
-    phone = models.CharField(max_length=30)
-    email = models.CharField(max_length=30)
+    phone_landline = models.CharField(max_length=30)
+    phone_mobile = models.CharField(max_length=30)
+    email = models.CharField(max_length=50)
 
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True)
 
     def __str__(self):
-        return '{} {} {}'.format(self.name_last, self.name_first, self.name_second)
+        return '{} - {}'.format(self.name, self.kso)
