@@ -46,7 +46,9 @@ class KsoRetrieveView(generics.RetrieveAPIView):
 
 class KsoEmployeeListView(DynaFieldsListAPIView):
     """
-    GET Список сотрудников КСО
+    GET Список сотрудников КСО.
+    @search - поиск по полю 'name'
+    @kso_id - фильтр по полю kso.id
     """
     serializer_class = KsoEmployeeListSerializer
     filter_backends = [filters.SearchFilter]
@@ -60,6 +62,16 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
             queryset = queryset.filter(kso__id=kso_id)
 
         return queryset
+
+    def options(self, request, *args, **kwargs):
+        """
+        Don't include the view description in OPTIONS responses.
+        """
+        meta = self.metadata_class()
+        data = meta.determine_metadata(request, self)
+        data.pop('description')
+        return data
+
 
 class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
