@@ -50,16 +50,16 @@ class KsoEmployee(models.Model):
     )
 
     # Фамилия, имя, отчество
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
 
     # Должность, отдел
-    department = models.CharField(max_length=50)
-    position = models.CharField(max_length=50)
+    department = models.CharField(max_length=200)
+    position = models.CharField(max_length=200)
 
     # Телефон, эл. почта
-    phone_landline = models.CharField(max_length=30)
-    phone_mobile = models.CharField(max_length=30)
-    email = models.CharField(max_length=50)
+    phone_landline = models.CharField(max_length=200)
+    phone_mobile = models.CharField(max_length=200)
+    email = models.CharField(max_length=200)
 
     birth_date = models.DateField(null=True)
 

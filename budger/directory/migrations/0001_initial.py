@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
                 ('name_second', models.CharField(max_length=20)),
                 ('department', models.CharField(max_length=30)),
                 ('position', models.CharField(max_length=30)),
-                ('phone', models.CharField(max_length=30)),
+                ('phone', models.CharField(max_length=200)),
                 ('email', models.CharField(max_length=30)),
                 ('birth_date', models.DateField()),
                 ('kso', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='employees', to='directory.Kso')),
