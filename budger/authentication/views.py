@@ -1,5 +1,5 @@
 from rest_framework import views
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser, update_last_login
 from .models import Profile
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
@@ -49,6 +49,7 @@ class LoginView(views.APIView):
             return Response({'error': 'user-does-not-exist'})
 
         token, _ = Token.objects.get_or_create(user=user)
+        update_last_login(None, user)
 
         return Response({
             'token': TokenSerializer(token).data,
