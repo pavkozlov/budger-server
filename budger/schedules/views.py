@@ -16,9 +16,6 @@ from .serializers import EventSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for listing or retrieving users.
-    """
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 

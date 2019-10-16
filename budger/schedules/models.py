@@ -97,8 +97,7 @@ class Event(models.Model):
     # ВАЖНО: коллега пользователя, формирующего мероприятие
     responsible_employee = models.ForeignKey(
         KsoEmployee,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.DO_NOTHING,
         related_name='owned_events'
     )
 
@@ -106,7 +105,8 @@ class Event(models.Model):
     # ВАЖНО: подразделения КСО, где работает пользователь, формирующий мероприятие
     attendant_departments = models.ManyToManyField(
         KsoDepartment,
-        related_name='participated_events'
+        related_name='participated_events',
+        blank=True
     )
 
     # Ответственное структурное подразделение
@@ -114,8 +114,7 @@ class Event(models.Model):
     responsible_department = models.ForeignKey(
         KsoDepartment,
         related_name='owned_events',
-        on_delete=models.SET_NULL,
-        null=True
+        on_delete=models.DO_NOTHING
     )
 
     # Тип мероприятия

@@ -1,9 +1,8 @@
-from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 from .models import Annual, Event
 
 
-class ScheduleSerializer(DynamicFieldsModelSerializer):
+class AnnualSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Annual
         fields = '__all__'
