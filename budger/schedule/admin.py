@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Annual, Event
 
-# Register your models here.
+
+admin.site.register(Annual)
+admin.site.register(Event)
