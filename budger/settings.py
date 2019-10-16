@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'budger.authentication',
     'budger.directory',
-    # 'budger.schedule',
+    'budger.schedule',
 ]
 
 REST_FRAMEWORK = {
