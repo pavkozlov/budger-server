@@ -52,6 +52,7 @@ class KsoDepartment(models.Model):
 
     class Meta:
         ordering = ['title']
+        unique_together = ('kso', 'title',)
 
     def __str__(self):
         return '{}'.format(self.title)
