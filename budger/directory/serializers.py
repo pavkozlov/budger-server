@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 from .models.entity import Entity
-from .models.kso import Kso, KsoDepartment, KsoEmployee
+from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
 class EntitySerializer(DynamicFieldsModelSerializer):
@@ -10,10 +10,17 @@ class EntitySerializer(DynamicFieldsModelSerializer):
         fields = '__all__'
 
 
-class KsoDepartmentSerializer(serializers.ModelSerializer):
+class KsoDepartment1Serializer(serializers.ModelSerializer):
     class Meta:
-        model = KsoDepartment
-        fields = ('id', 'title')
+        model = KsoDepartment1
+        fields = ('id', 'title', 'sub_departments')
+
+    class _KsoDepartment2Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = KsoDepartment1
+            fields = ('id', 'title')
+
+    sub_departments = _KsoDepartment2Serializer(many=True)
 
 
 class KsoSerializer(DynamicFieldsModelSerializer):
@@ -21,7 +28,7 @@ class KsoSerializer(DynamicFieldsModelSerializer):
         model = Kso
         fields = '__all__'
 
-    departments = KsoDepartmentSerializer(many=True)
+    departments = KsoDepartment1Serializer(many=True)
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
@@ -32,7 +39,7 @@ class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
     class _KsoSerializer(serializers.ModelSerializer):
         class Meta:
             model = Kso
-            fields = ['id', 'title_full']
+            fields = ['id', 'title_short', 'title_full']
 
     kso = _KsoSerializer()
 
@@ -40,6 +47,12 @@ class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
 class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
-        fields = '__all__'
+        exclude = ('department2',)
 
-    kso = KsoSerializer()
+    class _KsoSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Kso
+            fields = '__all__'
+
+    kso = _KsoSerializer()
+    department1 = KsoDepartment1Serializer()

@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import date
+from .json_parser import x_departments
 
 
 class KsoEmployeeJsonParser:
@@ -55,11 +56,14 @@ class KsoEmployeeJsonParser:
             'title_short': self.kso_lookup[obj['ID_kso']]
         }
 
+        department1, department2 = x_departments(obj)
+
         if obj.get('name', '').strip() != '':
             return {
                 'kso': kso,
                 'name': obj.get('name', ''),
-                'department': obj.get('otdel', ''),
+                'department1': department1 or kso['title_short'],
+                'department2': department2,
                 'position': obj.get('position', ''),
                 'phone_landline': obj.get('work_phone', ''),
                 'phone_mobile': obj.get('mob_phone', ''),

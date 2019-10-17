@@ -1,6 +1,6 @@
 from django.db import models
 from budger.directory.models.entity import Entity
-from budger.directory.models.kso import Kso, KsoDepartment, KsoEmployee
+from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
 ANNUAL_STATUS_ENUM = [
@@ -104,7 +104,7 @@ class Event(models.Model):
     # Привлекаемые структурные подразделения
     # ВАЖНО: подразделения КСО, где работает пользователь, формирующий мероприятие
     attendant_departments = models.ManyToManyField(
-        KsoDepartment,
+        KsoDepartment1,
         related_name='participated_events',
         blank=True
     )
@@ -112,7 +112,7 @@ class Event(models.Model):
     # Ответственное структурное подразделение
     # ВАЖНО: подразделение КСО, где работает пользователь, формирующий мероприятие
     responsible_department = models.ForeignKey(
-        KsoDepartment,
+        KsoDepartment1,
         related_name='owned_events',
         on_delete=models.DO_NOTHING
     )
