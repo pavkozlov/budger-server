@@ -52,7 +52,7 @@ class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
     class _KsoSerializer(serializers.ModelSerializer):
         class Meta:
             model = Kso
-            fields = '__all__'
+            fields = ('id', 'title_full', 'title_short')
 
     kso = _KsoSerializer()
     department1 = KsoDepartment1Serializer()
