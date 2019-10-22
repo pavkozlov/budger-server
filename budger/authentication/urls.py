@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    ProfileView,
+    EmployeeView,
     LoginView,
     LogoutView
 )
@@ -9,5 +9,5 @@ from .views import (
 urlpatterns = [
     path('login', LoginView.as_view()),
     path('logout', LogoutView.as_view()),
-    path('profile', ProfileView.as_view()),
+    path('employee', EmployeeView.as_view()),
 ]
