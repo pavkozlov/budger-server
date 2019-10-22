@@ -1,11 +1,12 @@
 from rest_framework import views
 from django.contrib.auth.models import User, AnonymousUser, update_last_login
-from .models import Profile
+# from .models import Profile
+from budger.directory.models.kso import KsoEmployee
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
-from .serializers import ProfileSerializer, TokenSerializer
+from .serializers import TokenSerializer, KsoEmployeeSerializer
 
 
 class LoginView(views.APIView):
@@ -44,16 +45,16 @@ class LoginView(views.APIView):
             return Response({'error': 'invalid-credentials'})
 
         try:
-            profile = Profile.objects.get(user=user)
-        except Profile.DoesNotExist:
-            return Response({'error': 'user-does-not-exist'})
+            kso_employee = KsoEmployee.objects.get(user=user)
+        except KsoEmployee.DoesNotExist:
+            return Response({'error': 'user-does-not-have-employee-relation'})
 
         token, _ = Token.objects.get_or_create(user=user)
         update_last_login(None, user)
 
         return Response({
             'token': TokenSerializer(token).data,
-            'profile': ProfileSerializer(profile).data
+            'employee': KsoEmployeeSerializer(kso_employee).data
         })
 
 
@@ -61,37 +62,38 @@ class LogoutView(views.APIView):
     """
     POST Выход пользователя из системы.
     """
+
     def post(self, request):
         request.user.auth_token.delete()
         return Response()
 
 
-class ProfileView(views.APIView):
+class EmployeeView(views.APIView):
     """
-    GET Сведения о текущем пользователе.
-    POST Сохранение данных текущего пользователя:
+    GET Сведения о текущем работнике.
+    POST Сохранение данных текущего работника:
         @last_name
         @first_name
         @second_name
         @position
     """
+
     def get_user(self, request):
         auth_user = request.user
 
         if auth_user is not None and type(auth_user) is not AnonymousUser:
             try:
-                return Profile.objects.get(auth_user=auth_user)
-            except Profile.DoesNotExist:
+                return KsoEmployee.objects.get(user=auth_user)
+            except KsoEmployee.DoesNotExist:
                 pass
 
         return None
 
     def get(self, request):
         user = self.get_user(request)
-
         if user:
             return Response(
-                {'user': ProfileSerializer(user).data}
+                {'user': KsoEmployeeSerializer(user).data}
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
@@ -101,12 +103,10 @@ class ProfileView(views.APIView):
 
         if user and 'user' in request.data:
             user_data = request.data['user']
-            user.last_name = user_data.get('last_name', '')
-            user.first_name = user_data.get('first_name', '')
-            user.second_name = user_data.get('second_name', '')
+            user.name = user_data.get('name', '')
             user.position = user_data.get('position', '')
             user.save()
 
         return Response(
-            {'user': ProfileSerializer(user).data}
+            {'user': KsoEmployeeSerializer(user).data}
         )
