@@ -14,12 +14,12 @@ class Entity(models.Model):
     reg_date = models.DateField()
 
     # Наименование ОПФ
-    opf_full = models.CharField(max_length=100)
+    opf_full = models.CharField(max_length=300)
     opf_code = models.CharField(max_length=10)
 
     # Наименование ЮЛ
-    title_full = models.CharField(max_length=200)
-    title_short = models.CharField(max_length=200)
+    title_full = models.CharField(max_length=300)
+    title_short = models.CharField(max_length=300)
 
     # ИНН, КПП, ОГРН
     inn = models.CharField(max_length=12)
@@ -39,7 +39,7 @@ class Entity(models.Model):
     addr_office = models.CharField(max_length=50, null=True)
 
     # Руководитель
-    head_position = models.CharField(max_length=100)
+    head_position = models.CharField(max_length=300)
     head_name_last = models.CharField(max_length=30)
     head_name_first = models.CharField(max_length=30)
     head_name_second = models.CharField(max_length=30)
