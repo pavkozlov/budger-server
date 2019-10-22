@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Kso(models.Model):
@@ -50,6 +53,9 @@ class KsoDepartment1(models.Model):
     # Наименование
     title = models.CharField(max_length=255)
 
+    # Может принимать участие в проведении мероприятий
+    can_participate_in_events = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['title']
         unique_together = ('kso', 'title',)
@@ -88,6 +94,16 @@ class KsoEmployee(models.Model):
     """
     Работник контрольно-счетной организации
     """
+
+    # Модель пользователя
+    user = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    read_only_fields = (user,)
 
     # Ссылка на организацию
     kso = models.ForeignKey(
