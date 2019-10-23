@@ -26,11 +26,11 @@ class KsoDepartment1Serializer(serializers.ModelSerializer):
 class KsoOgrnField(serializers.RelatedField):
     def to_representation(self, value):
         try:
-            entity = Entity.objects.get(ogrn=value)
-            data = EntitySerializer(entity).data
-            return data
+            obj = Entity.objects.get(ogrn=value)
+            entity = EntitySerializer(obj).data
         except Entity.DoesNotExist:
-            return value
+            entity = None
+        return {'ogrn_number': value, 'entity': entity}
 
 
 class KsoSerializer(DynamicFieldsModelSerializer):
