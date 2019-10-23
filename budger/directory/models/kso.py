@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Kso(models.Model):
@@ -32,6 +30,9 @@ class Kso(models.Model):
 
     # Состоит в СМ КСО
     in_alliance = models.BooleanField()
+
+    # ОГРН
+    ogrn = models.CharField(max_length=13, null=True, blank=True)
 
     class Meta:
         ordering = ['title_full']

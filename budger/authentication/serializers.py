@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 # from budger.directory.serializers import KsoEmployeeSerializer
-# from .models import Profile
 from budger.directory.models.kso import KsoEmployee
 from budger.directory.serializers import KsoSerializer, KsoDepartment1Serializer
 
