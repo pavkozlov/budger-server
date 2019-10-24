@@ -140,6 +140,8 @@ class KsoEmployee(models.Model):
 
     birth_date = models.DateField(null=True, blank=True)
 
+    photo_slug = models.CharField(max_length=100, null=True, blank=True)
+
     class Meta:
         ordering = ['name']
 
