@@ -23,14 +23,14 @@ class KsoDepartment1Serializer(serializers.ModelSerializer):
     sub_departments = _KsoDepartment2Serializer(many=True)
 
 
-class KsoOgrnField(serializers.RelatedField):
+class KsoEntityField(serializers.RelatedField):
     def to_representation(self, value):
         try:
             obj = Entity.objects.get(ogrn=value)
             entity = EntitySerializer(obj).data
         except Entity.DoesNotExist:
             entity = None
-        return {'ogrn_number': value, 'entity': entity}
+        return entity
 
 
 class KsoSerializer(DynamicFieldsModelSerializer):
@@ -38,7 +38,7 @@ class KsoSerializer(DynamicFieldsModelSerializer):
         model = Kso
         fields = '__all__'
 
-    ogrn = KsoOgrnField(read_only=True)
+    entity = KsoEntityField(read_only=True, source='ogrn')
     departments = KsoDepartment1Serializer(many=True)
 
 
