@@ -28,14 +28,7 @@ class KsoSerializer(DynamicFieldsModelSerializer):
         model = Kso
         fields = '__all__'
 
-    def get_entity(self, kso):
-        try:
-            entity = Entity.objects.get(ogrn=kso.ogrn)
-            return EntitySerializer(entity).data
-        except Entity.DoesNotExist:
-            return None
-
-    entity = serializers.SerializerMethodField()
+    entity = EntitySerializer()
     departments = KsoDepartment1Serializer(many=True)
 
 
