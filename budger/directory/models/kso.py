@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from budger.directory.models.entity import Entity
 
 
 class Kso(models.Model):
@@ -31,8 +32,8 @@ class Kso(models.Model):
     # Состоит в СМ КСО
     in_alliance = models.BooleanField()
 
-    # ОГРН
-    ogrn = models.CharField(max_length=13, null=True, blank=True)
+    # ЮЛ
+    entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['title_full']

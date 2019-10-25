@@ -49,5 +49,8 @@ class Entity(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    # Изменения ЮЛ
+    updates = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
