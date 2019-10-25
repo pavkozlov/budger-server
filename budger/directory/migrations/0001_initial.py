@@ -102,6 +102,7 @@ class Migration(migrations.Migration):
                 ('phone_mobile', models.CharField(max_length=200)),
                 ('email', models.CharField(max_length=200)),
                 ('birth_date', models.DateField(null=True)),
+                ('photo_slug', models.CharField(max_length=100, null=True)),
                 ('department1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='directory.KsoDepartment1', null=True, blank=True)),
                 ('department2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='directory.KsoDepartment2', null=True, blank=True)),
                 ('kso', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='employees', to='directory.Kso')),
