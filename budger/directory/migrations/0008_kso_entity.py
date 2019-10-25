@@ -4,7 +4,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def populate_kso(apps, schema_editor):
+def populate_kso_entity(apps, schema_editor):
     """ Добавление entity в KSO """
     Kso = apps.get_model('directory', 'Kso')
     Entity = apps.get_model('directory', 'Entity')
@@ -13,13 +13,12 @@ def populate_kso(apps, schema_editor):
 
     for kso_obj in kso_objects:
         ogrn = kso_obj.ogrn
-        entity = None
         try:
             entity = Entity.objects.get(ogrn=ogrn)
+            kso_obj.entity = entity
+            kso_obj.save()
         except Entity.DoesNotExist:
             pass
-        kso_obj.entity = entity
-        kso_obj.save()
 
 
 class Migration(migrations.Migration):
@@ -34,7 +33,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
                                     to='directory.Entity'),
         ),
-        migrations.RunPython(populate_kso),
+        migrations.RunPython(populate_kso_entity),
         migrations.RemoveField(
             model_name='kso',
             name='ogrn',
