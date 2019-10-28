@@ -52,5 +52,8 @@ class Entity(models.Model):
     # Изменения ЮЛ
     updates = models.TextField(blank=True, null=True)
 
+    # Учредители
+    founders = models.ManyToManyField('self', blank=True, db_index=True)
+
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
