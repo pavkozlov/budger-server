@@ -18,9 +18,9 @@ class Entity(models.Model):
     opf_code = models.CharField(max_length=1000, null=True, blank=True)
 
     # Наименование ЮЛ
-    title_full = models.CharField(max_length=300)
-    title_short = models.CharField(max_length=300, null=True, blank=True)
-    title_search = models.CharField(max_length=601, default='')
+    title_full = models.CharField(max_length=1000)
+    title_short = models.CharField(max_length=1000, null=True, blank=True)
+    title_search = models.CharField(max_length=2001, default='', db_index=True)
 
     # ИНН, КПП, ОГРН
     inn = models.CharField(max_length=12, db_index=True, unique=True)

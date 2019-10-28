@@ -108,7 +108,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entity',
             name='title_short',
-            field=models.CharField(blank=True, max_length=300, null=True),
+            field=models.CharField(blank=True, max_length=1000, null=True),
+        ),
+        migrations.AlterField(
+            model_name='entity',
+            name='title_full',
+            field=models.CharField(max_length=1000),
         ),
         migrations.AlterField(
             model_name='ksoemployee',

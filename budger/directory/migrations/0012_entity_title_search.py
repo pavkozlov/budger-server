@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='entity',
             name='title_search',
-            field=models.CharField(default='', max_length=601),
+            field=models.CharField(default='', max_length=2001, db_index=True),
         ),
     ]
