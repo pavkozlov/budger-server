@@ -28,4 +28,24 @@ class Migration(migrations.Migration):
             name='birth_date',
             field=models.DateField(blank=True, null=True),
         ),
+        migrations.AlterField(
+            model_name='entity',
+            name='head_position',
+            field=models.CharField(max_length=300),
+        ),
+        migrations.AlterField(
+            model_name='entity',
+            name='opf_full',
+            field=models.CharField(max_length=300),
+        ),
+        migrations.AlterField(
+            model_name='entity',
+            name='title_full',
+            field=models.CharField(max_length=300),
+        ),
+        migrations.AlterField(
+            model_name='entity',
+            name='title_short',
+            field=models.CharField(max_length=300),
+        ),
     ]

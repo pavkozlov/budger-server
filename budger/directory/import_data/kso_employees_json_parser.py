@@ -69,6 +69,7 @@ class KsoEmployeeJsonParser:
                 'phone_mobile': obj.get('mob_phone', ''),
                 'email': obj.get('email', ''),
                 'birth_date': get_date('birth_date'),
+                'photo_slug': obj.get('photo', ''),
             }
 
         return None
