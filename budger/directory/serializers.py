@@ -9,6 +9,13 @@ class EntitySerializer(DynamicFieldsModelSerializer):
         model = Entity
         fields = '__all__'
 
+    class _EntitySerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Entity
+            fields = ('id', 'inn', 'title_full', 'title_short')
+
+    founders = _EntitySerializer(many=True)
+
 
 class KsoDepartment1Serializer(serializers.ModelSerializer):
     class Meta:
