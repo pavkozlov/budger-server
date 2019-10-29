@@ -23,7 +23,7 @@ class Entity(models.Model):
     title_search = models.CharField(max_length=2001, default='', db_index=True)
 
     # ИНН, КПП, ОГРН
-    inn = models.CharField(max_length=12, db_index=True, unique=True)
+    inn = models.CharField(max_length=12, db_index=True)
     kpp = models.CharField(max_length=9, null=True, blank=True)
     ogrn = models.CharField(max_length=13)
 

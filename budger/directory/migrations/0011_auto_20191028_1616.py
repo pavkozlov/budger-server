@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entity',
             name='inn',
-            field=models.CharField(db_index=True, unique=True, max_length=12),
+            field=models.CharField(db_index=True, max_length=12),
         ),
         migrations.AlterField(
             model_name='entity',
