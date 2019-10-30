@@ -40,12 +40,17 @@ class KsoSerializer(DynamicFieldsModelSerializer):
         fields = '__all__'
 
     def get_head(self, obj):
-        employee = KsoEmployee.objects.get(kso=obj, is_head=True)
-        return {
-            'name': employee.name,
-            'position': employee.position,
-            'photo_slug': employee.photo_slug
-        }
+        try:
+            employee = KsoEmployee.objects.get(kso=obj, is_head=True)
+            return {
+                'name': employee.name,
+                'position': employee.position,
+                'photo_slug': employee.photo_slug
+            }
+        except KsoEmployee.DoesNotExist:
+            return None
+        except KsoEmployee.MultipleObjectsReturned:
+            return None
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
