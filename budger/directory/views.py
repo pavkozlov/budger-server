@@ -3,7 +3,7 @@ from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
-from .serializers import EntitySerializer, KsoSerializer, KsoEmployeeListSerializer, KsoEmployeeRetrieveSerializer
+from .serializers import EntitySerializer, KsoListSerializer, KsoRetrieveSerializer, KsoEmployeeListSerializer, KsoEmployeeRetrieveSerializer
 from .filters import EntityFilter
 
 
@@ -28,8 +28,8 @@ class KsoListView(DynaFieldsListAPIView):
     """
     GET Список КСО
     """
-    serializer_class = KsoSerializer
-    queryset = Kso.objects.all()
+    serializer_class = KsoListSerializer
+    queryset = Kso.objects.list()
     pagination_class = UnlimitedResultsSetPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['title_search']
@@ -39,7 +39,7 @@ class KsoRetrieveView(generics.RetrieveAPIView):
     """
     GET Сведения о выбранном КСО
     """
-    serializer_class = KsoSerializer
+    serializer_class = KsoRetrieveSerializer
     queryset = Kso.objects.all()
 
 

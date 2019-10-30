@@ -1,12 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from budger.directory.models.entity import Entity
+from ..managers import KsoManager
 
 
 class Kso(models.Model):
     """
     Контрольно-счетная организация
     """
+    objects = KsoManager()
 
     # Наименование изображения с логотипом
     logo = models.CharField(max_length=50)
@@ -24,7 +26,7 @@ class Kso(models.Model):
     phone = models.CharField(max_length=100)
 
     # Численность сотрудников
-    worker_counts_staff = models.IntegerField()
+    worker_count_staff = models.IntegerField()
     worker_count_fact = models.IntegerField()
 
     # Состоит в СМ КСО

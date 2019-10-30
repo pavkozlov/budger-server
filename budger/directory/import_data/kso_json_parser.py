@@ -23,7 +23,7 @@ def transform(obj: dict):
         'www': obj.get('web', ''),
         'email': obj.get('mail', ''),
         'phone': obj.get('phone', ''),
-        'worker_counts_staff': get_int('worker_count'),
+        'worker_count_staff': get_int('worker_count'),
         'worker_count_fact': get_int('worker_count_fact'),
         'in_alliance': get_bool('union')
     }

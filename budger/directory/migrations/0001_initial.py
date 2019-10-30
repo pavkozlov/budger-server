@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('www', models.CharField(max_length=100)),
                 ('email', models.CharField(max_length=100)),
                 ('phone', models.CharField(max_length=100)),
-                ('worker_counts_staff', models.IntegerField()),
+                ('worker_count_staff', models.IntegerField()),
                 ('worker_count_fact', models.IntegerField()),
                 ('in_alliance', models.BooleanField()),
             ],
