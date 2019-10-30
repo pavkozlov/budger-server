@@ -15,9 +15,6 @@ class Kso(models.Model):
     title_full = models.CharField(max_length=200)
     title_short = models.CharField(max_length=200)
 
-    # Руководитель
-    chief_name = models.CharField(max_length=200)
-
     # Адреса и контакты
     addr_legal = models.CharField(max_length=200)
     addr_fact = models.CharField(max_length=200)
@@ -142,6 +139,8 @@ class KsoEmployee(models.Model):
     birth_date = models.DateField(null=True, blank=True)
 
     photo_slug = models.CharField(max_length=100, null=True, blank=True)
+
+    is_head = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         ordering = ['name']

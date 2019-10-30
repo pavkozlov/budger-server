@@ -31,12 +31,21 @@ class KsoDepartment1Serializer(serializers.ModelSerializer):
 
 
 class KsoSerializer(DynamicFieldsModelSerializer):
+    entity = EntitySerializer()
+    departments = KsoDepartment1Serializer(many=True)
+    head = serializers.SerializerMethodField()
+
     class Meta:
         model = Kso
         fields = '__all__'
 
-    entity = EntitySerializer()
-    departments = KsoDepartment1Serializer(many=True)
+    def get_head(self, obj):
+        employee = KsoEmployee.objects.get(kso=obj, is_head=True)
+        return {
+            'name': employee.name,
+            'position': employee.position,
+            'photo_slug': employee.photo_slug
+        }
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
