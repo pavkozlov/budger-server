@@ -12,8 +12,9 @@ class Kso(models.Model):
     logo = models.CharField(max_length=50)
 
     # Название
-    title_full = models.CharField(max_length=200)
-    title_short = models.CharField(max_length=200)
+    title_full = models.CharField(max_length=1000)
+    title_short = models.CharField(max_length=1000)
+    title_search = models.CharField(max_length=2001)
 
     # Адреса и контакты
     addr_legal = models.CharField(max_length=200)
