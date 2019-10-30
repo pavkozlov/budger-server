@@ -55,6 +55,7 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
         try:
             employee = KsoEmployee.objects.get(kso=obj, is_head=True)
             return {
+                'id': employee.id,
                 'name': employee.name,
                 'position': employee.position,
                 'photo_slug': employee.photo_slug
