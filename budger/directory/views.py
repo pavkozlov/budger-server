@@ -4,21 +4,21 @@ from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 from .serializers import EntitySerializer, KsoSerializer, KsoEmployeeListSerializer, KsoEmployeeRetrieveSerializer
+from .filters import EntityFilter
 
 
 class EntityListView(DynaFieldsListAPIView):
     """
-    GET Список организаций из ЕГРЮЛ
+    GET Список организаций из ЕГРЮЛ/ЕГРИП
     """
     serializer_class = EntitySerializer
+    filter_backends = [EntityFilter]
     queryset = Entity.objects.all()
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title_full', 'title_short', 'inn']
 
 
 class EntityRetrieveView(generics.RetrieveAPIView):
     """
-    GET Сведения об организации из ЕГРЮЛ
+    GET Сведения об организации из ЕГРЮЛ/ЕГРИП
     """
     serializer_class = EntitySerializer
     queryset = Entity.objects.all()
@@ -32,7 +32,7 @@ class KsoListView(DynaFieldsListAPIView):
     queryset = Kso.objects.all()
     pagination_class = UnlimitedResultsSetPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['title_full', 'title_short']
+    search_fields = ['title_search']
 
 
 class KsoRetrieveView(generics.RetrieveAPIView):
@@ -41,7 +41,6 @@ class KsoRetrieveView(generics.RetrieveAPIView):
     """
     serializer_class = KsoSerializer
     queryset = Kso.objects.all()
-    filter_backends = [filters.SearchFilter]
 
 
 class KsoEmployeeListView(DynaFieldsListAPIView):
@@ -79,4 +78,3 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
     serializer_class = KsoEmployeeRetrieveSerializer
     queryset = KsoEmployee.objects.all()
-    filter_backends = [filters.SearchFilter]
