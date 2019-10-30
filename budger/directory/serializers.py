@@ -45,10 +45,11 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
     entity = EntitySerializer()
     departments = KsoDepartment1Serializer(many=True)
     head = serializers.SerializerMethodField()
+    worker_count_fact = serializers.SerializerMethodField()
 
     class Meta:
         model = Kso
-        fields = '__all__'
+        exclude = ('title_search',)
 
     def get_head(self, obj):
         try:
@@ -62,6 +63,10 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
             return None
         except KsoEmployee.MultipleObjectsReturned:
             return None
+
+    def get_worker_count_fact(self, obj):
+        employees = KsoEmployee.objects.filter(kso=obj).count()
+        return employees
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
