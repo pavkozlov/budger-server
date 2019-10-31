@@ -4,17 +4,26 @@ from .models.entity import Entity
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
-class EntitySerializer(DynamicFieldsModelSerializer):
+class EntityListSerializer(DynamicFieldsModelSerializer):
+    class Meta:
+        model = Entity
+        fields = (
+            'id', 'reg_date', 'title_full', 'inn', 'ogrn',
+            'head_position', 'head_name_last', 'head_name_first', 'head_name_second'
+        )
+
+
+class EntityRetrieveSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Entity
         fields = '__all__'
 
-    class _EntitySerializer(serializers.ModelSerializer):
+    class _FounderSerializer(serializers.ModelSerializer):
         class Meta:
             model = Entity
             fields = ('id', 'inn', 'title_full', 'title_short')
 
-    founders = _EntitySerializer(many=True)
+    founders = _FounderSerializer(many=True)
 
 
 class KsoDepartment1Serializer(serializers.ModelSerializer):
@@ -42,7 +51,7 @@ class KsoListSerializer(serializers.ModelSerializer):
 
 
 class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
-    entity = EntitySerializer()
+    entity = EntityRetrieveSerializer()
     departments = KsoDepartment1Serializer(many=True)
     head = serializers.SerializerMethodField()
     worker_count_fact = serializers.SerializerMethodField()

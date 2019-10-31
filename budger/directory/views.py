@@ -3,7 +3,14 @@ from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
-from .serializers import EntitySerializer, KsoListSerializer, KsoRetrieveSerializer, KsoEmployeeListSerializer, KsoEmployeeRetrieveSerializer
+from .serializers import (
+    EntityListSerializer,
+    EntityRetrieveSerializer,
+    KsoListSerializer,
+    KsoRetrieveSerializer,
+    KsoEmployeeListSerializer,
+    KsoEmployeeRetrieveSerializer
+)
 from .filters import EntityFilter
 
 
@@ -11,7 +18,7 @@ class EntityListView(DynaFieldsListAPIView):
     """
     GET Список организаций из ЕГРЮЛ/ЕГРИП
     """
-    serializer_class = EntitySerializer
+    serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
     queryset = Entity.objects.all()
 
@@ -20,7 +27,7 @@ class EntityRetrieveView(generics.RetrieveAPIView):
     """
     GET Сведения об организации из ЕГРЮЛ/ЕГРИП
     """
-    serializer_class = EntitySerializer
+    serializer_class = EntityRetrieveSerializer
     queryset = Entity.objects.all()
 
 
