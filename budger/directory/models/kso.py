@@ -25,9 +25,8 @@ class Kso(models.Model):
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
 
-    # Численность сотрудников
-    worker_count_staff = models.IntegerField()
-    worker_count_fact = models.IntegerField()
+    # Численность сотрудников штатная
+    employees_count_staff = models.IntegerField()
 
     # Состоит в СМ КСО
     in_alliance = models.BooleanField()

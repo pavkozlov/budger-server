@@ -11,7 +11,7 @@ class KsoManager(models.Manager):
                     directory_kso.id,
                     directory_kso.title_full,
                     directory_kso.in_alliance,
-                    directory_kso.worker_count_staff,
+                    directory_kso.employees_count_staff,
                     COUNT(emp_1.*),
 
                     emp_2.id,
@@ -37,9 +37,9 @@ class KsoManager(models.Manager):
                     id=row[0],
                     title_full=row[1],
                     in_alliance=row[2],
-                    worker_count_staff=row[3],
-                    worker_count_fact=row[4]
+                    employees_count_staff=row[3],
                 )
+                m.employees_count_fact = row[4]
                 m.head = {
                     'id': row[5],
                     'name': row[6],

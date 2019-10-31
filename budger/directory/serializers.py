@@ -41,12 +41,13 @@ class KsoDepartment1Serializer(serializers.ModelSerializer):
 
 class KsoListSerializer(serializers.ModelSerializer):
     head = serializers.DictField()
+    employees_count_fact = serializers.IntegerField()
 
     class Meta:
         model = Kso
         fields = (
-            'id', 'title_full', 'worker_count_fact',
-            'worker_count_staff', 'in_alliance', 'head'
+            'id', 'title_full', 'head', 'in_alliance',
+            'employees_count_staff', 'employees_count_fact'
         )
 
 
@@ -54,7 +55,7 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
     entity = EntityRetrieveSerializer()
     departments = KsoDepartment1Serializer(many=True)
     head = serializers.SerializerMethodField()
-    worker_count_fact = serializers.SerializerMethodField()
+    employees_count_fact = serializers.SerializerMethodField()
 
     class Meta:
         model = Kso
@@ -74,9 +75,9 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
         except KsoEmployee.MultipleObjectsReturned:
             return None
 
-    def get_worker_count_fact(self, obj):
-        employees = KsoEmployee.objects.filter(kso=obj).count()
-        return employees
+    def get_employees_count_fact(self, obj):
+        count = KsoEmployee.objects.filter(kso=obj).count()
+        return count
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
