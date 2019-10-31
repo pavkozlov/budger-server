@@ -20,16 +20,14 @@ CREATE FUNCTION kso_save() RETURNS trigger AS $kso_save$
 
 	DECLARE
     	title_full              VARCHAR(1000);
-    	title_short             VARCHAR(1000);
 
     BEGIN
     	IF NEW.entity_id IS NOT NULL THEN
-    		SELECT directory_entity.title_full, directory_entity.title_short INTO title_full, title_short
+    		SELECT directory_entity.title_full INTO title_full
     		    FROM directory_entity WHERE id = NEW.entity_id;
     		NEW.title_full := title_full;
-    		NEW.title_short := title_short;
 	    END IF;
-	    NEW.title_search := UPPER(CONCAT(NEW.title_full, ' ', NEW.title_short));
+		NEW.title_search := UPPER(CONCAT(NEW.title_full, ' ', NEW.title_short));
         RETURN NEW;
     END;
 $kso_save$ LANGUAGE plpgsql;

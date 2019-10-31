@@ -9,7 +9,7 @@ class KsoManager(models.Manager):
             sql = '''
                 SELECT
                     directory_kso.id,
-                    directory_kso.title_full,
+                    directory_kso.title_short,
                     directory_kso.in_alliance,
                     directory_kso.employees_count_staff,
                     COUNT(emp_1.*),
@@ -35,7 +35,7 @@ class KsoManager(models.Manager):
             for row in cursor.fetchall():
                 m = self.model(
                     id=row[0],
-                    title_full=row[1],
+                    title_short=row[1],
                     in_alliance=row[2],
                     employees_count_staff=row[3],
                 )

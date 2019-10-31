@@ -53,8 +53,9 @@ class KsoRetrieveView(generics.RetrieveAPIView):
 class KsoEmployeeListView(DynaFieldsListAPIView):
     """
     GET Список сотрудников КСО.
-    @search - поиск по полю 'name'
-    @kso_id - фильтр по полю kso.id
+    @_filter__title - поиск по полям 'title_full', 'title_short'
+    @_filter__inn - фильтр по полю inn
+    @_filter__kso_id - фильтр по полю kso.id
     """
     serializer_class = KsoEmployeeListSerializer
     filter_backends = [filters.SearchFilter]
