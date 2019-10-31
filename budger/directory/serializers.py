@@ -46,7 +46,7 @@ class KsoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Kso
         fields = (
-            'id', 'title_full', 'head', 'in_alliance',
+            'id', 'title_short', 'head', 'in_alliance',
             'employees_count_staff', 'employees_count_fact'
         )
 
