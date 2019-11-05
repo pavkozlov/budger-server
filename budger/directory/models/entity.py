@@ -11,6 +11,9 @@ class Entity(models.Model):
     # Дата регистрации
     reg_date = models.DateField()
 
+    # Дата прекращения
+    term_date = models.DateField(null=True, blank=True)
+
     # Наименование ОПФ
     opf_full = models.CharField(max_length=300, null=True, blank=True)
     opf_code = models.CharField(max_length=1000, null=True, blank=True)
