@@ -62,11 +62,11 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        queryset = KsoEmployee.objects.all()
+        queryset = KsoEmployee.objects.order_by('name')
 
         kso_id = self.request.query_params.get('kso_id', None)
         if kso_id is not None:
-            queryset = queryset.filter(kso__id=kso_id)
+            queryset = queryset.filter(kso__id=kso_id).order_by('name')
 
         return queryset
 
