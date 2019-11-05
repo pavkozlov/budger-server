@@ -18,13 +18,6 @@ class EntityRetrieveSerializer(DynamicFieldsModelSerializer):
         model = Entity
         fields = '__all__'
 
-    class _FounderSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Entity
-            fields = ('id', 'inn', 'title_full', 'title_short')
-
-    founders = _FounderSerializer(many=True)
-
 
 class KsoDepartment1Serializer(serializers.ModelSerializer):
     class Meta:

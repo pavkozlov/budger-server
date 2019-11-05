@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 
 class Entity(models.Model):
@@ -6,9 +7,6 @@ class Entity(models.Model):
     Юридическое лицо | индивидуальный предприниматель.
     Данные импортируются из справочника ЕГРЮЛ.
     """
-
-    class Meta:
-        ordering = ['title_full']
 
     # Дата регистрации
     reg_date = models.DateField()
@@ -54,7 +52,10 @@ class Entity(models.Model):
     updates = models.TextField(blank=True, null=True)
 
     # Учредители
-    founders = models.ManyToManyField('self', blank=True)
+    founders = ArrayField(models.CharField(max_length=12), blank=True, null=True)
+
+    class Meta:
+        ordering = ['title_full']
 
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
