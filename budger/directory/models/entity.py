@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 
 
 class Entity(models.Model):
@@ -62,3 +62,8 @@ class Entity(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
+
+
+class FounderTree(models.Model):
+    entity = models.OneToOneField(Entity, on_delete=models.CASCADE)
+    tree = JSONField()
