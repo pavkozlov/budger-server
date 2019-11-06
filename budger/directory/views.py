@@ -1,3 +1,7 @@
+"""
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+"""
 from rest_framework import generics, filters
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoEmployee
@@ -21,6 +25,12 @@ class EntityListView(DynaFieldsListAPIView):
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
     queryset = Entity.objects.all()
+
+    """
+    @method_decorator(cache_page(60 * 60 * 2))
+    def list(self, request):
+        return super().list(request)
+    """
 
 
 class EntityRetrieveView(generics.RetrieveAPIView):
