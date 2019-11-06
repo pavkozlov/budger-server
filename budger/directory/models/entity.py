@@ -64,6 +64,6 @@ class Entity(models.Model):
         return '{} - {}'.format(self.inn, self.title_full)
 
 
-class FounderTree(models.Model):
+class FoundersTree(models.Model):
     entity = models.OneToOneField(Entity, on_delete=models.CASCADE)
-    tree = JSONField()
+    data = JSONField()
