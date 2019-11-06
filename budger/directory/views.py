@@ -1,5 +1,5 @@
-from rest_framework import generics, filters
-from budger.directory.models.entity import Entity
+from rest_framework import generics, filters, response
+from budger.directory.models.entity import Entity, FoundersTree
 from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
@@ -9,7 +9,8 @@ from .serializers import (
     KsoListSerializer,
     KsoRetrieveSerializer,
     KsoEmployeeListSerializer,
-    KsoEmployeeRetrieveSerializer
+    KsoEmployeeRetrieveSerializer,
+    FoundersTreeSerialiser,
 )
 from .filters import EntityFilter
 
@@ -86,3 +87,10 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
     serializer_class = KsoEmployeeRetrieveSerializer
     queryset = KsoEmployee.objects.all()
+
+
+class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):
+    def retrieve(self, request, *args, **kwargs):
+        entity_id = kwargs['pk']
+        founders_tree = FoundersTree.objects.get(entity_id=entity_id)
+        return response.Response(founders_tree.data)

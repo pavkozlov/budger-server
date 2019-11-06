@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
-from .models.entity import Entity
+from .models.entity import Entity, FoundersTree
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
@@ -98,3 +98,11 @@ class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
 
     kso = _KsoSerializer()
     department1 = KsoDepartment1Serializer()
+
+
+class FoundersTreeSerialiser(serializers.ModelSerializer):
+    data = serializers.JSONField()
+
+    class Meta:
+        model = FoundersTree
+        fields = '__all__'
