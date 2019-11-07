@@ -35,7 +35,7 @@ class EntityListView(DynaFieldsListAPIView):
 
 class EntityRetrieveView(generics.RetrieveAPIView):
     """
-    GET Сведения об организации из ЕГРЮЛ/ЕГРИП
+    GET Сведения об организации из ЕГРЮЛ/ЕГРИП.
     """
     serializer_class = EntityRetrieveSerializer
     queryset = Entity.objects.all()
@@ -43,7 +43,7 @@ class EntityRetrieveView(generics.RetrieveAPIView):
 
 class KsoListView(DynaFieldsListAPIView):
     """
-    GET Список КСО
+    GET Список КСО.
     """
     serializer_class = KsoListSerializer
     queryset = Kso.objects.list()
@@ -54,7 +54,7 @@ class KsoListView(DynaFieldsListAPIView):
 
 class KsoRetrieveView(generics.RetrieveAPIView):
     """
-    GET Сведения о выбранном КСО
+    GET Сведения о выбранном КСО.
     """
     serializer_class = KsoRetrieveSerializer
     queryset = Kso.objects.all()
@@ -63,8 +63,6 @@ class KsoRetrieveView(generics.RetrieveAPIView):
 class KsoEmployeeListView(DynaFieldsListAPIView):
     """
     GET Список сотрудников КСО.
-    @_filter__title - поиск по полям 'title_full', 'title_short'
-    @_filter__inn - фильтр по полю inn
     @_filter__kso_id - фильтр по полю kso.id
     """
     serializer_class = KsoEmployeeListSerializer
@@ -80,12 +78,6 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
 
         return queryset
 
-    def options(self, request, *args, **kwargs):
-        meta = self.metadata_class()
-        data = meta.determine_metadata(request, self)
-        data.pop('description')
-        return data
-
 
 class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
@@ -96,6 +88,9 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
 
 
 class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):
+    """
+    GET Граф дочерних ЮЛ, учрежденных выбранным ЮЛ и его потомками.
+    """
     def retrieve(self, request, *args, **kwargs):
         entity_id = kwargs['pk']
         founders_tree = FoundersTree.objects.get(entity_id=entity_id)
