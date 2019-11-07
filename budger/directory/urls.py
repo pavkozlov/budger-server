@@ -16,6 +16,4 @@ urlpatterns = [
 
     path('kso-employee', KsoEmployeeListView.as_view()),
     path('kso-employee/<int:pk>', KsoEmployeeRetrieveView.as_view()),
-
-
 ]
