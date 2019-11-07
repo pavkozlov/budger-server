@@ -2,8 +2,8 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
-from rest_framework import generics, filters
-from budger.directory.models.entity import Entity
+from rest_framework import generics, filters, response
+from budger.directory.models.entity import Entity, FoundersTree
 from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
@@ -13,7 +13,7 @@ from .serializers import (
     KsoListSerializer,
     KsoRetrieveSerializer,
     KsoEmployeeListSerializer,
-    KsoEmployeeRetrieveSerializer
+    KsoEmployeeRetrieveSerializer,
 )
 from .filters import EntityFilter
 
@@ -81,9 +81,6 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
         return queryset
 
     def options(self, request, *args, **kwargs):
-        """
-        Don't include the view description in OPTIONS responses.
-        """
         meta = self.metadata_class()
         data = meta.determine_metadata(request, self)
         data.pop('description')
@@ -96,3 +93,10 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
     serializer_class = KsoEmployeeRetrieveSerializer
     queryset = KsoEmployee.objects.all()
+
+
+class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):
+    def retrieve(self, request, *args, **kwargs):
+        entity_id = kwargs['pk']
+        founders_tree = FoundersTree.objects.get(entity_id=entity_id)
+        return response.Response(founders_tree.data)

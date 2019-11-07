@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
-from .models.entity import Entity
+from .models.entity import Entity, FoundersTree
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
