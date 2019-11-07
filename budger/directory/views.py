@@ -1,3 +1,7 @@
+"""
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+"""
 from rest_framework import generics, filters, response
 from budger.directory.models.entity import Entity, FoundersTree
 from budger.directory.models.kso import Kso, KsoEmployee
@@ -10,7 +14,6 @@ from .serializers import (
     KsoRetrieveSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeRetrieveSerializer,
-    FoundersTreeSerialiser,
 )
 from .filters import EntityFilter
 
@@ -22,6 +25,12 @@ class EntityListView(DynaFieldsListAPIView):
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
     queryset = Entity.objects.all()
+
+    """
+    @method_decorator(cache_page(60 * 60 * 2))
+    def list(self, request):
+        return super().list(request)
+    """
 
 
 class EntityRetrieveView(generics.RetrieveAPIView):
@@ -72,9 +81,6 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
         return queryset
 
     def options(self, request, *args, **kwargs):
-        """
-        Don't include the view description in OPTIONS responses.
-        """
         meta = self.metadata_class()
         data = meta.determine_metadata(request, self)
         data.pop('description')

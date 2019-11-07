@@ -98,11 +98,3 @@ class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
 
     kso = _KsoSerializer()
     department1 = KsoDepartment1Serializer()
-
-
-class FoundersTreeSerialiser(serializers.ModelSerializer):
-    data = serializers.JSONField()
-
-    class Meta:
-        model = FoundersTree
-        fields = '__all__'
