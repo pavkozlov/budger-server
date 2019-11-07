@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('directory', '0002_auto_20191017_1219'),
+        ('directory', '0001_initial'),
     ]
 
     operations = [
