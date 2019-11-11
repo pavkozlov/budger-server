@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
 from rest_framework import generics, filters, response
-from budger.directory.models.entity import Entity, FoundersTree
+from budger.directory.models.entity import Entity, EntitySubordinates
 from budger.directory.models.kso import Kso, KsoEmployee
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
@@ -93,5 +93,5 @@ class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):
     """
     def retrieve(self, request, *args, **kwargs):
         entity_id = kwargs['pk']
-        founders_tree = FoundersTree.objects.get(entity_id=entity_id)
-        return response.Response(founders_tree.data)
+        subordinates = EntitySubordinates.objects.get(entity_id=entity_id)
+        return response.Response(subordinates.data)
