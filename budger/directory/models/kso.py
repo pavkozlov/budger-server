@@ -144,6 +144,8 @@ class KsoEmployee(models.Model):
 
     is_head = models.BooleanField(default=False, db_index=True)
 
+    can_be_responsible = models.BooleanField(default=False, db_index=True)
+
     class Meta:
         ordering = ['name']
 

@@ -77,7 +77,7 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Статус мероприятия
-    status = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_STATUS_ENUM)
+    status = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_STATUS_ENUM, blank=True, null=True)
 
     # Вид мероприятия
     type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
@@ -118,7 +118,7 @@ class Event(models.Model):
     )
 
     # Тип мероприятия
-    mode = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_MODE_ENUM)
+    mode = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_MODE_ENUM, blank=True, null=True)
 
     # Вид контроля
     inspection = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_INSPECTION_ENUM)
@@ -127,7 +127,7 @@ class Event(models.Model):
     form = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_FORM_ENUM)
 
     # Метод проведения мероприятия
-    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM)
+    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM, blank=True, null=True)
 
     # Основание мероприятия
     reason = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_REASON_ENUM)
@@ -145,13 +145,18 @@ class Event(models.Model):
     attendant_experts = models.TextField(null=True)
 
     # Фонд рабочего времени (человекочасы)
-    working_time = models.PositiveSmallIntegerField()
+    working_time = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # Объект контроля
     controlled_entities = models.ManyToManyField(Entity, db_index=True)
 
     # КСО, принимающие участие в мероприятии (когда тип мероприятия параллельный или совместный)
-    attendant_kso = models.ManyToManyField(Kso, db_index=True)
+    attendant_kso = models.ManyToManyField(Kso, db_index=True, blank=True)
+
+    # Реквизиты обращения
+    appeal_author = models.CharField(max_length=200, db_index=True, blank=True, null=True)
+    appeal_number = models.CharField(max_length=50, db_index=True, blank=True, null=True)
+    appeal_date = models.DateField(db_index=True, blank=True, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.exec_from, self.exec_to)
