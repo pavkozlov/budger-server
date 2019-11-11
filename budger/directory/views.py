@@ -2,7 +2,7 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
-from rest_framework import generics, filters, response
+from rest_framework import generics, filters, response, views
 from budger.directory.models.entity import Entity, FoundersTree
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
@@ -14,8 +14,8 @@ from .serializers import (
     KsoRetrieveSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeRetrieveSerializer,
-    KsoResponsibleEmployeeListSerializer,
-    KsoResponsibleDepartment1Serializer,
+    KsoResponsiblesEmployeeSerializer,
+    KsoResponsiblesDepartment1Serializer,
 )
 from .filters import EntityFilter
 
@@ -89,20 +89,19 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     queryset = KsoEmployee.objects.all()
 
 
-class KsoResponsibleListView(generics.ListAPIView):
+class KsoResponsiblesView(views.APIView):
     """
-    GET Список всех сотрудников КСО и подразделений, имеющих право принимать участие в проведении мероприятий
+    GET Список всех сотрудников КСО и подразделений, имеющих право являться отвестсвенными за мероприятия
     """
-
-    def list(self, request, *args, **kwargs):
+    def get(self, request):
         result = {}
         kso = request.user.ksoemployee.kso
 
-        responsible_employers = KsoEmployee.objects.filter(kso=kso)
-        responsible_departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
+        employees = KsoEmployee.objects.filter(kso=kso, can_be_responsible=True)
+        departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
 
-        result['responsible_departments'] = KsoResponsibleDepartment1Serializer(responsible_departments, many=True).data
-        result['responsible_employers'] = KsoResponsibleEmployeeListSerializer(responsible_employers, many=True).data
+        result['departments'] = KsoResponsiblesDepartment1Serializer(departments, many=True).data
+        result['employees'] = KsoResponsiblesEmployeeSerializer(employees, many=True).data
 
         return response.Response(result)
 
