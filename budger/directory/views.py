@@ -2,9 +2,9 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
-from rest_framework import generics, filters, response
+from rest_framework import generics, filters, response, views
 from budger.directory.models.entity import Entity, FoundersTree
-from budger.directory.models.kso import Kso, KsoEmployee
+from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 from .serializers import (
@@ -14,6 +14,8 @@ from .serializers import (
     KsoRetrieveSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeRetrieveSerializer,
+    KsoResponsiblesEmployeeSerializer,
+    KsoResponsiblesDepartment1Serializer,
 )
 from .filters import EntityFilter
 
@@ -85,6 +87,23 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
     serializer_class = KsoEmployeeRetrieveSerializer
     queryset = KsoEmployee.objects.all()
+
+
+class KsoResponsiblesView(views.APIView):
+    """
+    GET Список всех сотрудников КСО и подразделений, имеющих право являться отвестсвенными за мероприятия
+    """
+    def get(self, request):
+        result = {}
+        kso = request.user.ksoemployee.kso
+
+        employees = KsoEmployee.objects.filter(kso=kso, can_be_responsible=True)
+        departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
+
+        result['departments'] = KsoResponsiblesDepartment1Serializer(departments, many=True).data
+        result['employees'] = KsoResponsiblesEmployeeSerializer(employees, many=True).data
+
+        return response.Response(result)
 
 
 class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):

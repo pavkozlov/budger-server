@@ -2,9 +2,8 @@ from django.urls import path
 from .views import (
     EntityListView, EntityRetrieveView,
     KsoListView, KsoRetrieveView,
-    KsoEmployeeListView, KsoEmployeeRetrieveView, EntityFoundersTreeRetrieveView
+    KsoEmployeeListView, KsoEmployeeRetrieveView, EntityFoundersTreeRetrieveView, KsoResponsiblesView
 )
-
 
 urlpatterns = [
     path('entity', EntityListView.as_view()),
@@ -12,6 +11,7 @@ urlpatterns = [
     path('entity/<int:pk>/children', EntityFoundersTreeRetrieveView.as_view()),
 
     path('kso', KsoListView.as_view()),
+    path('kso/responsibles', KsoResponsiblesView.as_view()),
     path('kso/<int:pk>', KsoRetrieveView.as_view()),
 
     path('kso-employee', KsoEmployeeListView.as_view()),

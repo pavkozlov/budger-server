@@ -86,6 +86,18 @@ class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
     kso = _KsoSerializer()
 
 
+class KsoResponsiblesEmployeeSerializer(DynamicFieldsModelSerializer):
+    class Meta:
+        model = KsoEmployee
+        fields = ('id', 'name')
+
+
+class KsoResponsiblesDepartment1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoDepartment1
+        fields = ('id', 'title')
+
+
 class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
