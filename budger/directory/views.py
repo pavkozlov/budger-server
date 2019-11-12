@@ -3,7 +3,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
 
-from rest_framework import generics, filters, response, views
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, filters, response, status, views
 from budger.directory.models.entity import Entity, EntitySubordinates
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
@@ -23,7 +24,7 @@ from .filters import EntityFilter
 
 class EntityListView(DynaFieldsListAPIView):
     """
-    GET Список организаций из ЕГРЮЛ/ЕГРИП
+    GET Список объектов контроля
     """
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
@@ -38,7 +39,7 @@ class EntityListView(DynaFieldsListAPIView):
 
 class EntityRetrieveView(generics.RetrieveAPIView):
     """
-    GET Сведения об организации из ЕГРЮЛ/ЕГРИП.
+    GET Сведения об объекте контроля.
     """
     serializer_class = EntityRetrieveSerializer
     queryset = Entity.objects.all()
@@ -92,26 +93,33 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
 
 class KsoResponsiblesView(views.APIView):
     """
-    GET Список всех сотрудников КСО и подразделений, имеющих право являться отвестсвенными за мероприятия
+    GET Список сотрудников и подразделений КСО, могущих являться отвестсвенными за мероприятия
     """
     def get(self, request):
-        result = {}
         kso = request.user.ksoemployee.kso
 
         employees = KsoEmployee.objects.filter(kso=kso, can_be_responsible=True)
         departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
 
-        result['departments'] = KsoResponsiblesDepartment1Serializer(departments, many=True).data
-        result['employees'] = KsoResponsiblesEmployeeSerializer(employees, many=True).data
+        return response.Response({
+            'departments': KsoResponsiblesDepartment1Serializer(departments, many=True).data,
+            'employees': KsoResponsiblesEmployeeSerializer(employees, many=True).data
+        })
 
-        return response.Response(result)
 
-
-class EntityFoundersTreeRetrieveView(generics.RetrieveAPIView):
+class EntitySubordinatesView(views.APIView):
     """
-    GET Граф дочерних ЮЛ, учрежденных выбранным ЮЛ и его потомками.
+    GET Граф подчиненных объектов котроля.
+    @inn -- ИНН объекта, для которого требуется вывести граф.
     """
-    def retrieve(self, request, *args, **kwargs):
-        entity_id = kwargs['pk']
-        subordinates = EntitySubordinates.objects.get(entity_id=entity_id)
-        return response.Response(subordinates.data)
+    def get(self, request):
+        if 'inn' not in request.query_params:
+            return response.Response(
+                {"detail": "@inn не определен."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        inn = request.query_params['inn']
+        entity = get_object_or_404(Entity, inn=inn)
+        subordinates = EntitySubordinates.objects.get(entity_id=entity.id)
+        return response.Response(subordinates.tree)
