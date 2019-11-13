@@ -42,7 +42,7 @@ class Entity(models.Model):
 
     # Наименование и код ОПФ
     opf_title = models.CharField(max_length=250, null=True, blank=True)
-    opf_code = models.CharField(max_length=5, null=True, blank=True)
+    opf_code = models.CharField(max_length=5, null=True, blank=True, db_index=True)
 
     # Код и Наименование по ОКФС
     okfs_title = models.CharField(max_length=250)
@@ -87,7 +87,7 @@ class Entity(models.Model):
     head_accession_date = models.DateField(null=True, blank=True)
 
     # Код статуса организации.
-    org_status_code = models.CharField(max_length=1, choices=ORG_STATUS_ENUM)
+    org_status_code = models.CharField(max_length=1, choices=ORG_STATUS_ENUM, db_index=True)
 
     # Изменения ЮЛ (берется из ЕГРЮЛ)
     updates = models.TextField(blank=True, null=True)
