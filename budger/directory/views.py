@@ -125,11 +125,10 @@ class EntitySubordinatesView(views.APIView):
         return response.Response(subordinates.tree)
 
 
-class EntityMunicipalsView(views.APIView):
+class EntityMunicipalsView(DynaFieldsListAPIView):
     """
     GET Список муниципальных объектов контроля.
     """
-    def get(self, request):
-        entities = Entity.objects.filter(opf_code__startswith=754, org_status_code=1)
-        entities_serializer = EntityListSerializer(entities, many=True)
-        return response.Response(entities_serializer.data)
+    serializer_class = EntityListSerializer
+    filter_backends = [EntityFilter]
+    queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code=1)
