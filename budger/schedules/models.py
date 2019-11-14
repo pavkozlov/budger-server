@@ -114,7 +114,7 @@ class Event(models.Model):
     responsible_department = models.ForeignKey(
         KsoDepartment1,
         related_name='owned_events',
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING, null=True, blank=True
     )
 
     # Тип мероприятия
