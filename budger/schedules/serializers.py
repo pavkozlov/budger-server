@@ -1,6 +1,7 @@
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 from .models import Annual, Event
 from rest_framework import serializers
+from budger.directory.serializers import EntityListShortSerializer
 
 
 class AnnualSerializer(DynamicFieldsModelSerializer):
@@ -10,6 +11,8 @@ class AnnualSerializer(DynamicFieldsModelSerializer):
 
 
 class EventSerializer(DynamicFieldsModelSerializer):
+    controlled_entities = EntityListShortSerializer(many=True)
+
     class Meta:
         model = Event
         fields = '__all__'
