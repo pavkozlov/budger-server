@@ -148,7 +148,7 @@ class Event(models.Model):
     working_time = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # Объект контроля
-    controlled_entities = models.ManyToManyField(Entity, db_index=True)
+    controlled_entities = models.ManyToManyField(Entity, db_index=True, blank=True)
 
     # КСО, принимающие участие в мероприятии (когда тип мероприятия параллельный или совместный)
     attendant_kso = models.ManyToManyField(Kso, db_index=True, blank=True)
