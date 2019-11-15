@@ -144,8 +144,10 @@ class EntityMunicipalsView(DynaFieldsListAPIView):
     """
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
-    # queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code__in=[1, 4])
+    queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code__in=[1, 4])
+    """
     queryset = Entity.objects.filter(
         title_full__istartswith='АДМИНИСТРАЦИЯ ГОРОДСКОГО ОКРУГА ',
         org_status_code__in=[1, 4]
     )
+    """
