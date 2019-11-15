@@ -1,7 +1,7 @@
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 from .models import Annual, Event
 from rest_framework import serializers
-from budger.directory.serializers import EntityListShortSerializer
+from budger.directory.serializers import EntityListShortSerializer, KsoDepartment1Serializer
 
 
 class AnnualSerializer(DynamicFieldsModelSerializer):
@@ -11,11 +11,18 @@ class AnnualSerializer(DynamicFieldsModelSerializer):
 
 
 class EventSerializer(DynamicFieldsModelSerializer):
-    controlled_entities = EntityListShortSerializer(many=True)
+    responsible_department_obj = serializers.SerializerMethodField()
+    controlled_entities_obj = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
         fields = '__all__'
+
+    def get_responsible_department_obj(self, obj):
+        return KsoDepartment1Serializer(obj.responsible_department).data
+
+    def get_controlled_entities_obj(self, obj):
+        return EntityListShortSerializer(obj.controlled_entities, many=True).data
 
     def validate(self, attrs):
         if attrs['reason'] == 2:
