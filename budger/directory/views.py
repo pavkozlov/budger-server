@@ -107,7 +107,7 @@ class KsoResponsiblesView(views.APIView):
         })
 
 
-class EntitySubordinatesView(views.APIView):
+class EntitySubordinatesView2Delete(views.APIView):
     """
     GET Граф подчиненных объектов котроля.
     @inn -- ИНН объекта, для которого требуется вывести граф.
@@ -125,10 +125,27 @@ class EntitySubordinatesView(views.APIView):
         return response.Response(subordinates.tree)
 
 
+class EntitySubordinatesView(views.APIView):
+    lookup_field = 'ofk_code'
+
+    """
+    GET Граф подчиненных объектов контроля.
+    @ofk_code — ОФК-код объекта, для которого требуется вывести граф.
+    """
+    def get(self, request, ofk_code):
+        entity = get_object_or_404(Entity, ofk_code=ofk_code)
+        subordinates = get_object_or_404(EntitySubordinates, entity_id=entity.id)
+        return response.Response(subordinates.tree)
+
+
 class EntityMunicipalsView(DynaFieldsListAPIView):
     """
     GET Список муниципальных объектов контроля.
     """
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
-    queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code=1)
+    # queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code__in=[1, 4])
+    queryset = Entity.objects.filter(
+        title_full__istartswith='АДМИНИСТРАЦИЯ ГОРОДСКОГО ОКРУГА ',
+        org_status_code__in=[1, 4]
+    )

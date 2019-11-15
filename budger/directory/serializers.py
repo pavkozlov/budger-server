@@ -9,7 +9,7 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
         model = Entity
         fields = (
             'id', 'reg_date', 'title_full', 'title_short', 'inn', 'ogrn',
-            'head_position', 'head_name'
+            'head_position', 'head_name', 'ofk_code'
         )
 
 

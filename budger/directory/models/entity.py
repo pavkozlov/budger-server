@@ -64,6 +64,10 @@ class Entity(models.Model):
     kpp = models.CharField(max_length=9, null=True, blank=True)
     ogrn = models.CharField(max_length=13, null=True, blank=True)
 
+    # Справочник ОКТМО
+    oktmo_code = models.CharField(max_length=11, null=True, blank=True)
+    oktmo_title = models.CharField(max_length=500, null=True, blank=True)
+
     # Адрес
     addr_index = models.CharField(max_length=6, null=True, blank=True)
 
