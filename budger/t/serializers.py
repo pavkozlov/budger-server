@@ -9,6 +9,16 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    responsible_department_obj = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = (
+            'title',
+            'responsible_department',
+            'attendant_departments',
+            'responsible_department_obj',
+        )
+
+    def get_responsible_department_obj(self, obj):
+        return DepartmentSerializer(obj.responsible_department).data
