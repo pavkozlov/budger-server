@@ -4,6 +4,12 @@ from .models.entity import Entity
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
+class EntityListShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ('id', 'title_full', 'title_short')
+
+
 class EntityListSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Entity
