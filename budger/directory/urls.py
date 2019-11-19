@@ -12,6 +12,7 @@ urlpatterns = [
     path('entity', EntityListView.as_view()),
     path('entity/<int:pk>', EntityRetrieveView.as_view()),
 
+    # Дерево объектов контроля
     path('entity/regionals/', EntityRegionalsView.as_view()),
     path('entity/municipals/', EntityMunicipalsView.as_view()),
     path('entity/<int:pk>/subordinates/', EntitySubordinatesView.as_view()),

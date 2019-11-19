@@ -4,21 +4,22 @@ from django.views.decorators.cache import cache_page
 """
 
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, filters, response, status, views
-from budger.directory.models.entity import Entity
+from rest_framework import generics, filters, response, views
+from budger.directory.models.entity import Entity, MunicipalBudget
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 from .serializers import (
-    EntityShortSerializerWithSubordinates, EntityListSerializer, EntitySerializer,
-    KsoListSerializer,
-    KsoSerializer,
+    EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
+    KsoListSerializer, KsoSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeMediumSerializer,
     KsoEmployeeShortSerializer,
     KsoDepartment1ShortSerializer,
+    MunicipalBudgetSerializer
 )
 from .filters import EntityFilter
+from django.db.models import Q
 
 
 class EntityListView(DynaFieldsListAPIView):
@@ -113,36 +114,55 @@ class EntityRegionalsView(views.APIView):
     GET Список муниципальных объектов контроля - ГРБС.
     """
     def get(self, request):
-        queryset = Entity.objects.filter(
-            opf_code__in=['75201', '75203', '75204'],
-            org_status_code__in=['1', '4'],
-            parent_id__isnull=True,
-            org_type_code__in=['01', '02'],
-            budget_lvl_code__in=['20', '50'],
-        )
-        serializer = EntityShortSerializerWithSubordinates(queryset, many=True)
+        if 'filter' in request.query_params and request.query_params['filter']:
+            terms = request.query_params['filter']
+            queryset = Entity.objects.filter(
+                (Q(title_search__icontains=terms) | Q(inn=terms)) &
+                Q(budget_lvl_code__in=['20', '50'])
+            )
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
+        else:
+            queryset = Entity.objects.filter(
+                parent_id__isnull=True,
+                opf_code__in=['75201', '75203', '75204'],
+                org_type_code__in=['01', '02'],
+                budget_lvl_code__in=['20', '50'],
+                org_status_code__in=['1', '4'],
+            )
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)
 
 
 class EntityMunicipalsView(views.APIView):
     """
-    GET Список муниципальных объектов контроля.
+    GET Список групп верхнего уровня муниципальных объектов контроля.
+    @code -- Список муниципальных объектов контроля с заданным budget_code
     """
-
     def get(self, request):
-        queryset = Entity.objects.filter(
-            budget_lvl_code__in=['31', '32'],
-            okogu_code__in=['3300100', '3300200'],
-            org_status_code__in=['1', '4']
-        ).distinct()
+        if 'budget_code' in request.query_params and request.query_params['budget_code']:
+            budget_code=request.query_params['budget_code']
+            parent = get_object_or_404(MunicipalBudget, code=budget_code)
+            queryset = Entity.objects.filter(pk__in=parent.subordinates)
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
+        elif 'filter' in request.query_params and request.query_params['filter']:
+            terms = request.query_params['filter']
+            queryset = Entity.objects.filter(
+                (Q(title_search__icontains=terms) | Q(inn=terms)) &
+                Q(budget_lvl_code__in=['31', '32'])
+            )
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
+        else:
+            queryset = MunicipalBudget.objects.all()
+            serializer = MunicipalBudgetSerializer(queryset, many=True)
+        return response.Response(serializer.data)
 
 
 class EntitySubordinatesView(views.APIView):
     """
-    GET Список подчиненных объектов контроля.
+    GET Список муниципальных объектов контроля - ГРБС.
     """
     def get(self, request, pk):
-        entity = get_object_or_404(Entity, pk=pk)
-        subordinates = Entity.objects.filter(pk__in=entity.subordinates)
-        serializer = EntityShortSerializerWithSubordinates(subordinates, many=True)
+        parent = get_object_or_404(Entity, pk=pk)
+        queryset = Entity.objects.filter(pk__in=parent.subordinates)
+        serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
-from .models.entity import Entity
+from .models.entity import Entity, MunicipalBudget
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
@@ -24,10 +24,10 @@ class EntityShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code')
 
 
-class EntityShortSerializerWithSubordinates(serializers.ModelSerializer):
+class EntitySubordinatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'subordinates')
+        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'kbk_code', 'subordinates')
 
 
 class EntitySerializer(serializers.ModelSerializer):
@@ -145,3 +145,19 @@ class KsoEmployeeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
         fields = ('id', 'name', 'position',)
+
+
+#
+# MunicipalBudgetTitle serializers
+#
+
+
+class MunicipalBudgetSerializer(serializers.ModelSerializer):
+    title_full = serializers.SerializerMethodField()
+
+    def get_title_full(self, obj):
+        return obj.title_display
+
+    class Meta:
+        model = MunicipalBudget
+        fields = ('title_full', 'subordinates', 'code',)

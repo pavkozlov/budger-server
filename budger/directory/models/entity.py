@@ -135,3 +135,18 @@ class Entity(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
+
+
+class MunicipalBudget(models.Model):
+    title_original = models.CharField(max_length=2000)
+    title_display = models.CharField(max_length=2000, db_index=True, null=True, blank=True)
+    code = models.CharField(max_length=8, db_index=True)
+
+    # Следующий уровень муниципального дерева ОК
+    subordinates = ArrayField(models.IntegerField(), blank=True, null=True)
+
+    class Meta:
+        ordering = ['title_display']
+
+    def __str__(self):
+        return self.title_display
