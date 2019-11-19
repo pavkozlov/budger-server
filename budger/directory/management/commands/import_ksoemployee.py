@@ -30,29 +30,31 @@ def parse_row(row):
     return row_list
 
 
-def get_user(user_id):
+def get_user(row):
     """
-    Функция принимает id User, возвращает User или None
+    Функция принимает строку из файла, возвращает User или None
     :param user_id:
     :return:
     """
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(id=row[10])
     except User.DoesNotExist:
         user = None
+        print('KsoEmployee with id {} have incorrect data (user_id = {})'.format(row[0], row[10]))
     return user
 
 
-def get_kso(kso_id):
+def get_kso(row):
     """
-    Функция принимает id Kso, возвращает Kso или None
+    Функция принимает строку из файла, возвращает Kso или None
     :param kso_id:
     :return:
     """
     try:
-        kso = Kso.objects.get(id=kso_id)
+        kso = Kso.objects.get(id=row[9])
     except Kso.DoesNotExist:
         kso = None
+        print('KsoEmployee with id {} have incorrect data (kso_id = {})'.format(row[0], row[9]))
     return kso
 
 
@@ -63,15 +65,13 @@ def update_ksoemployee(ksoemployee, row_list):
     :param row_list:
     :return:
     """
-    kso = get_kso(row_list[9])
+    kso = get_kso(row_list)
     if kso is None:
-        print('KsoEmployee with id {} have incorrect data (kso_id = {})'.format(row_list[0], row_list[9]))
         return
 
     if row_list[10] is not None:
-        user = get_user(row_list[10])
+        user = get_user(row_list)
         if user is None:
-            print('KsoEmployee with id {} have incorrect data (user_id = {})'.format(row_list[0], row_list[10]))
             return
     else:
         user = None
@@ -119,14 +119,12 @@ class Command(BaseCommand):
 
             except KsoEmployee.DoesNotExist:
 
-                kso = get_kso(row_list[9])
+                kso = get_kso(row_list)
                 if kso is None:
-                    print('KsoEmployee with id {} have incorrect data (kso_id = {})'.format(row_list[0], row_list[9]))
                     continue
 
-                user = get_user(row_list[10])
+                user = get_user(row_list)
                 if user is None:
-                    print('KsoEmployee with id {} have incorrect data (user_id = {})'.format(row_list[0], row_list[10]))
                     continue
 
                 KsoEmployee.objects.create(
