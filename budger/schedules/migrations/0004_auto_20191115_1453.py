@@ -15,4 +15,24 @@ class Migration(migrations.Migration):
             name='controlled_entities',
             field=models.ManyToManyField(blank=True, db_index=True, to='directory.Entity'),
         ),
+        migrations.AlterField(
+            model_name='event',
+            name='financial_control',
+            field=models.PositiveSmallIntegerField(blank=True, choices=[(1, 'Финансовый аудит (контроль)'), (2, 'Аудит эффективности')], db_index=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name='event',
+            name='initiator',
+            field=models.PositiveSmallIntegerField(choices=[(1, 'Руководитель субъекта РФ (муниципального образования)'), (2, 'Законодательный орган субъекта РФ (муниципального образования)'), (3, 'Счетная палата РФ'), (4, 'Правоохранителные органы'), (5, 'Гражданин'), (6, 'Общественная организация'), (7, 'КСП Московской области')], db_index=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name='event',
+            name='mode',
+            field=models.PositiveSmallIntegerField(blank=True, choices=[(2, 'Самостоятельное'), (1, 'Совместное'), (3, 'Параллельное')], db_index=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name='event',
+            name='type',
+            field=models.PositiveSmallIntegerField(choices=[(1, 'Контрольное'), (3, 'Экспертно-аналитическое'), (2, 'Экспертное')], db_index=True),
+        ),
     ]
