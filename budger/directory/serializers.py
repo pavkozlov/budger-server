@@ -4,10 +4,9 @@ from .models.entity import Entity
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
-class EntityListShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entity
-        fields = ('id', 'title_full', 'title_short')
+########################################################################################################################
+# Entity serializers
+########################################################################################################################
 
 
 class EntityListSerializer(DynamicFieldsModelSerializer):
@@ -19,26 +18,55 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
         )
 
 
-class EntityRetrieveSerializer(DynamicFieldsModelSerializer):
+class EntityShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code')
+
+
+class EntityShortSerializerWithSubordinates(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'subordinates')
+
+
+class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = '__all__'
 
 
+########################################################################################################################
+# Kso departments serializers
+########################################################################################################################
+
+
+class KsoDepartment1ShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoDepartment1
+        fields = ('id', 'title',)
+
+
+class KsoDepartment2ShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoDepartment1
+        fields = ('id', 'title',)
+
+
 class KsoDepartment1Serializer(serializers.ModelSerializer):
+    sub_departments = KsoDepartment2ShortSerializer(many=True)
+
     class Meta:
         model = KsoDepartment1
         fields = ('id', 'title', 'sub_departments')
 
-    class _KsoDepartment2Serializer(serializers.ModelSerializer):
-        class Meta:
-            model = KsoDepartment1
-            fields = ('id', 'title')
 
-    sub_departments = _KsoDepartment2Serializer(many=True)
+########################################################################################################################
+# Kso serializers
+########################################################################################################################
 
 
-class KsoListSerializer(serializers.ModelSerializer):
+class KsoListSerializer(DynamicFieldsModelSerializer):
     head = serializers.DictField()
     employees_count_fact = serializers.IntegerField()
 
@@ -50,8 +78,20 @@ class KsoListSerializer(serializers.ModelSerializer):
         )
 
 
-class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
-    entity = EntityRetrieveSerializer()
+class KsoShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Kso
+        fields = ('id', 'title_short')
+
+
+class KsoMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Kso
+        fields = ('id', 'title_short', 'addr_fact')
+
+
+class KsoSerializer(serializers.ModelSerializer):
+    entity = EntitySerializer()
     departments = KsoDepartment1Serializer(many=True)
     head = serializers.SerializerMethodField()
     employees_count_fact = serializers.SerializerMethodField()
@@ -79,40 +119,29 @@ class KsoRetrieveSerializer(DynamicFieldsModelSerializer):
         return count
 
 
+########################################################################################################################
+# Kso employee serializers
+########################################################################################################################
+
+
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
+    kso = KsoShortSerializer()
+
     class Meta:
         model = KsoEmployee
         fields = '__all__'
 
-    class _KsoSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Kso
-            fields = ('id', 'title_short')
 
-    kso = _KsoSerializer()
+class KsoEmployeeMediumSerializer(serializers.ModelSerializer):
+    kso = KsoMediumSerializer()
+    department1 = KsoDepartment1Serializer()
 
-
-class KsoResponsiblesEmployeeSerializer(DynamicFieldsModelSerializer):
-    class Meta:
-        model = KsoEmployee
-        fields = ('id', 'name')
-
-
-class KsoResponsiblesDepartment1Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = KsoDepartment1
-        fields = ('id', 'title')
-
-
-class KsoEmployeeRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
         exclude = ('department2',)
 
-    class _KsoSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Kso
-            fields = ('id', 'title_full', 'addr_fact')
 
-    kso = _KsoSerializer()
-    department1 = KsoDepartment1Serializer()
+class KsoEmployeeShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoEmployee
+        fields = ('id', 'name', 'position',)

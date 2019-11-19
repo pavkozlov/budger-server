@@ -12,11 +12,11 @@ from .models import (
     EVENT_REASON_ENUM,
     Event
 )
-from .serializers import EventSerializer
+from .serializers import EventFullSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    serializer_class = EventSerializer
+    serializer_class = EventFullSerializer
     queryset = Event.objects.all()
 
 

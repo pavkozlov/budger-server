@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 
 
 class Entity(models.Model):
@@ -21,6 +21,25 @@ class Entity(models.Model):
         ('2', 'недействующая'),
         ('3', 'отсутствуют правоотношения'),
         ('4', 'специальные указания'),
+    ]
+
+    BUDGET_LVL_CODE_ENUM = [
+        ('00', 'не определен'),
+        ('10', 'федеральный бюджет'),
+        ('20', 'бюджет субъекта Российской Федерации'),
+        ('30', 'местный бюджет'),
+        ('31', 'бюджет городского округа'),
+        ('32', 'бюджет муниципального района'),
+        ('33', 'бюджет городского поселения'),
+        ('34', 'бюджет сельского поселения'),
+        ('35', 'бюджет городского округа с внутригородским делением'),
+        ('36', 'бюджет внутригородского муниципального образования города федерального значения'),
+        ('37', 'бюджет внутригородского района'),
+        ('40', 'бюджет государственного внебюджетного фонда Российской Федерации'),
+        ('41', 'бюджет Пенсионного фонда Российской Федерации'),
+        ('42', 'бюджет Фонда социального страхования Российской Федерации'),
+        ('43', 'бюджет Федерального фонда обязательного медицинского страхования'),
+        ('50', 'бюджет территориального государственного внебюджетного фонда'),
     ]
 
     # Учетный номер организации, присваиваемый в ОрФК
@@ -93,11 +112,18 @@ class Entity(models.Model):
     # Код статуса организации.
     org_status_code = models.CharField(max_length=1, choices=ORG_STATUS_ENUM, db_index=True)
 
-    # Изменения ЮЛ (берется из ЕГРЮЛ)
-    updates = models.TextField(blank=True, null=True)
+    # Код бюджета организации
+    budget_code = models.CharField(max_length=8, db_index=True, null=True, blank=True)
+    budget_title = models.CharField(max_length=2000, null=True, blank=True)
 
-    # Учредители, список ИНН (берется из ЕГРЮЛ)
-    founders = ArrayField(models.CharField(max_length=12), blank=True, null=True)
+    # Код уровня бюджета
+    budget_lvl_code = models.CharField(max_length=2, choices=BUDGET_LVL_CODE_ENUM, db_index=True, null=True, blank=True)
+
+    # Код по справочнику ОКОГУ.
+    okogu_code = models.CharField(max_length=7, db_index=True, null=True, blank=True)
+
+    # Подчиненные огранизации (по версии РУБП)
+    subordinates = ArrayField(models.IntegerField(), blank=True, null=True)
 
     # Служебные поля
     created = models.DateTimeField(auto_now_add=True)
@@ -109,13 +135,3 @@ class Entity(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)
-
-
-class EntitySubordinates(models.Model):
-    """
-    Подчиненные организации.
-    В поле tree хранится информация о подчиненнных организациях. Дерево строится специальным скриптом на основе
-    entity.parent_code для выбранных (далеко не для всех) объектов.
-    """
-    entity = models.OneToOneField(Entity, on_delete=models.CASCADE)
-    tree = JSONField()

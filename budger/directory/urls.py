@@ -3,16 +3,18 @@ from .views import (
     EntityListView, EntityRetrieveView,
     KsoListView, KsoRetrieveView,
     KsoEmployeeListView, KsoEmployeeRetrieveView,
-    EntitySubordinatesView, EntitySubordinatesView2Delete, KsoResponsiblesView,
-    EntityMunicipalsView
+    EntitySubordinatesView,
+    KsoResponsiblesView,
+    EntityRegionalsView, EntityMunicipalsView
 )
 
 urlpatterns = [
     path('entity', EntityListView.as_view()),
     path('entity/<int:pk>', EntityRetrieveView.as_view()),
-    path('entity/<str:ofk_code>/subordinates/', EntitySubordinatesView.as_view()),
-    path('entity/subordinates', EntitySubordinatesView2Delete.as_view()),
-    path('entity/municipals', EntityMunicipalsView.as_view()),
+
+    path('entity/regionals/', EntityRegionalsView.as_view()),
+    path('entity/municipals/', EntityMunicipalsView.as_view()),
+    path('entity/<int:pk>/subordinates/', EntitySubordinatesView.as_view()),
 
     path('kso', KsoListView.as_view()),
     path('kso/<int:pk>', KsoRetrieveView.as_view()),

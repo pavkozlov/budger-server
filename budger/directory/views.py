@@ -5,26 +5,27 @@ from django.views.decorators.cache import cache_page
 
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, status, views
-from budger.directory.models.entity import Entity, EntitySubordinates
+from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 from .serializers import (
-    EntityListSerializer,
-    EntityRetrieveSerializer,
+    EntityShortSerializerWithSubordinates, EntityListSerializer, EntitySerializer,
     KsoListSerializer,
-    KsoRetrieveSerializer,
+    KsoSerializer,
     KsoEmployeeListSerializer,
-    KsoEmployeeRetrieveSerializer,
-    KsoResponsiblesEmployeeSerializer,
-    KsoResponsiblesDepartment1Serializer,
+    KsoEmployeeMediumSerializer,
+    KsoEmployeeShortSerializer,
+    KsoDepartment1ShortSerializer,
 )
 from .filters import EntityFilter
 
 
 class EntityListView(DynaFieldsListAPIView):
     """
-    GET Список объектов контроля
+    GET Список объектов контроля.
+    @_filter__title
+    @_filter__inn
     """
     serializer_class = EntityListSerializer
     filter_backends = [EntityFilter]
@@ -41,7 +42,7 @@ class EntityRetrieveView(generics.RetrieveAPIView):
     """
     GET Сведения об объекте контроля.
     """
-    serializer_class = EntityRetrieveSerializer
+    serializer_class = EntitySerializer
     queryset = Entity.objects.all()
 
 
@@ -60,7 +61,7 @@ class KsoRetrieveView(generics.RetrieveAPIView):
     """
     GET Сведения о выбранном КСО.
     """
-    serializer_class = KsoRetrieveSerializer
+    serializer_class = KsoSerializer
     queryset = Kso.objects.all()
 
 
@@ -87,7 +88,7 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
     """
     GET Сведения о выбранном сотруднике КСО
     """
-    serializer_class = KsoEmployeeRetrieveSerializer
+    serializer_class = KsoEmployeeMediumSerializer
     queryset = KsoEmployee.objects.all()
 
 
@@ -102,52 +103,46 @@ class KsoResponsiblesView(views.APIView):
         departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
 
         return response.Response({
-            'departments': KsoResponsiblesDepartment1Serializer(departments, many=True).data,
-            'employees': KsoResponsiblesEmployeeSerializer(employees, many=True).data
+            'departments': KsoDepartment1ShortSerializer(departments, many=True).data,
+            'employees': KsoEmployeeShortSerializer(employees, many=True).data
         })
 
 
-class EntitySubordinatesView2Delete(views.APIView):
+class EntityRegionalsView(views.APIView):
     """
-    GET Граф подчиненных объектов котроля.
-    @inn -- ИНН объекта, для которого требуется вывести граф.
+    GET Список муниципальных объектов контроля - ГРБС.
     """
     def get(self, request):
-        if 'inn' not in request.query_params:
-            return response.Response(
-                {"detail": "@inn не определен."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        inn = request.query_params['inn']
-        entity = get_object_or_404(Entity, inn=inn)
-        subordinates = EntitySubordinates.objects.get(entity_id=entity.id)
-        return response.Response(subordinates.tree)
-
-
-class EntitySubordinatesView(views.APIView):
-    lookup_field = 'ofk_code'
-
-    """
-    GET Граф подчиненных объектов контроля.
-    @ofk_code — ОФК-код объекта, для которого требуется вывести граф.
-    """
-    def get(self, request, ofk_code):
-        entity = get_object_or_404(Entity, ofk_code=ofk_code)
-        subordinates = get_object_or_404(EntitySubordinates, entity_id=entity.id)
-        return response.Response(subordinates.tree)
+        queryset = Entity.objects.filter(
+            opf_code__in=['75201', '75203', '75204'],
+            org_status_code__in=['1', '4'],
+            parent_id__isnull=True,
+            org_type_code__in=['01', '02'],
+            budget_lvl_code__in=['20', '50'],
+        )
+        serializer = EntityShortSerializerWithSubordinates(queryset, many=True)
+        return response.Response(serializer.data)
 
 
-class EntityMunicipalsView(DynaFieldsListAPIView):
+class EntityMunicipalsView(views.APIView):
     """
     GET Список муниципальных объектов контроля.
     """
-    serializer_class = EntityListSerializer
-    filter_backends = [EntityFilter]
-    queryset = Entity.objects.filter(opf_code__startswith=754, org_status_code__in=[1, 4])
+
+    def get(self, request):
+        queryset = Entity.objects.filter(
+            budget_lvl_code__in=['31', '32'],
+            okogu_code__in=['3300100', '3300200'],
+            org_status_code__in=['1', '4']
+        ).distinct()
+
+
+class EntitySubordinatesView(views.APIView):
     """
-    queryset = Entity.objects.filter(
-        title_full__istartswith='АДМИНИСТРАЦИЯ ГОРОДСКОГО ОКРУГА ',
-        org_status_code__in=[1, 4]
-    )
+    GET Список подчиненных объектов контроля.
     """
+    def get(self, request, pk):
+        entity = get_object_or_404(Entity, pk=pk)
+        subordinates = Entity.objects.filter(pk__in=entity.subordinates)
+        serializer = EntityShortSerializerWithSubordinates(subordinates, many=True)
+        return response.Response(serializer.data)

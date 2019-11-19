@@ -3,7 +3,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 # from budger.directory.serializers import KsoEmployeeSerializer
 from budger.directory.models.kso import KsoEmployee
-from budger.directory.serializers import KsoRetrieveSerializer, KsoDepartment1Serializer
+from budger.directory.serializers import KsoSerializer, KsoDepartment1Serializer
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class KsoEmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    kso = KsoRetrieveSerializer()
+    kso = KsoSerializer()
     department1 = KsoDepartment1Serializer()
 
     class Meta:

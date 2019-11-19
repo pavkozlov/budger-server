@@ -136,7 +136,11 @@ class Event(models.Model):
     initiator = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_INITIATOR_ENUM, null=True)
 
     # Тип финансового контроля
-    financial_control = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_FINANCIAL_CONTROL_ENUM)
+    financial_control = models.PositiveSmallIntegerField(
+        db_index=True,
+        choices=EVENT_FINANCIAL_CONTROL_ENUM,
+        null=True, blank=True
+    )
 
     # Примечание
     note = models.TextField(null=True)
@@ -148,7 +152,7 @@ class Event(models.Model):
     working_time = models.PositiveSmallIntegerField(blank=True, null=True)
 
     # Объект контроля
-    controlled_entities = models.ManyToManyField(Entity, db_index=True)
+    controlled_entities = models.ManyToManyField(Entity, db_index=True, blank=True)
 
     # КСО, принимающие участие в мероприятии (когда тип мероприятия параллельный или совместный)
     attendant_kso = models.ManyToManyField(Kso, db_index=True, blank=True)
