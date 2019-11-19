@@ -30,23 +30,68 @@ def parse_row(row):
     return row_list
 
 
-def update_ksoemployee(ksoemployee, row):
-    ksoemployee.id = row[0]
-    ksoemployee.name = row[1]
-    ksoemployee.position = row[2]
-    ksoemployee.phone_landline = row[3]
-    ksoemployee.phone_mobile = row[4]
-    ksoemployee.email = row[5]
-    ksoemployee.birth_date = row[6]
-    ksoemployee.department1_id = row[7]
-    ksoemployee.department2_id = row[8]
-    ksoemployee.kso = Kso.objects.get(id=row[9])
-    user = None if row[10] is None else User.objects.get(id=row[10])
+def get_user(user_id):
+    """
+    Функция принимает id User, возвращает User или None
+    :param user_id:
+    :return:
+    """
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        user = None
+    return user
+
+
+def get_kso(kso_id):
+    """
+    Функция принимает id Kso, возвращает Kso или None
+    :param kso_id:
+    :return:
+    """
+    try:
+        kso = Kso.objects.get(id=kso_id)
+    except Kso.DoesNotExist:
+        kso = None
+    return kso
+
+
+def update_ksoemployee(ksoemployee, row_list):
+    """
+    Функция принимает объект KsoEmployee и обновляет его параметры из списка row_list.
+    :param ksoemployee:
+    :param row_list:
+    :return:
+    """
+    kso = get_kso(row_list[9])
+    if kso is None:
+        print('KsoEmployee with id {} have incorrect data (kso_id = {})'.format(row_list[0], row_list[9]))
+        return
+
+    if row_list[10] is not None:
+        user = get_user(row_list[10])
+        if user is None:
+            print('KsoEmployee with id {} have incorrect data (user_id = {})'.format(row_list[0], row_list[10]))
+            return
+    else:
+        user = None
+
+    ksoemployee.id = row_list[0]
+    ksoemployee.name = row_list[1]
+    ksoemployee.position = row_list[2]
+    ksoemployee.phone_landline = row_list[3]
+    ksoemployee.phone_mobile = row_list[4]
+    ksoemployee.email = row_list[5]
+    ksoemployee.birth_date = row_list[6]
+    ksoemployee.department1_id = row_list[7]
+    ksoemployee.department2_id = row_list[8]
+    ksoemployee.kso = kso
     ksoemployee.user = user
-    ksoemployee.photo_slug = row[11]
-    ksoemployee.is_head = row[12]
-    ksoemployee.can_be_responsible = row[13]
+    ksoemployee.photo_slug = row_list[11]
+    ksoemployee.is_head = row_list[12]
+    ksoemployee.can_be_responsible = row_list[13]
     ksoemployee.save()
+    return True
 
 
 class Command(BaseCommand):
@@ -67,9 +112,23 @@ class Command(BaseCommand):
             row_list = parse_row(row)
             try:
                 ksoepmloyee = KsoEmployee.objects.get(id=row_list[0])
-                update_ksoemployee(ksoepmloyee, row_list)
-                updated_counter += 1
+                updated = update_ksoemployee(ksoepmloyee, row_list)
+
+                if updated:
+                    updated_counter += 1
+
             except KsoEmployee.DoesNotExist:
+
+                kso = get_kso(row_list[9])
+                if kso is None:
+                    print('KsoEmployee with id {} have incorrect data (kso_id = {})'.format(row_list[0], row_list[9]))
+                    continue
+
+                user = get_user(row_list[10])
+                if user is None:
+                    print('KsoEmployee with id {} have incorrect data (user_id = {})'.format(row_list[0], row_list[10]))
+                    continue
+
                 KsoEmployee.objects.create(
                     id=row_list[0],
                     name=row_list[1],
@@ -80,8 +139,8 @@ class Command(BaseCommand):
                     birth_date=row_list[6],
                     department1_id=row_list[7],
                     department2_id=row_list[8],
-                    kso=Kso.objects.get(id=row_list[9]),
-                    user=None if row_list[10] is None else User.objects.get(id=row_list[10]),
+                    kso=kso,
+                    user=user,
                     photo_slug=row_list[11],
                     is_head=row_list[12],
                     can_be_responsible=row_list[13],
