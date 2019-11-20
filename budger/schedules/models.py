@@ -23,29 +23,8 @@ EVENT_TYPE_ENUM = [
 
 EVENT_MODE_ENUM = [
     (2, 'Самостоятельное'),
-    (1, 'Совместное'),
-    (3, 'Параллельное'),
-]
-
-EVENT_FORM_ENUM = [
-    (1, 'Плановая'),
-    (2, 'Внеплановая'),
-]
-
-EVENT_INSPECTION_ENUM = [
-    (1, 'Внешний государственный (муниципальный) финансовый контроль'),
-    (2, 'Внутренний государственный (муниципальный) финансовый контроль'),
-    (3, 'Внутренний аудит объектов контроля Счетной палаты'),
-]
-
-EVENT_METHOD_ENUM = [
-    (1, 'Обследование'),
-    (2, 'Проверка'),
-]
-
-EVENT_REASON_ENUM = [
-    (1, 'По инициативе контрольного органа'),
-    (2, 'По поручениям и обращениям'),
+    (1, 'Совместное мероприятие'),
+    (3, 'Параллельное мероприятие'),
 ]
 
 EVENT_INITIATOR_ENUM = [
@@ -58,8 +37,8 @@ EVENT_INITIATOR_ENUM = [
     (7, 'КСП Московской области'),
 ]
 
-EVENT_FINANCIAL_CONTROL_ENUM = [
-    (1, 'Финансовый аудит (контроль)'),
+EVENT_SUBJECT_ENUM = [
+    (1, 'Финансовый аудит'),
     (2, 'Аудит эффективности'),
 ]
 
@@ -94,7 +73,6 @@ class Event(models.Model):
     exec_to = models.DateField(db_index=True)
 
     # Ответственный за мероприятие
-    # ВАЖНО: коллега пользователя, формирующего мероприятие
     responsible_employee = models.ForeignKey(
         KsoEmployee,
         on_delete=models.DO_NOTHING,
@@ -102,7 +80,6 @@ class Event(models.Model):
     )
 
     # Привлекаемые структурные подразделения
-    # ВАЖНО: подразделения КСО, где работает пользователь, формирующий мероприятие
     attendant_departments = models.ManyToManyField(
         KsoDepartment1,
         related_name='participated_events',
@@ -110,57 +87,48 @@ class Event(models.Model):
     )
 
     # Ответственное структурное подразделение
-    # ВАЖНО: подразделение КСО, где работает пользователь, формирующий мероприятие
     responsible_department = models.ForeignKey(
         KsoDepartment1,
         related_name='owned_events',
-        on_delete=models.DO_NOTHING, null=True, blank=True
+        on_delete=models.DO_NOTHING,
+        null=True, blank=True
     )
 
     # Тип мероприятия
-    mode = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_MODE_ENUM, blank=True, null=True)
-
-    # Вид контроля
-    inspection = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_INSPECTION_ENUM)
-
-    # Форма мероприятия
-    form = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_FORM_ENUM)
-
-    # Метод проведения мероприятия
-    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM, blank=True, null=True)
-
-    # Основание мероприятия
-    reason = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_REASON_ENUM)
-
-    # Инициатор поручений/обращений
-    initiator = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_INITIATOR_ENUM, null=True)
+    mode = models.PositiveSmallIntegerField(
+        choices=EVENT_MODE_ENUM,
+        blank=True, null=True
+    )
 
     # Тип финансового контроля
-    financial_control = models.PositiveSmallIntegerField(
-        db_index=True,
-        choices=EVENT_FINANCIAL_CONTROL_ENUM,
+    subject = models.PositiveSmallIntegerField(
+        choices=EVENT_SUBJECT_ENUM,
         null=True, blank=True
     )
 
     # Примечание
-    note = models.TextField(null=True)
+    notes = models.TextField(null=True, blank=True)
+
+    # Обоснование включения в план
+    memo = models.TextField(null=True, blank=True)
 
     # Привлекаемые внешние организации (эксперты)
     attendant_experts = models.TextField(null=True)
 
-    # Фонд рабочего времени (человекочасы)
-    working_time = models.PositiveSmallIntegerField(blank=True, null=True)
-
-    # Объект контроля
-    controlled_entities = models.ManyToManyField(Entity, db_index=True, blank=True)
+    # Объекты контроля
+    controlled_entities = models.ManyToManyField(Entity, blank=True)
 
     # КСО, принимающие участие в мероприятии (когда тип мероприятия параллельный или совместный)
-    attendant_kso = models.ManyToManyField(Kso, db_index=True, blank=True)
+    attendant_ksos = models.ManyToManyField(Kso, blank=True)
 
-    # Реквизиты обращения
-    appeal_author = models.CharField(max_length=200, db_index=True, blank=True, null=True)
-    appeal_number = models.CharField(max_length=50, db_index=True, blank=True, null=True)
-    appeal_date = models.DateField(db_index=True, blank=True, null=True)
+    # Инициатор поручения/обращения, реквизиты письма
+    initiator = models.PositiveSmallIntegerField(
+        db_index=True,
+        choices=EVENT_INITIATOR_ENUM,
+        blank=True, null=True
+    )
+    letter_number = models.CharField(max_length=20, blank=True, null=True)
+    letter_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.exec_from, self.exec_to)
