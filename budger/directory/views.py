@@ -9,6 +9,7 @@ from budger.directory.models.entity import Entity, MunicipalBudget
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
+
 from .serializers import (
     EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
     KsoListSerializer, KsoSerializer,
@@ -18,6 +19,7 @@ from .serializers import (
     KsoDepartment1ShortSerializer,
     MunicipalBudgetSerializer
 )
+
 from .filters import EntityFilter
 from django.db.models import Q
 
@@ -97,6 +99,7 @@ class KsoResponsiblesView(views.APIView):
     """
     GET Список сотрудников и подразделений КСО, могущих являться отвестсвенными за мероприятия
     """
+
     def get(self, request):
         kso = request.user.ksoemployee.kso
 
@@ -113,6 +116,7 @@ class EntityRegionalsView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
     """
+
     def get(self, request):
         if 'filter' in request.query_params and request.query_params['filter']:
             terms = request.query_params['filter']
@@ -138,9 +142,10 @@ class EntityMunicipalsView(views.APIView):
     GET Список групп верхнего уровня муниципальных объектов контроля.
     @code -- Список муниципальных объектов контроля с заданным budget_code
     """
+
     def get(self, request):
         if 'budget_code' in request.query_params and request.query_params['budget_code']:
-            budget_code=request.query_params['budget_code']
+            budget_code = request.query_params['budget_code']
             parent = get_object_or_404(MunicipalBudget, code=budget_code)
             queryset = Entity.objects.filter(pk__in=parent.subordinates)
             serializer = EntitySubordinatesSerializer(queryset, many=True)
@@ -161,6 +166,7 @@ class EntitySubordinatesView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
     """
+
     def get(self, request, pk):
         parent = get_object_or_404(Entity, pk=pk)
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
