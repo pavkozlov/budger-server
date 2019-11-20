@@ -37,6 +37,13 @@ EVENT_INITIATOR_ENUM = [
     (7, 'КСП Московской области'),
 ]
 
+WORKFLOW_STATUS_ENUM = [
+    (0, 'Черновик'),
+    (1, 'Согласовано начальником инспекции'),
+    (2, 'Согласовано аудитором'),
+    (3, 'Согласовано Председателем'),
+]
+
 
 class Annual(models.Model):
     year = models.PositiveSmallIntegerField(db_index=True)
@@ -123,8 +130,46 @@ class Event(models.Model):
     letter_number = models.CharField(max_length=20, blank=True, null=True)
     letter_date = models.DateField(blank=True, null=True)
 
+    creator = models.ForeignKey(
+        KsoEmployee,
+        on_delete=models.CASCADE
+    )
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return '{} - {}'.format(self.exec_from, self.exec_to)
 
     class Meta:
         ordering = ['-exec_from']
+
+
+class Workflow(models.Model):
+    """
+    Воркфлоу согласования документа с Event
+    """
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    # Отправитель
+    sender = models.ForeignKey(
+        KsoEmployee,
+        related_name='workflow_sender',
+        on_delete=models.CASCADE
+    )
+
+    # Получатель
+    recipient = models.ForeignKey(
+        KsoEmployee,
+        related_name='workflow_recipient',
+        on_delete=models.CASCADE
+    )
+
+    status = models.PositiveSmallIntegerField(choices=WORKFLOW_STATUS_ENUM)
+    memo = models.TextField()
+
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created']
