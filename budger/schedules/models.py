@@ -37,11 +37,6 @@ EVENT_INITIATOR_ENUM = [
     (7, 'КСП Московской области'),
 ]
 
-EVENT_SUBJECT_ENUM = [
-    (1, 'Финансовый аудит'),
-    (2, 'Аудит эффективности'),
-]
-
 
 class Annual(models.Model):
     year = models.PositiveSmallIntegerField(db_index=True)
@@ -101,10 +96,8 @@ class Event(models.Model):
     )
 
     # Тип финансового контроля
-    subject = models.PositiveSmallIntegerField(
-        choices=EVENT_SUBJECT_ENUM,
-        null=True, blank=True
-    )
+    subject_performance = models.BooleanField(default=False)
+    subject_financial = models.BooleanField(default=False)
 
     # Примечание
     notes = models.TextField(null=True, blank=True)
