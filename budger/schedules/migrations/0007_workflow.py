@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('directory', '0010_curator_and_head'),
-        ('schedules', '0006_auto_20191120_1654'),
+        ('schedules', '0006_event'),
     ]
 
     operations = [
