@@ -61,6 +61,20 @@ class KsoDepartment1Serializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'sub_departments')
 
 
+class KsoDepartment1WithHeadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoDepartment1
+        fields = ('id', 'title', 'head', 'curator')
+
+    class _KsoEmployeeShortSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = KsoEmployee
+            fields = ('id', 'name', 'position',)
+
+    head = _KsoEmployeeShortSerializer()
+    curator = _KsoEmployeeShortSerializer()
+
+
 ########################################################################################################################
 # Kso serializers
 ########################################################################################################################

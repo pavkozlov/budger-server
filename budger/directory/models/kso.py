@@ -57,6 +57,12 @@ class KsoDepartment1(models.Model):
     # Может принимать участие в проведении мероприятий
     can_participate_in_events = models.BooleanField(default=False)
 
+    # Глава
+    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='headed_department')
+
+    # Куратор подразделения
+    curator = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='curated_department')
+
     class Meta:
         ordering = ['title']
         unique_together = ('kso', 'title',)
