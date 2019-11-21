@@ -207,8 +207,7 @@ class EmployeeSuperiorsView(views.APIView):
             department = KsoDepartment1.objects.get(id=department1_id)
             result.append(self.get_employee(department.head.id, with_department=False))
 
-        employee_kso = KsoEmployee.objects.get(id=employee_id).kso
-        kso_head = KsoEmployee.objects.get(kso_id=employee_kso, is_head=True)
+        kso_head = KsoEmployee.objects.get(id=employee_id).kso.head
 
         result.append(self.get_employee(kso_head.id, with_department=False))
 
