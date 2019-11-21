@@ -13,11 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='ksodepartment2',
-            name='curator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='curated_department2', to='directory.KsoEmployee'),
-        ),
-        migrations.AddField(
-            model_name='ksodepartment2',
             name='head',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='headed_department2', to='directory.KsoEmployee'),
         ),

@@ -175,16 +175,16 @@ class EntitySubordinatesView(views.APIView):
 
 
 class EmployeeSuperiorsView(views.APIView):
-    def get_employee(self, employee_id, with_department=True):
-        data = {}
-        employee = KsoEmployee.objects.get(id=employee_id)
+    def get_employee(self, employee):
+        data = dict()
+
         data['name'] = employee.name
         data['position'] = employee.position
 
-        if employee.department1 is not None and with_department:
+        if employee.department1 is not None:
             data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
 
-        if employee.department2 is not None and with_department:
+        if employee.department2 is not None:
             data['ksodepartment2'] = KsoDepartment2ShortSerializer(employee.department2).data
 
         return data
@@ -192,23 +192,20 @@ class EmployeeSuperiorsView(views.APIView):
     def get(self, request, pk):
         result = []
 
-        employee_id = KsoEmployee.objects.get(user_id=pk).id
-        employee = self.get_employee(employee_id)
+        employee = KsoEmployee.objects.get(user_id=pk)
 
-        result.append(employee)
+        result.append(self.get_employee(employee))
 
-        if employee.get('ksodepartment2', None) is not None:
-            department2_id = employee['ksodepartment2']['id']
-            department = KsoDepartment2.objects.get(id=department2_id)
-            result.append(self.get_employee(department.head.id, with_department=False))
+        if employee.department2 is not None:
+            department = employee.department2
+            department_head = department.head
+            result.append(self.get_employee(department_head))
 
-        if employee.get('ksodepartment1', None) is not None:
-            department1_id = employee['ksodepartment1']['id']
-            department = KsoDepartment1.objects.get(id=department1_id)
-            result.append(self.get_employee(department.head.id, with_department=False))
+        if employee.department1 is not None:
+            department = employee.department1
+            department_head = department.head
+            result.append(self.get_employee(department_head))
 
-        kso_head = KsoEmployee.objects.get(id=employee_id).kso.head
-
-        result.append(self.get_employee(kso_head.id, with_department=False))
+        result.append(self.get_employee(employee.kso.head))
 
         return response.Response(result)
