@@ -200,7 +200,7 @@ class EmployeeSuperiorsView(views.APIView):
         employee = KsoEmployee.objects.get(user_id=pk)
         kso_head = employee.kso.head
 
-        if employee == kso_head:
+        if employee.is_head:
             result.append(self.get_employee(employee))
         else:
             result.append(self.get_employee(employee))
@@ -209,7 +209,9 @@ class EmployeeSuperiorsView(views.APIView):
             if dep2_head:
                 result.append(dep2_head)
 
-            result.append(self.get_head(employee.department1))
+            dep1_head = self.get_head(employee.department1)
+            if dep1_head:
+                result.append(dep1_head)
 
             result.append(self.get_employee(kso_head))
 
