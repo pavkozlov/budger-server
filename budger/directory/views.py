@@ -189,16 +189,10 @@ class EmployeeSuperiorsView(views.APIView):
 
         return data
 
-    def append_departments_heads(self, employee, result):
-        if employee.department2 is not None:
-            department = employee.department2
+    def get_head(self, department):
+        if department is not None:
             department_head = department.head
-            result.append(self.get_employee(department_head))
-
-        if employee.department1 is not None:
-            department = employee.department1
-            department_head = department.head
-            result.append(self.get_employee(department_head))
+            return self.get_employee(department_head)
 
     def get(self, request, pk):
         result = []
@@ -206,13 +200,17 @@ class EmployeeSuperiorsView(views.APIView):
         employee = KsoEmployee.objects.get(user_id=pk)
         kso_head = employee.kso.head
 
-        result.append(self.get_employee(kso_head))
-
         if employee == kso_head:
-            return response.Response(result)
+            result.append(self.get_employee(employee))
+        else:
+            result.append(self.get_employee(employee))
 
-        self.append_departments_heads(employee, result)
+            dep2_head = self.get_head(employee.department2)
+            if dep2_head:
+                result.append(dep2_head)
 
-        result.append(self.get_employee(employee))
+            result.append(self.get_head(employee.department1))
+
+            result.append(self.get_employee(kso_head))
 
         return response.Response(result)
