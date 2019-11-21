@@ -5,7 +5,8 @@ from .views import (
     KsoEmployeeListView, KsoEmployeeRetrieveView,
     EntitySubordinatesView,
     KsoResponsiblesView,
-    EntityRegionalsView, EntityMunicipalsView
+    EntityRegionalsView, EntityMunicipalsView,
+    EmployeeSuperiorsView
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
 
     path('kso-employee', KsoEmployeeListView.as_view()),
     path('kso-employee/<int:pk>', KsoEmployeeRetrieveView.as_view()),
+    path('kso-employee/<int:pk>/superiors/', EmployeeSuperiorsView.as_view()),
 ]

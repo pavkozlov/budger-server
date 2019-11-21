@@ -69,7 +69,7 @@ class KsoDepartment1WithHeadSerializer(serializers.ModelSerializer):
     class _KsoEmployeeShortSerializer(serializers.ModelSerializer):
         class Meta:
             model = KsoEmployee
-            fields = ('id', 'name', 'position',)
+            fields = ('id', 'name', 'position', 'photo_slug')
 
     head = _KsoEmployeeShortSerializer()
     curator = _KsoEmployeeShortSerializer()

@@ -6,7 +6,7 @@ from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views
 from budger.directory.models.entity import Entity, MunicipalBudget
-from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
+from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1, KsoDepartment2
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 
@@ -16,7 +16,7 @@ from .serializers import (
     KsoEmployeeListSerializer,
     KsoEmployeeMediumSerializer,
     KsoEmployeeShortSerializer,
-    KsoDepartment1ShortSerializer,
+    KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer,
     MunicipalBudgetSerializer
 )
 
@@ -172,3 +172,44 @@ class EntitySubordinatesView(views.APIView):
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
         serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)
+
+
+class EmployeeSuperiorsView(views.APIView):
+    def get_employee(self, employee_id, with_department=True):
+        data = {}
+        employee = KsoEmployee.objects.get(id=employee_id)
+        data['name'] = employee.name
+        data['position'] = employee.position
+
+        if employee.department1 is not None and with_department:
+            data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
+
+        if employee.department2 is not None and with_department:
+            data['ksodepartment2'] = KsoDepartment2ShortSerializer(employee.department2).data
+
+        return data
+
+    def get(self, request, pk):
+        result = []
+
+        employee_id = KsoEmployee.objects.get(user_id=pk).id
+        employee = self.get_employee(employee_id)
+
+        result.append(employee)
+
+        if employee.get('ksodepartment2', None) is not None:
+            department2_id = employee['ksodepartment2']['id']
+            department = KsoDepartment2.objects.get(id=department2_id)
+            result.append(self.get_employee(department.head.id, with_department=False))
+
+        if employee.get('ksodepartment1', None) is not None:
+            department1_id = employee['ksodepartment1']['id']
+            department = KsoDepartment1.objects.get(id=department1_id)
+            result.append(self.get_employee(department.head.id, with_department=False))
+
+        employee_kso = KsoEmployee.objects.get(id=employee_id).kso
+        kso_head = KsoEmployee.objects.get(kso_id=employee_kso, is_head=True)
+
+        result.append(self.get_employee(kso_head.id, with_department=False))
+
+        return response.Response(result)
