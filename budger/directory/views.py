@@ -176,10 +176,10 @@ class EntitySubordinatesView(views.APIView):
 
 class EmployeeSuperiorsView(views.APIView):
     def get_employee(self, employee):
-        data = dict()
-
-        data['name'] = employee.name
-        data['position'] = employee.position
+        data = {
+            'name': employee.name,
+            'position': employee.position,
+        }
 
         if employee.department1 is not None:
             data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
@@ -189,13 +189,7 @@ class EmployeeSuperiorsView(views.APIView):
 
         return data
 
-    def get(self, request, pk):
-        result = []
-
-        employee = KsoEmployee.objects.get(user_id=pk)
-
-        result.append(self.get_employee(employee))
-
+    def append_departments_heads(self, employee, result):
         if employee.department2 is not None:
             department = employee.department2
             department_head = department.head
@@ -206,8 +200,19 @@ class EmployeeSuperiorsView(views.APIView):
             department_head = department.head
             result.append(self.get_employee(department_head))
 
+    def get(self, request, pk):
+        result = []
+
+        employee = KsoEmployee.objects.get(user_id=pk)
         kso_head = employee.kso.head
-        if employee != kso_head:
-            result.append(self.get_employee(employee.kso.head))
+
+        result.append(self.get_employee(employee.kso.head))
+
+        if employee == kso_head:
+            return response.Response(result)
+
+        self.append_departments_heads(employee, result)
+
+        result.append(self.get_employee(employee))
 
         return response.Response(result)
