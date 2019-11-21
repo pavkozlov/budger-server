@@ -206,7 +206,7 @@ class EmployeeSuperiorsView(views.APIView):
         employee = KsoEmployee.objects.get(user_id=pk)
         kso_head = employee.kso.head
 
-        result.append(self.get_employee(employee.kso.head))
+        result.append(self.get_employee(kso_head))
 
         if employee == kso_head:
             return response.Response(result)
