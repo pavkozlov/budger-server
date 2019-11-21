@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-from budger.directory.models.entity import Entity
-from ..managers import KsoManager
+from .entity import Entity
 
 
 class Kso(models.Model):
     """
     Контрольно-счетная организация
     """
-    objects = KsoManager()
+    # objects = KsoManager()
 
     # Наименование изображения с логотипом
     logo = models.CharField(max_length=50)
@@ -31,8 +30,20 @@ class Kso(models.Model):
     # Состоит в СМ КСО
     in_alliance = models.BooleanField()
 
-    # ЮЛ
-    entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
+    # Ссылка на соотв. объект контроля (юр. лицо)
+    entity = models.ForeignKey(
+        Entity,
+        blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+
+    # Руководитель
+    head = models.ForeignKey(
+        'KsoEmployee',
+        blank=True, null=True,
+        related_name='headed_kso',
+        on_delete=models.SET_NULL
+    )
 
     class Meta:
         ordering = ['title_full']

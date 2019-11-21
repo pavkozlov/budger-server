@@ -57,9 +57,6 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
-    # Статус мероприятия
-    status = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_STATUS_ENUM, blank=True, null=True)
-
     # Вид мероприятия
     type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 

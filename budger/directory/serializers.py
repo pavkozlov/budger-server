@@ -4,11 +4,6 @@ from .models.entity import Entity, MunicipalBudget
 from .models.kso import Kso, KsoDepartment1, KsoEmployee
 
 
-########################################################################################################################
-# Entity serializers
-########################################################################################################################
-
-
 class EntityListSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Entity
@@ -36,9 +31,10 @@ class EntitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-########################################################################################################################
-# Kso departments serializers
-########################################################################################################################
+class KsoEmployeeShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KsoEmployee
+        fields = ('id', 'name', 'position',)
 
 
 class KsoDepartment1ShortSerializer(serializers.ModelSerializer):
@@ -75,14 +71,9 @@ class KsoDepartment1WithHeadSerializer(serializers.ModelSerializer):
     curator = _KsoEmployeeShortSerializer()
 
 
-########################################################################################################################
-# Kso serializers
-########################################################################################################################
-
-
 class KsoListSerializer(DynamicFieldsModelSerializer):
-    head = serializers.DictField()
-    employees_count_fact = serializers.IntegerField()
+    head = KsoEmployeeShortSerializer()
+    employees_count_fact = serializers.SerializerMethodField()
 
     class Meta:
         model = Kso
@@ -90,6 +81,10 @@ class KsoListSerializer(DynamicFieldsModelSerializer):
             'id', 'title_short', 'head', 'in_alliance',
             'employees_count_staff', 'employees_count_fact'
         )
+
+    def get_employees_count_fact(self, obj):
+        count = KsoEmployee.objects.filter(kso=obj).count()
+        return count
 
 
 class KsoShortSerializer(serializers.ModelSerializer):
@@ -107,35 +102,16 @@ class KsoMediumSerializer(serializers.ModelSerializer):
 class KsoSerializer(serializers.ModelSerializer):
     entity = EntitySerializer()
     departments = KsoDepartment1Serializer(many=True)
-    head = serializers.SerializerMethodField()
+    head = KsoEmployeeShortSerializer()
     employees_count_fact = serializers.SerializerMethodField()
 
     class Meta:
         model = Kso
         exclude = ('title_search',)
 
-    def get_head(self, obj):
-        try:
-            employee = KsoEmployee.objects.get(kso=obj, is_head=True)
-            return {
-                'id': employee.id,
-                'name': employee.name,
-                'position': employee.position,
-                'photo_slug': employee.photo_slug
-            }
-        except KsoEmployee.DoesNotExist:
-            return None
-        except KsoEmployee.MultipleObjectsReturned:
-            return None
-
     def get_employees_count_fact(self, obj):
         count = KsoEmployee.objects.filter(kso=obj).count()
         return count
-
-
-########################################################################################################################
-# Kso employee serializers
-########################################################################################################################
 
 
 class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
@@ -153,17 +129,6 @@ class KsoEmployeeMediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
         exclude = ('department2',)
-
-
-class KsoEmployeeShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = KsoEmployee
-        fields = ('id', 'name', 'position',)
-
-
-#
-# MunicipalBudgetTitle serializers
-#
 
 
 class MunicipalBudgetSerializer(serializers.ModelSerializer):
