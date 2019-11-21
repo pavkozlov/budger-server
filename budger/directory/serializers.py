@@ -34,7 +34,7 @@ class EntitySerializer(serializers.ModelSerializer):
 class KsoEmployeeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
-        fields = ('id', 'name', 'position',)
+        fields = ('id', 'name', 'position', 'photo_slug',)
 
 
 class KsoDepartment1ShortSerializer(serializers.ModelSerializer):
