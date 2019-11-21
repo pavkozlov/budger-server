@@ -103,9 +103,6 @@ class KsoDepartment2(models.Model):
     # Глава
     head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='headed_department2')
 
-    # Куратор подразделения
-    curator = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='curated_department2')
-
     class Meta:
         ordering = ['title']
         unique_together = ('department1', 'title',)
