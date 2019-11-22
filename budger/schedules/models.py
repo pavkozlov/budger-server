@@ -1,7 +1,7 @@
 from django.db import models
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
-
+from django.contrib.postgres.fields import ArrayField
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -9,16 +9,18 @@ ANNUAL_STATUS_ENUM = [
     (3, 'Согласовано'),
 ]
 
-EVENT_STATUS_ENUM = [
-    (1, 'В работе'),
-    (2, 'На согласовании'),
-    (3, 'Согласовано'),
-]
-
-EVENT_TYPE_ENUM = [
+TYPE_OF_CONTROL_ENUM = [
     (1, 'Контрольное'),
     (3, 'Экспертно-аналитическое'),
     (2, 'Экспертное'),
+]
+
+EVENT_TYPE_ENUM = [
+    (1, 'Финансовый аудит (контроль)'),
+    (3, 'Аудит в сфере закупок'),
+    (2, 'Аудит эффективности'),
+    (3, 'Экспертиза проекта закона'),
+    (4, 'Финансово-экономическая экспертиза')
 ]
 
 EVENT_MODE_ENUM = [
@@ -27,21 +29,39 @@ EVENT_MODE_ENUM = [
     (3, 'Параллельное мероприятие'),
 ]
 
-EVENT_INITIATOR_ENUM = [
-    (1, 'Руководитель субъекта РФ (муниципального образования)'),
-    (2, 'Законодательный орган субъекта РФ (муниципального образования)'),
-    (3, 'Счетная палата РФ'),
-    (4, 'Правоохранителные органы'),
-    (5, 'Гражданин'),
-    (6, 'Общественная организация'),
-    (7, 'КСП Московской области'),
-]
-
 WORKFLOW_STATUS_ENUM = [
     (0, 'Черновик'),
     (1, 'Согласовано начальником инспекции'),
     (2, 'Согласовано аудитором'),
     (3, 'Согласовано Председателем'),
+]
+
+EVENT_GROUNDS_ENUM = [
+    (0, 'По предложениям Губернатора Московской области / Главы муниципального образования'),
+    (1, 'По поручениям Московской областной думы / Законодательного органа муниципального образования'),
+    (2, 'По обращениям граждан'),
+    (3, 'По обращениям общественных организаций'),
+    (4, 'По обращениям правоохранительных органов'),
+    (5, 'По решению Совета КСО МО'),
+    (6, 'По решению органа аудита (контроля)'),
+    (7, 'По обращениям Правительства Московской области / Администрации муниципального образования'),
+]
+
+ADDITIONAL_ENUM = [
+    (0, 'С оценкой рисков возникновения коррупционных проявлений'),
+    (1, 'С проверкой реализации приоритетных и национальных проектов'),
+    (2, 'С проверкой соблюдения порядка управления и распоряжения имуществом'),
+    (3, 'С проверкой порядка и условий предоставления межбюджетных трансфертов'),
+]
+
+EVENT_METHODS_ENUM = [
+    (0, 'Обследование (анализ, оценка)'),
+    (1, 'Проверка')
+]
+
+EVENT_WAYS_ENUM = [
+    (0, 'С выездом'),
+    (1, 'Камерально')
 ]
 
 
@@ -57,24 +77,38 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
-    # Вид мероприятия
-    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
+    # Тип контроля
+    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=TYPE_OF_CONTROL_ENUM)
+
+    # Тип мероприятия
+    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_TYPE_ENUM), size=3)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
 
+    # Основания для проведения мероприятия
+    grounds = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_GROUNDS_ENUM), size=8)
+
+    # Дополнительные признаки
+    additional = ArrayField(models.PositiveSmallIntegerField(choices=ADDITIONAL_ENUM), size=4, blank=True, null=True)
+
     # Проверяемый период
-    period_from = models.DateField(db_index=True)
-    period_to = models.DateField(db_index=True)
+    period_from = models.DateField(db_index=True, null=True, blank=True)
+    period_to = models.DateField(db_index=True, null=True, blank=True)
+
+    # Метод проведения
+    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHODS_ENUM, null=True, blank=True)
+
+    # Способ проведения
+    ways = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAYS_ENUM, null=True, blank=True)
 
     # Даты проведения мероприятия
     exec_from = models.DateField(db_index=True)
     exec_to = models.DateField(db_index=True)
 
     # Ответственный за мероприятие
-    responsible_employee = models.ForeignKey(
+    responsible_employee = models.ManyToManyField(
         KsoEmployee,
-        on_delete=models.DO_NOTHING,
         related_name='owned_events'
     )
 
@@ -86,11 +120,9 @@ class Event(models.Model):
     )
 
     # Ответственное структурное подразделение
-    responsible_department = models.ForeignKey(
+    responsible_department = models.ManyToManyField(
         KsoDepartment1,
-        related_name='owned_events',
-        on_delete=models.DO_NOTHING,
-        null=True, blank=True
+        related_name='owned_events'
     )
 
     # Тип мероприятия
@@ -99,33 +131,11 @@ class Event(models.Model):
         blank=True, null=True
     )
 
-    # Тип финансового контроля
-    subject_performance = models.BooleanField(default=False)
-    subject_financial = models.BooleanField(default=False)
-
-    # Примечание
-    notes = models.TextField(null=True, blank=True)
-
-    # Обоснование включения в план
-    memo = models.TextField(null=True, blank=True)
-
-    # Привлекаемые внешние организации (эксперты)
-    attendant_experts = models.TextField(null=True)
+    # Проект НПА
+    project_npa = models.IntegerField(blank=True, null=True)
 
     # Объекты контроля
     controlled_entities = models.ManyToManyField(Entity, blank=True)
-
-    # КСО, принимающие участие в мероприятии (когда тип мероприятия параллельный или совместный)
-    attendant_ksos = models.ManyToManyField(Kso, blank=True)
-
-    # Инициатор поручения/обращения, реквизиты письма
-    initiator = models.PositiveSmallIntegerField(
-        db_index=True,
-        choices=EVENT_INITIATOR_ENUM,
-        blank=True, null=True
-    )
-    letter_number = models.CharField(max_length=20, blank=True, null=True)
-    letter_date = models.DateField(blank=True, null=True)
 
     creator = models.ForeignKey(
         KsoEmployee,
