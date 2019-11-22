@@ -9,13 +9,13 @@ ANNUAL_STATUS_ENUM = [
     (3, 'Согласовано'),
 ]
 
-TYPE_OF_CONTROL_ENUM = [
+EVENT_TYPE_ENUM = [
     (1, 'Контрольное'),
     (3, 'Экспертно-аналитическое'),
     (2, 'Экспертное'),
 ]
 
-EVENT_TYPE_ENUM = [
+EVENT_SUBJECT_ENUM = [
     (1, 'Финансовый аудит (контроль)'),
     (3, 'Аудит в сфере закупок'),
     (2, 'Аудит эффективности'),
@@ -24,7 +24,7 @@ EVENT_TYPE_ENUM = [
 ]
 
 EVENT_MODE_ENUM = [
-    (2, 'Самостоятельное'),
+    (2, 'Самостоятельное мероприятие'),
     (1, 'Совместное мероприятие'),
     (3, 'Параллельное мероприятие'),
 ]
@@ -36,7 +36,7 @@ WORKFLOW_STATUS_ENUM = [
     (3, 'Согласовано Председателем'),
 ]
 
-EVENT_GROUNDS_ENUM = [
+EVENT_INITIATOR_ENUM = [
     (0, 'По предложениям Губернатора Московской области / Главы муниципального образования'),
     (1, 'По поручениям Московской областной думы / Законодательного органа муниципального образования'),
     (2, 'По обращениям граждан'),
@@ -47,19 +47,19 @@ EVENT_GROUNDS_ENUM = [
     (7, 'По обращениям Правительства Московской области / Администрации муниципального образования'),
 ]
 
-ADDITIONAL_ENUM = [
+EVENT_SUBTYPE = [
     (0, 'С оценкой рисков возникновения коррупционных проявлений'),
     (1, 'С проверкой реализации приоритетных и национальных проектов'),
     (2, 'С проверкой соблюдения порядка управления и распоряжения имуществом'),
     (3, 'С проверкой порядка и условий предоставления межбюджетных трансфертов'),
 ]
 
-EVENT_METHODS_ENUM = [
+EVENT_METHOD_ENUM = [
     (0, 'Обследование (анализ, оценка)'),
     (1, 'Проверка')
 ]
 
-EVENT_WAYS_ENUM = [
+EVENT_WAY_ENUM = [
     (0, 'С выездом'),
     (1, 'Камерально')
 ]
@@ -78,36 +78,36 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Тип контроля
-    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=TYPE_OF_CONTROL_ENUM)
+    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 
     # Тип мероприятия
-    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_TYPE_ENUM), size=3)
+    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
 
     # Основания для проведения мероприятия
-    grounds = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_GROUNDS_ENUM), size=8)
+    grounds = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), size=8)
 
     # Дополнительные признаки
-    additional = ArrayField(models.PositiveSmallIntegerField(choices=ADDITIONAL_ENUM), size=4, blank=True, null=True)
+    additional = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE), size=4, blank=True, null=True)
 
     # Проверяемый период
     period_from = models.DateField(db_index=True, null=True, blank=True)
     period_to = models.DateField(db_index=True, null=True, blank=True)
 
     # Метод проведения
-    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHODS_ENUM, null=True, blank=True)
+    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM, null=True, blank=True)
 
     # Способ проведения
-    ways = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAYS_ENUM, null=True, blank=True)
+    ways = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM, null=True, blank=True)
 
     # Даты проведения мероприятия
     exec_from = models.DateField(db_index=True)
     exec_to = models.DateField(db_index=True)
 
     # Ответственный за мероприятие
-    responsible_employee = models.ManyToManyField(
+    responsible_employees = models.ManyToManyField(
         KsoEmployee,
         related_name='owned_events'
     )
@@ -120,7 +120,7 @@ class Event(models.Model):
     )
 
     # Ответственное структурное подразделение
-    responsible_department = models.ManyToManyField(
+    responsible_departments = models.ManyToManyField(
         KsoDepartment1,
         related_name='owned_events'
     )
@@ -132,12 +132,16 @@ class Event(models.Model):
     )
 
     # Проект НПА
-    project_npa = models.IntegerField(blank=True, null=True)
+    document_project = models.TextField(blank=True, null=True)
 
     # Объекты контроля
     controlled_entities = models.ManyToManyField(Entity, blank=True)
 
-    creator = models.ForeignKey(
+    # Тип финансового контроля
+    subject_performance = models.BooleanField(default=False)
+    subject_financial = models.BooleanField(default=False)
+
+    author = models.ForeignKey(
         KsoEmployee,
         on_delete=models.CASCADE
     )
