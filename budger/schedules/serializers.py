@@ -59,6 +59,11 @@ class EventFullSerializer(serializers.ModelSerializer):
             many=True
         ).data
 
+        repr['attendant_ksos'] = KsoShortSerializer(
+            instance.attendant_ksos.all(),
+            many=True
+        ).data
+
         return repr
 
     def validate(self, attrs):
