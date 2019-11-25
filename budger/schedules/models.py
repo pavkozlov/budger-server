@@ -3,19 +3,20 @@ from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from django.contrib.postgres.fields import ArrayField
 
+
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
     (2, 'На согласовании'),
     (3, 'Согласовано'),
 ]
 
-EVENT_TYPE_OF_CONTROL_ENUM = [
+EVENT_TYPE_ENUM = [
     (1, 'Контрольное'),
     (3, 'Экспертно-аналитическое'),
     (2, 'Экспертное'),
 ]
 
-EVENT_TYPE_ENUM = [
+EVENT_SUBJECT_ENUM = [
     (1, 'Финансовый аудит (контроль)'),
     (3, 'Аудит в сфере закупок'),
     (2, 'Аудит эффективности'),
@@ -78,10 +79,10 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Тип контроля
-    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_OF_CONTROL_ENUM)
+    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 
     # Тип мероприятия
-    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_TYPE_ENUM), size=3)
+    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
@@ -100,7 +101,7 @@ class Event(models.Model):
     method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM, null=True, blank=True)
 
     # Способ проведения
-    ways = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM, null=True, blank=True)
+    way = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM, null=True, blank=True)
 
     # Даты проведения мероприятия
     exec_from = models.DateField(db_index=True)
