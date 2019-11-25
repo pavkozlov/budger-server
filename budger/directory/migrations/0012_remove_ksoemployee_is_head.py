@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('directory', '0011_kso_head'),
+        ('directory', '0012_ksodepartment2_head'),
     ]
 
     operations = [
