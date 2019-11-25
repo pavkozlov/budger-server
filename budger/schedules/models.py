@@ -9,13 +9,13 @@ ANNUAL_STATUS_ENUM = [
     (3, 'Согласовано'),
 ]
 
-EVENT_TYPE_ENUM = [
+EVENT_TYPE_OF_CONTROL_ENUM = [
     (1, 'Контрольное'),
     (3, 'Экспертно-аналитическое'),
     (2, 'Экспертное'),
 ]
 
-EVENT_SUBJECT_ENUM = [
+EVENT_TYPE_ENUM = [
     (1, 'Финансовый аудит (контроль)'),
     (3, 'Аудит в сфере закупок'),
     (2, 'Аудит эффективности'),
@@ -47,7 +47,7 @@ EVENT_INITIATOR_ENUM = [
     (7, 'По обращениям Правительства Московской области / Администрации муниципального образования'),
 ]
 
-EVENT_SUBTYPE = [
+EVENT_SUBTYPE_ENUM = [
     (0, 'С оценкой рисков возникновения коррупционных проявлений'),
     (1, 'С проверкой реализации приоритетных и национальных проектов'),
     (2, 'С проверкой соблюдения порядка управления и распоряжения имуществом'),
@@ -78,19 +78,19 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Тип контроля
-    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
+    type_of_control = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_OF_CONTROL_ENUM)
 
     # Тип мероприятия
-    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3)
+    type = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_TYPE_ENUM), size=3)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
 
     # Основания для проведения мероприятия
-    grounds = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), size=8)
+    initiator = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), size=8)
 
     # Дополнительные признаки
-    additional = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE), size=4, blank=True, null=True)
+    subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), size=4, blank=True, null=True)
 
     # Проверяемый период
     period_from = models.DateField(db_index=True, null=True, blank=True)
