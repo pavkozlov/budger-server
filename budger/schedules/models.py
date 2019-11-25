@@ -86,7 +86,12 @@ class Event(models.Model):
     subtype = models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM, blank=True, null=True)
 
     # Тип мероприятия
-    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3, null=True, blank=True, default=None)
+    subject = ArrayField(
+        models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM),
+        null=True,
+        blank=True,
+        default=None
+    )
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
