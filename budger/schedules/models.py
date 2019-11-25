@@ -153,10 +153,6 @@ class Event(models.Model):
     # Объекты контроля
     controlled_entities = models.ManyToManyField(Entity, blank=True)
 
-    # Тип финансового контроля
-    subject_performance = models.BooleanField(default=False)
-    subject_financial = models.BooleanField(default=False)
-
     author = models.ForeignKey(
         KsoEmployee,
         on_delete=models.CASCADE, null=True, default=None, blank=True
