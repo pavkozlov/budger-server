@@ -123,13 +123,14 @@ class KsoEmployee(models.Model):
 
     read_only_fields = (user,)
 
-    # Ссылка на организацию
+    # Работает в организации...
     kso = models.ForeignKey(
         'Kso',
         on_delete=models.CASCADE,
         related_name='employees'
     )
 
+    # Работает в департаменте...
     department1 = models.ForeignKey(
         KsoDepartment1,
         on_delete=models.CASCADE,
@@ -137,6 +138,7 @@ class KsoEmployee(models.Model):
         blank=True
     )
 
+    # Работает в отделе...
     department2 = models.ForeignKey(
         KsoDepartment2,
         on_delete=models.CASCADE,
@@ -155,12 +157,13 @@ class KsoEmployee(models.Model):
     phone_mobile = models.CharField(max_length=200)
     email = models.CharField(max_length=200)
 
+    # Дата рождения
     birth_date = models.DateField(null=True, blank=True)
 
+    # Имя файла с фотографией
     photo_slug = models.CharField(max_length=100, null=True, blank=True)
 
-    is_head = models.BooleanField(default=False, db_index=True)
-
+    # Может быть ответственным за мероприятие
     can_be_responsible = models.BooleanField(default=False, db_index=True)
 
     class Meta:
