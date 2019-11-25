@@ -3,7 +3,6 @@ from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from django.contrib.postgres.fields import ArrayField
 
-
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
     (2, 'На согласовании'),
@@ -112,6 +111,20 @@ class Event(models.Model):
     attendant_departments = models.ManyToManyField(
         KsoDepartment1,
         related_name='participated_events',
+        blank=True
+    )
+
+    # Параллельно привлекаемые КСО
+    attendant_ksos_parallel = models.ManyToManyField(
+        Kso,
+        related_name='parallel_participated_events',
+        blank=True
+    )
+
+    # Совместно привлекаемые КСО
+    attendant_ksos_together = models.ManyToManyField(
+        Kso,
+        related_name='together_participated_events',
         blank=True
     )
 

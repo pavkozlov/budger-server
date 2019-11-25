@@ -41,12 +41,12 @@ class EventFullSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         repr = super(EventFullSerializer, self).to_representation(instance)
 
-        repr['responsible_employee'] = KsoEmployeeShortSerializer(
-            instance.responsible_employee,
+        repr['responsible_employees'] = KsoEmployeeShortSerializer(
+            instance.responsible_employees, many=True
         ).data
 
-        repr['responsible_department'] = KsoDepartment1ShortSerializer(
-            instance.responsible_department,
+        repr['responsible_departments'] = KsoDepartment1ShortSerializer(
+            instance.responsible_departments, many=True
         ).data
 
         repr['attendant_departments'] = KsoDepartment1ShortSerializer(
@@ -59,8 +59,13 @@ class EventFullSerializer(serializers.ModelSerializer):
             many=True
         ).data
 
-        repr['attendant_ksos'] = KsoShortSerializer(
-            instance.attendant_ksos.all(),
+        repr['attendant_ksos_parallel'] = KsoShortSerializer(
+            instance.attendant_ksos_parallel.all(),
+            many=True
+        ).data
+
+        repr['attendant_ksos_together'] = KsoShortSerializer(
+            instance.attendant_ksos_together.all(),
             many=True
         ).data
 
