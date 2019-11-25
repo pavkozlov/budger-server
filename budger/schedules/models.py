@@ -86,11 +86,7 @@ class Event(models.Model):
     subtype = models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM, blank=True, null=True)
 
     # Тип мероприятия
-    subject = ArrayField(
-        models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM),
-        null=True, blank=True,
-        default=None
-    )
+    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3, null=True, blank=True, default=None)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
@@ -156,6 +152,10 @@ class Event(models.Model):
 
     # Объекты контроля
     controlled_entities = models.ManyToManyField(Entity, blank=True)
+
+    # Тип финансового контроля
+    subject_performance = models.BooleanField(default=False)
+    subject_financial = models.BooleanField(default=False)
 
     author = models.ForeignKey(
         KsoEmployee,
