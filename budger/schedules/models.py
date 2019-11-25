@@ -114,10 +114,17 @@ class Event(models.Model):
         blank=True
     )
 
-    # Привлекаемые КСО
-    attendant_ksos = models.ManyToManyField(
+    # Параллельно привлекаемые КСО
+    attendant_ksos_parallel = models.ManyToManyField(
         Kso,
-        related_name='participated_events',
+        related_name='parallel_participated_events',
+        blank=True
+    )
+
+    # Совместно привлекаемые КСО
+    attendant_ksos_together = models.ManyToManyField(
+        Kso,
+        related_name='together_participated_events',
         blank=True
     )
 

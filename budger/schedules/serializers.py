@@ -59,8 +59,13 @@ class EventFullSerializer(serializers.ModelSerializer):
             many=True
         ).data
 
-        repr['attendant_ksos'] = KsoShortSerializer(
-            instance.attendant_ksos.all(),
+        repr['attendant_ksos_parallel'] = KsoShortSerializer(
+            instance.attendant_ksos_parallel.all(),
+            many=True
+        ).data
+
+        repr['attendant_ksos_together'] = KsoShortSerializer(
+            instance.attendant_ksos_together.all(),
             many=True
         ).data
 
