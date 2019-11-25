@@ -55,11 +55,6 @@ EVENT_SUBTYPE_ENUM = [
     (3, 'С проверкой порядка и условий предоставления межбюджетных трансфертов'),
 ]
 
-EVENT_METHOD_ENUM = [
-    (0, 'Обследование (анализ, оценка)'),
-    (1, 'Проверка')
-]
-
 EVENT_WAY_ENUM = [
     (0, 'С выездом'),
     (1, 'Камерально')
@@ -79,16 +74,16 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Тип контроля
-    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
+    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM, blank=True, null=True)
 
     # Тип мероприятия
-    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3)
+    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3, null=True, blank=True, default=None)
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
 
     # Основания для проведения мероприятия
-    initiator = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), size=8)
+    initiator = models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM, null=True, blank=True)
 
     # Дополнительные признаки
     subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), size=4, blank=True, null=True)
@@ -98,7 +93,7 @@ class Event(models.Model):
     period_to = models.DateField(db_index=True, null=True, blank=True)
 
     # Метод проведения
-    method = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_METHOD_ENUM, null=True, blank=True)
+    method = models.CharField(max_length=250, null=True, blank=True, db_index=True)
 
     # Способ проведения
     way = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM, null=True, blank=True)
@@ -144,7 +139,7 @@ class Event(models.Model):
 
     author = models.ForeignKey(
         KsoEmployee,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE, null=True, default=None, blank=True
     )
 
     created = models.DateTimeField(auto_now_add=True)
