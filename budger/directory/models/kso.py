@@ -100,6 +100,9 @@ class KsoDepartment2(models.Model):
     # Название
     title = models.CharField(max_length=255)
 
+    # Глава
+    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='headed_department2')
+
     class Meta:
         ordering = ['title']
         unique_together = ('department1', 'title',)

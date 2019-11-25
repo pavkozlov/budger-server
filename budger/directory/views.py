@@ -6,7 +6,7 @@ from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views
 from budger.directory.models.entity import Entity, MunicipalBudget
-from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
+from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1, KsoDepartment2
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 
@@ -16,7 +16,7 @@ from .serializers import (
     KsoEmployeeListSerializer,
     KsoEmployeeMediumSerializer,
     KsoEmployeeShortSerializer,
-    KsoDepartment1ShortSerializer,
+    KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer,
     MunicipalBudgetSerializer
 )
 
@@ -172,3 +172,47 @@ class EntitySubordinatesView(views.APIView):
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
         serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)
+
+
+class EmployeeSuperiorsView(views.APIView):
+    def get_employee(self, employee):
+        data = {
+            'name': employee.name,
+            'position': employee.position,
+        }
+
+        if employee.department1 is not None:
+            data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
+
+        if employee.department2 is not None:
+            data['ksodepartment2'] = KsoDepartment2ShortSerializer(employee.department2).data
+
+        return data
+
+    def get_head(self, department):
+        if department is not None:
+            department_head = department.head
+            return self.get_employee(department_head)
+
+    def get(self, request, pk):
+        result = []
+
+        employee = KsoEmployee.objects.get(user_id=pk)
+        kso_head = employee.kso.head
+
+        if employee == kso_head:
+            result.append(self.get_employee(employee))
+        else:
+            result.append(self.get_employee(employee))
+
+            dep2_head = self.get_head(employee.department2)
+            if dep2_head:
+                result.append(dep2_head)
+
+            dep1_head = self.get_head(employee.department1)
+            if dep1_head:
+                result.append(dep1_head)
+
+            result.append(self.get_employee(kso_head))
+
+        return response.Response(result)
