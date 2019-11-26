@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'budger.authentication',
     'budger.directory',
     'budger.schedules',
+    'budger.bubbles',
     'budger.t',
 ]
 
