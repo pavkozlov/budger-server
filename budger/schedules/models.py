@@ -79,7 +79,7 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
-    # Тип контроля
+    # Вид мероприятия
     type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 
     # Дополнительные признаки
@@ -141,7 +141,7 @@ class Event(models.Model):
         related_name='owned_events'
     )
 
-    # Тип мероприятия
+    # Форма проведения
     mode = models.PositiveSmallIntegerField(
         choices=EVENT_MODE_ENUM,
         blank=True, null=True
