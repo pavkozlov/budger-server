@@ -80,10 +80,10 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Тип контроля
-    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM, blank=True, null=True)
+    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 
     # Дополнительные признаки
-    subtype = models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM, blank=True, null=True)
+    subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), blank=True, null=True)
 
     # Тип мероприятия
     subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM), size=3, null=True, blank=True, default=None)
@@ -102,7 +102,7 @@ class Event(models.Model):
     method = models.CharField(max_length=250, null=True, blank=True, db_index=True)
 
     # Способ проведения
-    way = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM, null=True, blank=True)
+    way = ArrayField(models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM), null=True, blank=True)
 
     # Даты проведения мероприятия
     exec_from = models.DateField(db_index=True)
