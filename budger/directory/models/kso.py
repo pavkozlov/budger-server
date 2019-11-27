@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from .entity import Entity
 
 
+# from budger.directory.serializers import KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer
+
 class Kso(models.Model):
     """
     Контрольно-счетная организация
@@ -69,10 +71,12 @@ class KsoDepartment1(models.Model):
     can_participate_in_events = models.BooleanField(default=False)
 
     # Глава
-    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='headed_department')
+    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='headed_department')
 
     # Куратор подразделения
-    curator = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='curated_department')
+    curator = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name='curated_department')
 
     class Meta:
         ordering = ['title']
@@ -101,7 +105,8 @@ class KsoDepartment2(models.Model):
     title = models.CharField(max_length=255)
 
     # Глава
-    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True, related_name='headed_department2')
+    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='headed_department2')
 
     class Meta:
         ordering = ['title']
@@ -174,3 +179,65 @@ class KsoEmployee(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.kso)
+
+    def is_head(self):
+        return True if self.kso.head == self else False
+
+    def get_superiors(self):
+        """Функция для получения руководителей работника КСО"""
+
+        def _get_employee(employee):
+            """
+            Функция принимает работника ксо, возвращает в виде dict его департаменты (id + title), id, name. position
+            :param employee:
+            :return: dict
+            """
+            data = {
+                'id': employee.id,
+                'name': employee.name,
+                'position': employee.position,
+            }
+
+            if employee.department1 is not None:
+                data['ksodepartment1'] = {
+                    'id': employee.department1.id,
+                    'title': employee.department1.title
+                }
+
+            if employee.department2 is not None:
+                data['ksodepartment2'] = {
+                    'id': employee.department2.id,
+                    'title': employee.department2.title
+                }
+            return data
+
+        def _get_head(department):
+            """
+            Функция получает департамент, возвращает его главу в виде dict
+            :param department:
+            :return: dict
+            """
+            if department is not None:
+                department_head = department.head
+                return _get_employee(department_head)
+
+        result = []
+
+        kso_head = self.kso.head
+        if self == kso_head:
+            result.append(_get_employee(self))
+
+        else:
+            result.append(_get_employee(self))
+
+            dep2_head = _get_head(self.department2)
+            if dep2_head:
+                result.append(dep2_head)
+
+            dep1_head = _get_head(self.department1)
+            if dep1_head:
+                result.append(dep1_head)
+
+            result.append(_get_employee(kso_head))
+
+        return result

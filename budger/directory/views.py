@@ -174,6 +174,7 @@ class EntitySubordinatesView(views.APIView):
 class EmployeeSuperiorsView(views.APIView):
     def get_employee(self, employee):
         data = {
+            'id': employee.id,
             'name': employee.name,
             'position': employee.position,
         }
