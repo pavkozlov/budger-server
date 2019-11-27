@@ -9,11 +9,14 @@ ANNUAL_STATUS_ENUM = [
     (3, 'Согласовано'),
 ]
 
+EVENT_STATUS_DRAFT = 10
+EVENT_STATUS_IN_WORK = 20
+EVENT_STATUS_ACCEPTED = 30
+
 EVENT_STATUS_ENUM = [
-    (10, 'Черновик'),
-    (20, 'Согласовано руководителем отдела'),
-    (30, 'Согласовано руководителем департамента'),
-    (40, 'Согласовано Председателем КСО'),
+    (EVENT_STATUS_DRAFT, 'Черновик'),
+    (EVENT_STATUS_IN_WORK, 'В работе'),
+    (EVENT_STATUS_ACCEPTED, 'Согласовано'),
 ]
 
 EVENT_TYPE_ENUM = [
@@ -36,11 +39,12 @@ EVENT_MODE_ENUM = [
     (3, 'Параллельное мероприятие'),
 ]
 
+WORKFLOW_STATUS_ACCEPTED = 1
+WORKFLOW_STATUS_REJECTED = 0
+
 WORKFLOW_STATUS_ENUM = [
-    (1, 'Черновик'),
-    (2, 'Согласовано начальником инспекции'),
-    (3, 'Согласовано аудитором'),
-    (4, 'Согласовано Председателем'),
+    (WORKFLOW_STATUS_ACCEPTED, 'Согласовано'),
+    (WORKFLOW_STATUS_REJECTED, 'Не согласовано'),
 ]
 
 EVENT_INITIATOR_ENUM = [
@@ -69,7 +73,11 @@ EVENT_WAY_ENUM = [
 
 class Annual(models.Model):
     year = models.PositiveSmallIntegerField(db_index=True)
-    status = models.PositiveSmallIntegerField(db_index=True, choices=ANNUAL_STATUS_ENUM)
+
+    status = models.PositiveSmallIntegerField(
+        db_index=True,
+        choices=ANNUAL_STATUS_ENUM
+    )
 
     def __str__(self):
         return '{} - {}'.format(self.year, self.status)
@@ -79,6 +87,15 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
+    # Статус мероприятия
+    status = models.PositiveSmallIntegerField(
+        db_index=True,
+        choices=EVENT_STATUS_ENUM,
+        default=EVENT_STATUS_DRAFT,
+        blank=True,
+        null=True
+    )
+
     # Вид мероприятия
     type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
 
@@ -86,8 +103,9 @@ class Event(models.Model):
     subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), blank=True, null=True)
 
     # Тип мероприятия
-    subject = ArrayField(
-        models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM),
+    subject = ArrayField(models.PositiveSmallIntegerField(
+        choices=EVENT_SUBJECT_ENUM),
+        size=3,
         null=True,
         blank=True,
         default=None
@@ -195,7 +213,8 @@ class Workflow(models.Model):
     )
 
     status = models.PositiveSmallIntegerField(choices=WORKFLOW_STATUS_ENUM)
-    memo = models.TextField()
+
+    memo = models.TextField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
 

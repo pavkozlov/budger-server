@@ -1,5 +1,5 @@
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
-from .models import Annual, Event
+from .models import Annual, Event, Workflow
 from rest_framework import serializers
 from budger.directory.serializers import (
     KsoShortSerializer,
@@ -76,3 +76,9 @@ class EventFullSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'message': 'Period range setup error.'})
 
         return attrs
+
+
+class WorkflowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workflow
+        fields = '__all__'
