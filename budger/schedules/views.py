@@ -14,7 +14,7 @@ from .models import (
 from .serializers import EventFullSerializer, WorkflowSerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from budger.libs.input_decorator import input_must_have
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -34,21 +34,14 @@ class EnumsApiView(views.APIView):
 
 
 class WorkflowView(views.APIView):
+
+    @input_must_have(['employee_id', 'event_id', 'outcome'])
     def post(self, request):
         # Получить данные
-        employee_id = request.data.get('employee_id', None)
-        event_id = request.data.get('event_id', None)
-        status = int(request.data.get('outcome', None))
+        employee_id = request.data['employee_id']
+        event_id = request.data['event_id']
+        status = int(request.data['outcome'])
         memo = request.data.get('memo', None)
-
-        if employee_id is None or event_id is None:
-            return response.Response(status=HTTP_400_BAD_REQUEST)
-
-        if status not in (WORKFLOW_STATUS_ACCEPTED, WORKFLOW_STATUS_REJECTED):
-            return response.Response(status=HTTP_400_BAD_REQUEST)
-
-        if status == WORKFLOW_STATUS_REJECTED and memo is None:
-            return response.Response(status=HTTP_400_BAD_REQUEST)
 
         sender = get_object_or_404(KsoEmployee, id=employee_id)
         event = get_object_or_404(Event, id=event_id)
