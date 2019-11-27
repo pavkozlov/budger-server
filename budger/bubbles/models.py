@@ -54,8 +54,8 @@ class BudgetFact(BudgetAbstract):
     approved = models.DateField()  # appdatetime в источнике данных
 
     # Код и наименование цели
-    goal_code = models.CharField(max_length=20)
-    goal_title = models.CharField(max_length=2000)
+    goal_code = models.CharField(max_length=20, null=True, blank=True)
+    goal_title = models.CharField(max_length=2000, null=True, blank=True)
 
     # Наименование полного кода расходов
     title = models.CharField(max_length=2000)
