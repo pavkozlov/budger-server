@@ -180,6 +180,9 @@ class KsoEmployee(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.name, self.kso)
 
+    def is_head(self):
+        return True if self.kso.head == self else False
+
     def get_superiors(self):
         """Функция для получения руководителей работника КСО"""
 

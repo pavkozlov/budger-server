@@ -78,7 +78,7 @@ class EventFullSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class WorkFlowSerializer(serializers.ModelSerializer):
+class WorkflowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workflow
         fields = '__all__'

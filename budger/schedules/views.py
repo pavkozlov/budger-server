@@ -6,13 +6,12 @@ from .models import (
     EVENT_INITIATOR_ENUM,
     EVENT_MODE_ENUM,
     Event, Workflow,
-    EVENT_STATUS_SENT,
-    EVENT_STATUS_AGREED_BY_DEPARTMENT1_HEAD,
-    EVENT_STATUS_AGREED_BY_DEPARTMENT2_HEAD,
-    EVENT_STATUS_AGREED_BY_KSO_HEAD,
-    WORKFLOW_STATUS_ACCEPTED, WORKFLOW_STATUS_REJECTED
+    EVENT_STATUS_IN_WORK,
+    EVENT_STATUS_ACCEPTED,
+    WORKFLOW_STATUS_REJECTED,
+    WORKFLOW_STATUS_ACCEPTED,
 )
-from .serializers import EventFullSerializer, WorkFlowSerializer
+from .serializers import EventFullSerializer, WorkflowSerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from rest_framework.status import HTTP_400_BAD_REQUEST
@@ -35,76 +34,55 @@ class EnumsApiView(views.APIView):
 
 
 class WorkflowView(views.APIView):
-    def get(self, request):
+    def post(self, request):
         # Получить данные
         employee_id = request.data.get('employee_id', None)
         event_id = request.data.get('event_id', None)
-        mode = request.data.get('mode', None)
+        status = int(request.data.get('outcome', None))
         memo = request.data.get('memo', None)
 
-        # Проверить данные
         if employee_id is None or event_id is None:
             return response.Response(status=HTTP_400_BAD_REQUEST)
 
-        if mode not in ('accepted', 'rejected'):
+        if status not in (WORKFLOW_STATUS_ACCEPTED, WORKFLOW_STATUS_REJECTED):
             return response.Response(status=HTTP_400_BAD_REQUEST)
 
-        if mode == 'rejected' and memo is None:
+        if status == WORKFLOW_STATUS_REJECTED and memo is None:
             return response.Response(status=HTTP_400_BAD_REQUEST)
 
-        employee = get_object_or_404(KsoEmployee, id=employee_id)
+        sender = get_object_or_404(KsoEmployee, id=employee_id)
         event = get_object_or_404(Event, id=event_id)
 
-        # Получить статус WorkFlow
-        if mode == 'accepted':
-            workflow_status = WORKFLOW_STATUS_ACCEPTED
-        elif mode == 'rejected':
-            workflow_status = WORKFLOW_STATUS_REJECTED
-
         # Получить список начальников
-        superiors = employee.get_superiors()
-
-        # Получить статус мероприятия и получателя
-        if len(superiors) == 1:
-            # Пользователь является председателем КСО
-            recipient = employee
-            status = EVENT_STATUS_AGREED_BY_KSO_HEAD
-
-        elif len(superiors) > 1:
-            recipient_id = superiors[1]['id']
-            recipient = KsoEmployee.objects.get(id=recipient_id)
-
-            if len(superiors) == 2:
-                # Пользователь является начальником департамента
-                if workflow_status == WORKFLOW_STATUS_ACCEPTED:
-                    status = EVENT_STATUS_AGREED_BY_DEPARTMENT1_HEAD
-                elif workflow_status == WORKFLOW_STATUS_REJECTED:
-                    status = EVENT_STATUS_AGREED_BY_DEPARTMENT2_HEAD
-
-            if len(superiors) == 3:
-                # Пользователь является начальником отдела
-                if workflow_status == WORKFLOW_STATUS_ACCEPTED:
-                    status = EVENT_STATUS_AGREED_BY_DEPARTMENT2_HEAD
-                elif workflow_status == WORKFLOW_STATUS_REJECTED:
-                    status = EVENT_STATUS_SENT
-
-            if len(superiors) == 4:
-                # Пользователь является рядовым сотрудником
-                status = EVENT_STATUS_SENT
+        superiors = sender.get_superiors()
 
         # Если аудиторов больше 1, отправляем на согласование председателю
         if event.responsible_employees.count() > 1:
             recipient_id = superiors[-1]['id']
             recipient = KsoEmployee.objects.get(id=recipient_id)
-            status = EVENT_STATUS_SENT
+            event_status = EVENT_STATUS_IN_WORK
+        else:
+            if sender.is_head():
+                # Если отправитель глава КСО, статус = согласовано
+                recipient = sender
+                event_status = EVENT_STATUS_ACCEPTED
+            else:
+                # Если отправитель не глава КСО, получатель = ближайший руководитель
+                recipient_id = superiors[1]['id']
+                recipient = KsoEmployee.objects.get(id=recipient_id)
+                event_status = EVENT_STATUS_IN_WORK
 
-        event.status = status
+        # Создать запись в Workflow
+        workflow = Workflow.objects.create(
+            event=event,
+            sender=sender,
+            recipient=recipient,
+            status=status,
+            memo=memo
+        )
+
+        # Обновить статус мероприятия
+        event.status = event_status
         event.save()
 
-        workflow = Workflow.objects.create(event=event,
-                                           sender=employee,
-                                           recipient=recipient,
-                                           status=workflow_status,
-                                           memo=memo)
-
-        return response.Response(WorkFlowSerializer(workflow).data)
+        return response.Response(WorkflowSerializer(workflow).data)

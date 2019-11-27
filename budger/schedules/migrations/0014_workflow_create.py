@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('schedules', '0013_refactor_event'),
     ]
@@ -13,12 +12,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='status',
-            field=models.PositiveSmallIntegerField(blank=True, choices=[(0, 'Черновик'), (10, 'Отправлено на согласование'), (20, 'Согласовано руководителем отдела'), (30, 'Согласовано руководителем департамента'), (40, 'Согласовано Председателем КСО')], db_index=True, default=0, null=True),
-        ),
-        migrations.AlterField(
-            model_name='annual',
-            name='status',
-            field=models.PositiveSmallIntegerField(choices=[(1, 'В работе'), (2, 'На согласовании'), (3, 'Согласовано')], db_index=True, default=0),
+            field=models.PositiveSmallIntegerField(
+                blank=True,
+                choices=[(10, 'Черновик'), (20, 'В работе'), (30, 'Согласовано')],
+                db_index=True, default=10, null=True),
         ),
         migrations.AlterField(
             model_name='workflow',

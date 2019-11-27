@@ -9,18 +9,14 @@ ANNUAL_STATUS_ENUM = [
     (3, 'Согласовано'),
 ]
 
-EVENT_STATUS_DRAFT = 0
-EVENT_STATUS_SENT = 10
-EVENT_STATUS_AGREED_BY_DEPARTMENT2_HEAD = 20
-EVENT_STATUS_AGREED_BY_DEPARTMENT1_HEAD = 30
-EVENT_STATUS_AGREED_BY_KSO_HEAD = 40
+EVENT_STATUS_DRAFT = 10
+EVENT_STATUS_IN_WORK = 20
+EVENT_STATUS_ACCEPTED = 30
 
 EVENT_STATUS_ENUM = [
     (EVENT_STATUS_DRAFT, 'Черновик'),
-    (EVENT_STATUS_SENT, 'Отправлено на согласование'),
-    (EVENT_STATUS_AGREED_BY_DEPARTMENT2_HEAD, 'Согласовано руководителем отдела'),
-    (EVENT_STATUS_AGREED_BY_DEPARTMENT1_HEAD, 'Согласовано руководителем департамента'),
-    (EVENT_STATUS_AGREED_BY_KSO_HEAD, 'Согласовано Председателем КСО'),
+    (EVENT_STATUS_IN_WORK, 'В работе'),
+    (EVENT_STATUS_ACCEPTED, 'Согласовано'),
 ]
 
 EVENT_TYPE_ENUM = [
@@ -44,7 +40,7 @@ EVENT_MODE_ENUM = [
 ]
 
 WORKFLOW_STATUS_ACCEPTED = 1
-WORKFLOW_STATUS_REJECTED = 1
+WORKFLOW_STATUS_REJECTED = 0
 WORKFLOW_STATUS_ENUM = [
     (WORKFLOW_STATUS_ACCEPTED, 'Согласовано'),
     (WORKFLOW_STATUS_REJECTED, 'Не согласовано'),
@@ -78,8 +74,7 @@ class Annual(models.Model):
     year = models.PositiveSmallIntegerField(db_index=True)
     status = models.PositiveSmallIntegerField(
         db_index=True,
-        choices=ANNUAL_STATUS_ENUM,
-        default=EVENT_STATUS_DRAFT
+        choices=ANNUAL_STATUS_ENUM
     )
 
     def __str__(self):
@@ -91,12 +86,13 @@ class Annual(models.Model):
 
 class Event(models.Model):
     # Статус мероприятия
-    status = models.PositiveSmallIntegerField(db_index=True,
-                                              choices=EVENT_STATUS_ENUM,
-                                              default=EVENT_STATUS_DRAFT,
-                                              blank=True,
-                                              null=True
-                                              )
+    status = models.PositiveSmallIntegerField(
+        db_index=True,
+        choices=EVENT_STATUS_ENUM,
+        default=EVENT_STATUS_DRAFT,
+        blank=True,
+        null=True
+    )
 
     # Вид мероприятия
     type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
@@ -105,12 +101,13 @@ class Event(models.Model):
     subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), blank=True, null=True)
 
     # Тип мероприятия
-    subject = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBJECT_ENUM),
-                         size=3,
-                         null=True,
-                         blank=True,
-                         default=None
-                         )
+    subject = ArrayField(models.PositiveSmallIntegerField(
+        choices=EVENT_SUBJECT_ENUM),
+        size=3,
+        null=True,
+        blank=True,
+        default=None
+    )
 
     # Наименование мероприятия
     title = models.CharField(max_length=255)
