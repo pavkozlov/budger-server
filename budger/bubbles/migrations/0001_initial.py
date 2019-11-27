@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='BudgetData',
+            name='BudgetPlan',
             fields=[
                 ('id', models.BigAutoField(editable=False, primary_key=True, serialize=False)),
                 ('amount', models.FloatField()),
@@ -37,5 +37,27 @@ class Migration(migrations.Migration):
                 ('kcsr_code', models.CharField(db_index=True, max_length=10)),
                 ('entity', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='directory.Entity')),
             ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='BudgetFact',
+            fields=[
+                ('id', models.BigAutoField(editable=False, primary_key=True, serialize=False)),
+                ('amount', models.FloatField()),
+                ('year', models.IntegerField()),
+                ('rzpr_code', models.CharField(db_index=True, max_length=4)),
+                ('kvr_code', models.CharField(db_index=True, max_length=3)),
+                ('kcsr_code', models.CharField(db_index=True, max_length=10)),
+                ('approved', models.DateField()),
+                ('goal_code', models.CharField(max_length=20)),
+                ('goal_title', models.CharField(max_length=2000)),
+                ('title', models.CharField(max_length=2000)),
+                ('entity', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='directory.Entity')),
+            ],
+            options={
+                'abstract': False,
+            },
         ),
     ]

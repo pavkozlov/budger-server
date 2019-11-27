@@ -2,12 +2,10 @@ from django.db import models
 from budger.directory.models.entity import Entity
 
 
-class BudgetData(models.Model):
+class BudgetAbstract(models.Model):
     """
-    Модель для информации о планировании бюджета.
-    Источник данных: http://budget.gov.ru/epbs/registry/SBRCOSTSUBMO/data?filterbudget.budgetcode=46000000
+    Абстрактная модель для работы с данными о планировании / исполении бюджета
     """
-
     id = models.BigAutoField(primary_key=True, editable=False)
 
     # Отношение к объекту контроля
@@ -18,9 +16,6 @@ class BudgetData(models.Model):
 
     # Год, даты утверждения, начала действия записи, окончания действия записи
     year = models.IntegerField()
-    approved = models.DateField()
-    started = models.DateField()
-    ended = models.DateField()
 
     # Информация о кодах разделов\подразделов классификации расходов бюджетов
     rzpr_code = models.CharField(max_length=4, db_index=True)
@@ -31,8 +26,48 @@ class BudgetData(models.Model):
     # Информация о кодах целевых статей расходов бюджета
     kcsr_code = models.CharField(max_length=10, db_index=True)
 
+    class Meta:
+        abstract = True
+
+
+class BudgetPlan(BudgetAbstract):
+    """
+    Модель для работы с данными запланированном бюджете.
+    Источник данных:
+    http://budget.gov.ru/epbs/registry/SBRCOSTSUBMO/data?filterbudget.budgetcode=46000000
+    """
+
+    # Даты утверждения, начала действия записи, окончания действия записи
+    approved = models.DateField()
+    started = models.DateField()
+    ended = models.DateField()
+
+
+class BudgetFact(BudgetAbstract):
+    """
+    Модель для работы с данными об исполнении бюджета.
+    Источник данных:
+    http://budget.gov.ru/epbs/registry/7710168360-CASHEXECEXPENSES/data?filterbudget.budgetcode=46000000
+    """
+
+    # Дата утверждения записи
+    approved = models.DateField()  # appdatetime в источнике данных
+
+    # Код и наименование цели
+    goal_code = models.CharField(max_length=20)
+    goal_title = models.CharField(max_length=2000)
+
+    # Наименование полного кода расходов
+    title = models.CharField(max_length=2000)
+
 
 class BudgetTitle(models.Model):
+    """
+    Модель для работы с заголовками:
+    разделов\подразделов классификации расходов бюджетов,
+    видах расходов бюджета
+    кодах целевых статей расходов бюджета.
+    """
 
     rzpr_code = models.CharField(
         max_length=4,
