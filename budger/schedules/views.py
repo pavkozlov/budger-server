@@ -92,6 +92,12 @@ class WorkflowView(views.APIView):
                 # Пользователь является рядовым сотрудником
                 status = EVENT_STATUS_SENT
 
+        # Если аудиторов больше 1, отправляем на согласование председателю
+        if event.responsible_employees.count() > 1:
+            recipient_id = superiors[-1]['id']
+            recipient = KsoEmployee.objects.get(id=recipient_id)
+            status = EVENT_STATUS_SENT
+
         event.status = status
         event.save()
 
