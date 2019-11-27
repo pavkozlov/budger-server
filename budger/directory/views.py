@@ -200,8 +200,6 @@ class EmployeeSuperiorsView(views.APIView):
 
         if employee != kso_head:
 
-            result.append(self.get_employee(employee))
-
             dep2_head = self.get_head(employee.department2)
             if dep2_head:
                 result.append(dep2_head)
