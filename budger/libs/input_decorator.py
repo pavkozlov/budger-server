@@ -1,6 +1,22 @@
 from rest_framework import response, status
 
 
+def check_field(required_fields, data):
+    nested_fields = required_fields.split('/')
+    received_data = data
+
+    for field in nested_fields:
+
+        if field in received_data:
+            if len(nested_fields) > 1:
+                received_data = received_data[field]
+        else:
+            message = 'Error: {} not found'.format(field)
+            return False, message
+
+    return True, None
+
+
 def input_must_have(required_fields):
     def real_decorator(function):
         def wrapper(*args):
@@ -8,33 +24,18 @@ def input_must_have(required_fields):
             data = args[1].data
 
             # Если пришла строка
-            if type(required_fields) is str:
-                nested_fields = required_fields.split('/')
-                for field in nested_fields:
-                    if field in data:
-                        if len(nested_fields) > 1:
-                            data = data[field]
-                    else:
-                        return response.Response(
-                            {'error': '{} not found.'.format(field)},
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
+            if isinstance(required_fields, str):
+                check_result, message = check_field(required_fields, data)
+                if not check_result:
+                    return response.Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
             # Если пришёл список
-            elif type(required_fields) is list:
+            elif isinstance(required_fields, list):
                 for field in required_fields:
-                    nested_fields = field.split('/')
-                    for f in nested_fields:
-                        if f in data:
-                            if len(nested_fields) > 1:
-                                data = data[f]
-                        else:
-                            return response.Response(
-                                {'error': '{} not found.'.format(f)},
-                                status=status.HTTP_400_BAD_REQUEST
-                            )
+                    check_result, message = check_field(field, data)
+                    if not check_result:
+                        return response.Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Вызвать обертываемую функцию и вернуть результат
             return function(*args)
 
         return wrapper
