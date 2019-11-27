@@ -195,12 +195,11 @@ class EmployeeSuperiorsView(views.APIView):
     def get(self, request, pk):
         result = []
 
-        employee = KsoEmployee.objects.get(user_id=pk)
+        employee = get_object_or_404(KsoEmployee, id=pk)
         kso_head = employee.kso.head
 
-        if employee == kso_head:
-            result.append(self.get_employee(employee))
-        else:
+        if employee != kso_head:
+
             result.append(self.get_employee(employee))
 
             dep2_head = self.get_head(employee.department2)
