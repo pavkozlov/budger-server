@@ -15,7 +15,6 @@ from .serializers import (
     KsoListSerializer, KsoSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeMediumSerializer,
-    KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer,
     MunicipalBudgetSerializer,
     KsoDepartment1WithHeadSerializer
 )
@@ -169,47 +168,3 @@ class EntitySubordinatesView(views.APIView):
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
         serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)
-
-
-class EmployeeSuperiorsView(views.APIView):
-    def get_employee(self, employee):
-        data = {
-            'name': employee.name,
-            'position': employee.position,
-        }
-
-        if employee.department1 is not None:
-            data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
-
-        if employee.department2 is not None:
-            data['ksodepartment2'] = KsoDepartment2ShortSerializer(employee.department2).data
-
-        return data
-
-    def get_head(self, department):
-        if department is not None:
-            department_head = department.head
-            return self.get_employee(department_head)
-
-    def get(self, request, pk):
-        result = []
-
-        employee = KsoEmployee.objects.get(user_id=pk)
-        kso_head = employee.kso.head
-
-        if employee == kso_head:
-            result.append(self.get_employee(employee))
-        else:
-            result.append(self.get_employee(employee))
-
-            dep2_head = self.get_head(employee.department2)
-            if dep2_head:
-                result.append(dep2_head)
-
-            dep1_head = self.get_head(employee.department1)
-            if dep1_head:
-                result.append(dep1_head)
-
-            result.append(self.get_employee(kso_head))
-
-        return response.Response(result)
