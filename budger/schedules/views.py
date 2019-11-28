@@ -23,6 +23,10 @@ class EventViewSet(viewsets.ModelViewSet):
 
 
 class EnumsApiView(views.APIView):
+    """
+    GET Список констант
+    """
+
     def get(self, request):
         return response.Response({
             'ANNUAL_STATUS_ENUM': ANNUAL_STATUS_ENUM,
