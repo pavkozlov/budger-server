@@ -9,14 +9,14 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
         model = Entity
         fields = (
             'id', 'reg_date', 'title_full', 'title_short', 'inn', 'ogrn',
-            'head_position', 'head_name', 'ofk_code'
+            'head_position', 'head_name', 'ofk_code', 'org_status_code', 'spec_event_code',
         )
 
 
 class EntityShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code')
+        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'org_status_code')
 
 
 class EntitySubordinatesSerializer(serializers.ModelSerializer):
