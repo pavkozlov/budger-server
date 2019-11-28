@@ -6,10 +6,13 @@ from .views import (
     EntitySubordinatesView,
     KsoResponsiblesView,
     EntityRegionalsView, EntityMunicipalsView,
-    EmployeeSuperiorsView
+    EmployeeSuperiorsView,
+    EnumsView
 )
 
 urlpatterns = [
+    path('_enums', EntityListView.as_view()),
+
     path('entity', EntityListView.as_view()),
     path('entity/<int:pk>', EntityRetrieveView.as_view()),
 
