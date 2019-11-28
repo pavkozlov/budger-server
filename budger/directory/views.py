@@ -6,7 +6,7 @@ from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views
 from budger.directory.models.entity import Entity, MunicipalBudget
-from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1, KsoDepartment2
+from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
 
@@ -15,9 +15,9 @@ from .serializers import (
     KsoListSerializer, KsoSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeMediumSerializer,
-    KsoEmployeeShortSerializer,
     KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer,
-    MunicipalBudgetSerializer
+    MunicipalBudgetSerializer,
+    KsoDepartment1WithHeadSerializer
 )
 
 from .filters import EntityFilter
@@ -97,18 +97,15 @@ class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
 
 class KsoResponsiblesView(views.APIView):
     """
-    GET Список сотрудников и подразделений КСО, могущих являться отвестсвенными за мероприятия
+    GET Список подразделений КСО, могущих являться отвестсвенными за мероприятия
     """
 
     def get(self, request):
         kso = request.user.ksoemployee.kso
-
-        employees = KsoEmployee.objects.filter(kso=kso, can_be_responsible=True)
         departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
 
         return response.Response({
-            'departments': KsoDepartment1ShortSerializer(departments, many=True).data,
-            'employees': KsoEmployeeShortSerializer(employees, many=True).data
+            'departments': KsoDepartment1WithHeadSerializer(departments, many=True).data,
         })
 
 
@@ -177,6 +174,7 @@ class EntitySubordinatesView(views.APIView):
 class EmployeeSuperiorsView(views.APIView):
     def get_employee(self, employee):
         data = {
+            'id': employee.id,
             'name': employee.name,
             'position': employee.position,
         }
@@ -197,13 +195,10 @@ class EmployeeSuperiorsView(views.APIView):
     def get(self, request, pk):
         result = []
 
-        employee = KsoEmployee.objects.get(user_id=pk)
+        employee = get_object_or_404(KsoEmployee, id=pk)
         kso_head = employee.kso.head
 
-        if employee == kso_head:
-            result.append(self.get_employee(employee))
-        else:
-            result.append(self.get_employee(employee))
+        if employee != kso_head:
 
             dep2_head = self.get_head(employee.department2)
             if dep2_head:
