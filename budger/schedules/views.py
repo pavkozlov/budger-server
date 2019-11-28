@@ -1,4 +1,4 @@
-from rest_framework import views, viewsets, response
+from rest_framework import views, viewsets, response, generics
 from .models import (
     ANNUAL_STATUS_ENUM,
     EVENT_STATUS_ENUM,
@@ -11,7 +11,7 @@ from .models import (
     WORKFLOW_STATUS_REJECTED,
     WORKFLOW_STATUS_ACCEPTED,
 )
-from .serializers import EventFullSerializer, WorkflowSerializer
+from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
@@ -38,6 +38,9 @@ class EnumsApiView(views.APIView):
 
 
 class WorkflowView(views.APIView):
+    """
+    POST Создать запись в workflow
+    """
 
     @input_must_have(['employee_id', 'event_id', 'outcome'])
     def post(self, request):
@@ -83,3 +86,15 @@ class WorkflowView(views.APIView):
         event.save()
 
         return response.Response(WorkflowSerializer(workflow).data)
+
+
+class WorkflowQueryListView(generics.ListAPIView):
+    """
+    GET Получить список Workflow для указанного пользователя
+    """
+    serializer_class = WorkflowQuerySerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        queryset = Workflow.objects.filter(recipient_id=pk).order_by('event_id', '-created').distinct('event_id')
+        return queryset

@@ -78,7 +78,22 @@ class EventFullSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class EventShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('id', 'title')
+
+
 class WorkflowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workflow
+        fields = '__all__'
+
+
+class WorkflowQuerySerializer(serializers.ModelSerializer):
+    sender = KsoEmployeeShortSerializer()
+    event = EventShortSerializer()
+
     class Meta:
         model = Workflow
         fields = '__all__'
