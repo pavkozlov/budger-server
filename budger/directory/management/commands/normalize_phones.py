@@ -3,31 +3,31 @@ from budger.directory.models.kso import KsoEmployee
 import re
 
 
-def clean_phone_number(phone):
+def normalize_phone_number(phone):
     """
     Функция принимает телефон в произвольном формате, возвращает только цифры
     :param phone:
     :return: str
     """
-    if phone is None:
-        return None
+    if len(phone) == 0:
+        return phone
+
+    code = re.findall('\((\d*)\)', phone)
+    country_code = code[0] if len(code) > 0 else None
 
     digits = re.findall('\d', phone)
     phone_number = ''.join([digit for digit in digits])
 
-    return check_country_code(phone_number)
+    if len(phone_number) == 10:
+        phone_number = '8' + phone_number
 
+    if country_code and phone_number.startswith(country_code):
+        phone_number = '8' + phone_number
 
-def check_country_code(number):
-    """
-    Функция принимает очищенный номер телефона, добавляет в начало 8, если её нет
-    :param number:
-    :return:
-    """
-    if len(number) == 10:
-        return '8' + number
-    else:
-        return number
+    if phone_number[0] != '8':
+        phone_number = '8' + phone_number
+
+    return phone_number
 
 
 class Command(BaseCommand):
@@ -37,8 +37,7 @@ class Command(BaseCommand):
         employees = KsoEmployee.objects.all()
 
         for employee in employees:
-
-            employee.phone_landline = clean_phone_number(employee.phone_landline)
-            employee.phone_mobile = clean_phone_number(employee.phone_mobile)
+            employee.phone_landline = normalize_phone_number(employee.phone_landline)
+            employee.phone_mobile = normalize_phone_number(employee.phone_mobile)
 
             employee.save()
