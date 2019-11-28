@@ -174,6 +174,9 @@ class KsoEmployee(models.Model):
     # Может быть ответственным за мероприятие
     can_be_responsible = models.BooleanField(default=False, db_index=True)
 
+    # Если пользоваталь отсутствует, сообщение о причине отсутствия (декрет, уход за ребенком что-то еще)
+    inactive_title = models.CharField(max_length=2000, null=True, blank=True, default=None)
+
     class Meta:
         ordering = ['name']
 
