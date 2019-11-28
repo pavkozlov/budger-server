@@ -5,10 +5,11 @@ from django.views.decorators.cache import cache_page
 
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views
-from budger.directory.models.entity import Entity, MunicipalBudget
+from budger.directory.models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
+
 
 from .serializers import (
     EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
@@ -211,3 +212,14 @@ class EmployeeSuperiorsView(views.APIView):
             result.append(self.get_employee(kso_head))
 
         return response.Response(result)
+
+
+class EnumsApiView(views.APIView):
+    """
+    GET Список констант
+    """
+
+    def get(self, request):
+        return response.Response({
+            'SPEC_EVENT_CODE_ENUM': SPEC_EVENT_CODE_ENUM
+        })
