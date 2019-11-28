@@ -110,7 +110,7 @@ class Event(models.Model):
     )
 
     # Наименование мероприятия
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=2000)
 
     # Основания для проведения мероприятия
     initiator = models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM, null=True, blank=True)
