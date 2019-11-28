@@ -214,7 +214,7 @@ class EmployeeSuperiorsView(views.APIView):
         return response.Response(result)
 
 
-class EnumsApiView(views.APIView):
+class EnumsView(views.APIView):
     """
     GET Список констант
     """
