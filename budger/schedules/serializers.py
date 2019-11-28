@@ -72,8 +72,9 @@ class EventFullSerializer(serializers.ModelSerializer):
         return repr
 
     def validate(self, attrs):
-        if attrs['period_to'] <= attrs['period_from']:
-            raise serializers.ValidationError({'message': 'Period range setup error.'})
+        if attrs.get('period_to', None) is not None and attrs.get('period_from', None) is not None:
+            if attrs['period_to'] <= attrs['period_from']:
+                raise serializers.ValidationError({'message': 'Period range setup error.'})
 
         return attrs
 
