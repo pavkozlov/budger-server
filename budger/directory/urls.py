@@ -11,7 +11,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path('_enums', EnumsView.as_view()),
+    path('_enums/', EnumsView.as_view()),
 
     path('entity', EntityListView.as_view()),
     path('entity/<int:pk>', EntityRetrieveView.as_view()),
