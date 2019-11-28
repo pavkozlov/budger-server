@@ -125,8 +125,7 @@ class KsoEmployee(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        null=True, blank=True
     )
 
     read_only_fields = (user,)
@@ -142,16 +141,14 @@ class KsoEmployee(models.Model):
     department1 = models.ForeignKey(
         KsoDepartment1,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        null=True, blank=True
     )
 
     # Работает в отделе...
     department2 = models.ForeignKey(
         KsoDepartment2,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        null=True, blank=True
     )
 
     # Фамилия, имя, отчество
@@ -161,9 +158,9 @@ class KsoEmployee(models.Model):
     position = models.CharField(max_length=200)
 
     # Телефон, эл. почта
-    phone_landline = models.CharField(max_length=200)
-    phone_mobile = models.CharField(max_length=200)
-    email = models.CharField(max_length=200)
+    phone_landline = models.CharField(max_length=200, null=True, blank=True)
+    phone_mobile = models.CharField(max_length=200, null=True, blank=True)
+    email = models.CharField(max_length=200, null=True, blank=True)
 
     # Дата рождения
     birth_date = models.DateField(null=True, blank=True)
