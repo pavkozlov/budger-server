@@ -144,8 +144,8 @@ class EntityMunicipalsView(views.APIView):
     """
 
     def get(self, request):
-        terms_budget = request.get('_filter__budget_code', None)
-        terms_title = request.get('_filter__title__inn', None)
+        terms_budget = request.query_params.get('_filter__budget_code', None)
+        terms_title = request.query_params.get('_filter__title__inn', None)
 
         if terms_budget is not None:
             parent = get_object_or_404(MunicipalBudget, code=terms_budget)
