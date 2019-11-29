@@ -142,6 +142,9 @@ class Entity(models.Model):
     updated = models.DateTimeField(auto_now=True)
     title_search = models.CharField(max_length=4001, default='', db_index=True)
 
+    # Дата акруальности данных
+    relevance_date = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         ordering = ['title_full']
 
