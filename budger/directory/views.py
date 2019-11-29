@@ -104,16 +104,15 @@ class KsoResponsiblesView(views.APIView):
     def get(self, request):
         kso = request.user.ksoemployee.kso
         departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
+        data = KsoDepartment1WithHeadSerializer(departments, many=True).data
 
-        return response.Response({
-            'departments': KsoDepartment1WithHeadSerializer(departments, many=True).data,
-        })
+        return response.Response({'departments': data})
 
 
 class EntityRegionalsView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
-    @_filter__title__inn фильтр по названию и ИНН
+    @_filter__title__inn Фильтр по названию и ИНН.
     """
 
     def get(self, request):
@@ -133,33 +132,38 @@ class EntityRegionalsView(views.APIView):
                 org_status_code__in=['1', '4'],
             )
 
-        serializer = EntitySubordinatesSerializer(queryset, many=True)
-        return response.Response(serializer.data)
+        data = EntitySubordinatesSerializer(queryset, many=True).data
+        return response.Response(data)
 
 
 class EntityMunicipalsView(views.APIView):
     """
     GET Список групп верхнего уровня муниципальных объектов контроля.
-    @code -- Список муниципальных объектов контроля с заданным budget_code
+    @_filter__budget_code Список муниципальных объектов контроля с заданным budget_code.
+    @_filter__title__inn Фильтр по названию и ИНН.
     """
 
     def get(self, request):
-        if 'budget_code' in request.query_params and request.query_params['budget_code']:
-            budget_code = request.query_params['budget_code']
-            parent = get_object_or_404(MunicipalBudget, code=budget_code)
+        terms_budget = request.get('_filter__budget_code', None)
+        terms_title = request.get('_filter__title__inn', None)
+
+        if terms_budget is not None:
+            parent = get_object_or_404(MunicipalBudget, code=terms_budget)
             queryset = Entity.objects.filter(pk__in=parent.subordinates)
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
-        elif 'filter' in request.query_params and request.query_params['filter']:
-            terms = request.query_params['filter']
+            data = EntitySubordinatesSerializer(queryset, many=True).data
+
+        elif terms_title is not None:
             queryset = Entity.objects.filter(
-                (Q(title_search__icontains=terms) | Q(inn=terms)) &
+                (Q(title_search__icontains=terms_title) | Q(inn=terms_title)) &
                 Q(budget_lvl_code__in=['31', '32'])
             )
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
+            data = EntitySubordinatesSerializer(queryset, many=True).data
+
         else:
             queryset = MunicipalBudget.objects.all()
-            serializer = MunicipalBudgetSerializer(queryset, many=True)
-        return response.Response(serializer.data)
+            data = MunicipalBudgetSerializer(queryset, many=True).data
+
+        return response.Response(data)
 
 
 class EntitySubordinatesView(views.APIView):
@@ -170,8 +174,8 @@ class EntitySubordinatesView(views.APIView):
     def get(self, request, pk):
         parent = get_object_or_404(Entity, pk=pk)
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
-        serializer = EntitySubordinatesSerializer(queryset, many=True)
-        return response.Response(serializer.data)
+        data = EntitySubordinatesSerializer(queryset, many=True).data
+        return response.Response(data)
 
 
 class EmployeeSuperiorsView(views.APIView):
@@ -196,7 +200,7 @@ class EmployeeSuperiorsView(views.APIView):
             return self.get_employee(department_head)
 
     def get(self, request, pk):
-        result = []
+        data = []
 
         employee = get_object_or_404(KsoEmployee, id=pk)
         kso_head = employee.kso.head
@@ -205,15 +209,15 @@ class EmployeeSuperiorsView(views.APIView):
 
             dep2_head = self.get_head(employee.department2)
             if dep2_head:
-                result.append(dep2_head)
+                data.append(dep2_head)
 
             dep1_head = self.get_head(employee.department1)
             if dep1_head:
-                result.append(dep1_head)
+                data.append(dep1_head)
 
-            result.append(self.get_employee(kso_head))
+            data.append(self.get_employee(kso_head))
 
-        return response.Response(result)
+        return response.Response(data)
 
 
 class EnumsView(views.APIView):
