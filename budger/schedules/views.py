@@ -90,7 +90,7 @@ class WorkflowView(views.APIView):
         return response.Response(WorkflowSerializer(workflow).data)
 
 
-class WorkflowQueryListView(generics.ListAPIView):
+class WorkflowListView(generics.ListAPIView):
     """
     GET Получить список Workflow для указанного пользователя
     @_filter__recipient_id
@@ -101,7 +101,9 @@ class WorkflowQueryListView(generics.ListAPIView):
     permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
 
     def list(self, request, *args, **kwargs):
-        if request.query_params.get('_filter__recipient_id', None):
-            return super(WorkflowQueryListView, self).list(request, *args, **kwargs)
-        else:
+        recipient_id = request.query_params.get('_filter__recipient_id', None)
+
+        if recipient_id is None and not request.user.has_perm('schedules.view_all_workflows'):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return super(WorkflowListView, self).list(request, *args, **kwargs)

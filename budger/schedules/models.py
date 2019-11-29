@@ -233,6 +233,6 @@ class Workflow(models.Model):
 
     class Meta:
         permissions = [
-            ("view_all_workflows", "Can view all workflows"),
+            ("view_all_workflows", "Can view all workflows."),
         ]
-        ordering = ['created']
+        ordering = ['-created']

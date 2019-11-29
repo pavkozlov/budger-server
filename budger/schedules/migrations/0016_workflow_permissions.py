@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='workflow',
-            options={'ordering': ['created'], 'permissions': [('view_all_workflows', 'Can view all workflows')]},
+            options={'ordering': ['-created'], 'permissions': [('view_all_workflows', 'Can view all workflows')]},
         ),
     ]
