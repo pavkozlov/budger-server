@@ -9,5 +9,5 @@ urlpatterns = [
     path('events/', include(router.urls)),
     path('_enums/', EnumsApiView.as_view()),
     path('workflow_create/', WorkflowView.as_view()),
-    path('workflow_query/<pk>', WorkflowQueryListView.as_view())
+    path('workflow_query/', WorkflowQueryListView.as_view())
 ]

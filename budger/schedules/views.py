@@ -1,4 +1,4 @@
-from rest_framework import views, viewsets, response, generics
+from rest_framework import views, viewsets, response, generics, status
 from .models import (
     ANNUAL_STATUS_ENUM,
     EVENT_STATUS_ENUM,
@@ -15,6 +15,8 @@ from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQueryS
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
+from .filters import WorkflowsFilter
+from .permissions import CanViewAllWorkflows, CanViewOwnWorkflows
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -91,10 +93,15 @@ class WorkflowView(views.APIView):
 class WorkflowQueryListView(generics.ListAPIView):
     """
     GET Получить список Workflow для указанного пользователя
+    @_filter__recipient_id
     """
     serializer_class = WorkflowQuerySerializer
+    filter_backends = [WorkflowsFilter]
+    queryset = Workflow.objects.all()
+    permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
 
-    def get_queryset(self):
-        pk = self.kwargs['pk']
-        queryset = Workflow.objects.filter(recipient_id=pk).order_by('event_id', '-created').distinct('event_id')
-        return queryset
+    def list(self, request, *args, **kwargs):
+        if request.query_params.get('_filter__recipient_id', None):
+            return super(WorkflowQueryListView, self).list(request, *args, **kwargs)
+        else:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)

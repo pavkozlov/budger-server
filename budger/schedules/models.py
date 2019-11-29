@@ -232,4 +232,7 @@ class Workflow(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        permissions = [
+            ("view_all_workflows", "Can view all workflows"),
+        ]
         ordering = ['created']
