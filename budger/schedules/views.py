@@ -1,4 +1,4 @@
-from rest_framework import views, viewsets, response
+from rest_framework import views, viewsets, response, generics, status
 from .models import (
     ANNUAL_STATUS_ENUM,
     EVENT_STATUS_ENUM,
@@ -11,10 +11,12 @@ from .models import (
     WORKFLOW_STATUS_REJECTED,
     WORKFLOW_STATUS_ACCEPTED,
 )
-from .serializers import EventFullSerializer, WorkflowSerializer
+from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
+from .filters import WorkflowsFilter
+from .permissions import CanViewAllWorkflows, CanViewOwnWorkflows
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -38,6 +40,9 @@ class EnumsApiView(views.APIView):
 
 
 class WorkflowView(views.APIView):
+    """
+    POST Создать запись в workflow
+    """
 
     @input_must_have(['employee_id', 'event_id', 'outcome'])
     def post(self, request):
@@ -83,3 +88,22 @@ class WorkflowView(views.APIView):
         event.save()
 
         return response.Response(WorkflowSerializer(workflow).data)
+
+
+class WorkflowListView(generics.ListAPIView):
+    """
+    GET Получить список Workflow для указанного пользователя
+    @_filter__recipient_id
+    """
+    serializer_class = WorkflowQuerySerializer
+    filter_backends = [WorkflowsFilter]
+    queryset = Workflow.objects.all()
+    permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
+
+    def list(self, request, *args, **kwargs):
+        recipient_id = request.query_params.get('_filter__recipient_id', None)
+
+        if recipient_id is None and not request.user.has_perm('schedules.view_all_workflows'):
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return super(WorkflowListView, self).list(request, *args, **kwargs)
