@@ -113,16 +113,17 @@ class KsoResponsiblesView(views.APIView):
 class EntityRegionalsView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
+    @_filter__title__inn фильтр по названию и ИНН
     """
 
     def get(self, request):
-        if 'filter' in request.query_params and request.query_params['filter']:
-            terms = request.query_params['filter']
+        terms = request.query_params.get('_filter__title__inn', None)
+
+        if terms is not None:
             queryset = Entity.objects.filter(
                 (Q(title_search__icontains=terms) | Q(inn=terms)) &
                 Q(budget_lvl_code__in=['20', '50'])
             )
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
         else:
             queryset = Entity.objects.filter(
                 parent_id__isnull=True,
@@ -131,7 +132,8 @@ class EntityRegionalsView(views.APIView):
                 budget_lvl_code__in=['20', '50'],
                 org_status_code__in=['1', '4'],
             )
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
+
+        serializer = EntitySubordinatesSerializer(queryset, many=True)
         return response.Response(serializer.data)
 
 
