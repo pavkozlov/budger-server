@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/auth10/', include('budger.authentication.urls')),
     path('api/directory/', include('budger.directory.urls')),
     path('api/schedules/', include('budger.schedules.urls')),
+    path('api/dashboard/', include('budger.dashboard.urls')),
     path('api/t/', include('budger.t.urls')),
     path('docs/', include_docs_urls(title='API')),
 ]
