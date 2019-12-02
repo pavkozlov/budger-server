@@ -15,7 +15,6 @@ class Job(models.Model):
 
     id = models.BigAutoField(primary_key=True, editable=False)
     code = models.CharField(max_length=300, db_index=True)
-    uuid = models.CharField(max_length=300, unique=True)
     status = models.PositiveSmallIntegerField(choices=JOB_STATUS_ENUM)
     created = models.DateTimeField()
     description = models.CharField(max_length=2000, null=True, blank=True)
