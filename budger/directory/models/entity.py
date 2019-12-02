@@ -52,10 +52,10 @@ class Entity(models.Model):
     """
 
     # Учетный номер организации, присваиваемый в ОрФК
-    ofk_regnum = models.CharField(max_length=5, db_index=True, unique=True)
+    ofk_regnum = models.CharField(max_length=5, db_index=True)
 
     # Код организации (обособленного подразделения) по Сводному реестру, присваиваемый в ОрФК
-    ofk_code = models.CharField(max_length=8, db_index=True, unique=True)
+    ofk_code = models.CharField(max_length=8, db_index=True)
 
     # Ссылка на вышестоящую организацию (вычисляется по полю "Код вышестоящего УБП по Сводному реестру")
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
