@@ -52,12 +52,10 @@ class Entity(models.Model):
     """
 
     # Учетный номер организации, присваиваемый в ОрФК
-    # TODO unique=True
-    ofk_regnum = models.CharField(max_length=5, db_index=True)
+    ofk_regnum = models.CharField(max_length=5, db_index=True, unique=True)
 
     # Код организации (обособленного подразделения) по Сводному реестру, присваиваемый в ОрФК
-    # TODO unique=True
-    ofk_code = models.CharField(max_length=8, db_index=True)
+    ofk_code = models.CharField(max_length=8, db_index=True, unique=True)
 
     # Ссылка на вышестоящую организацию (вычисляется по полю "Код вышестоящего УБП по Сводному реестру")
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
@@ -129,7 +127,13 @@ class Entity(models.Model):
     budget_title = models.CharField(max_length=2000, null=True, blank=True)
 
     # Код уровня бюджета
-    budget_lvl_code = models.CharField(max_length=2, choices=BUDGET_LVL_CODE_ENUM, db_index=True, null=True, blank=True)
+    budget_lvl_code = models.CharField(
+        max_length=2,
+        choices=BUDGET_LVL_CODE_ENUM,
+        db_index=True,
+        null=True,
+        blank=True
+    )
 
     # Код по справочнику ОКОГУ.
     okogu_code = models.CharField(max_length=7, db_index=True, null=True, blank=True)
