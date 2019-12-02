@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'budger.directory',
     'budger.schedules',
     'budger.bubbles',
+    'budger.dashboard',
     'budger.t',
 ]
 
@@ -86,10 +87,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'budger.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {'default': dj_database_url.config()}
+DATABASES = {
+    'default': dj_database_url.parse(os.environ['DATABASE_URL_SERVER']),
+    'jobs': dj_database_url.parse(os.environ['DATABASE_URL_JOBS'])
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
