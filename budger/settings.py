@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'budger.bubbles',
     'budger.dashboard',
     'budger.t',
+    'budger.collegium'
 ]
 
 REST_FRAMEWORK = {
