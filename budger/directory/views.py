@@ -80,13 +80,21 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        queryset = KsoEmployee.objects.order_by('name')
+        queryset = KsoEmployee.objects.all()
 
-        kso_id = self.request.query_params.get('kso_id', None)
-        if kso_id is not None:
-            queryset = queryset.filter(kso__id=kso_id).order_by('name')
+        kso_filter = self.request.query_params.get('kso_id')  # TODO: remove it
+        if kso_filter is not None:
+            queryset = queryset.filter(kso__id=kso_filter)
 
-        return queryset
+        kso_filter = self.request.query_params.get('_filter__kso_id')
+        if kso_filter is not None:
+            queryset = queryset.filter(kso__id=kso_filter)
+
+        name_filter = self.request.query_params.get('_filter__name')
+        if name_filter is not None:
+            queryset = queryset.filter(name__icontains=name_filter)
+
+        return queryset.order_by('name')
 
 
 class KsoEmployeeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
