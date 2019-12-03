@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
+from django.contrib.auth.models import User
 from .models.entity import Entity, MunicipalBudget
 from .models.kso import Kso, KsoDepartment1, KsoDepartment2, KsoEmployee
 
@@ -143,6 +144,10 @@ class KsoEmployeeSerializer(serializers.ModelSerializer):
         if type(employee.get('department2')) is int:
             obj = KsoDepartment2.objects.get(pk=employee['department2'])
             employee['department2'] = obj
+
+        if type(employee.get('user')) is int:
+            obj = User.objects.get(pk=employee['user'])
+            employee['user'] = obj
 
         return employee
 

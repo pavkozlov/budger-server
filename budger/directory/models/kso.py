@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from .entity import Entity
 
 
-# from budger.directory.serializers import KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer
-
 class Kso(models.Model):
     """
     Контрольно-счетная организация
