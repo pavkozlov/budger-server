@@ -3,14 +3,19 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+import os
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, filters, response, views
-from budger.directory.models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
-from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
+from rest_framework import generics, filters, response, views, parsers, status
+from django.db.models import Q
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
+import budger.app_settings as app_settings
+from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
+from .models.kso import Kso, KsoEmployee, KsoDepartment1
 from .permissions import CanUpdateEmployee
-
 
 from .serializers import (
     EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
@@ -23,7 +28,6 @@ from .serializers import (
 )
 
 from .filters import EntityFilter
-from django.db.models import Q
 
 
 class EntityListView(DynaFieldsListAPIView):
@@ -105,6 +109,38 @@ class KsoEmployeeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = KsoEmployeeSerializer
     queryset = KsoEmployee.objects.all()
     permission_classes = [CanUpdateEmployee]
+
+
+class KsoEmployeeUploadPhotoView(views.APIView):
+    """
+    PUT Загрузить файл с фото работника. Обязателен заголовок Content-Disposition:inline;filename={photo.jpg}
+    """
+    parser_classes = (parsers.FileUploadParser,)
+    permission_classes = [CanUpdateEmployee]
+
+    def put(self, request, *args, **kwargs):
+        response_status = status.HTTP_400_BAD_REQUEST
+        employee_id = kwargs.get('pk')
+
+        if employee_id is not None:
+            photo_file = request.FILES['file']
+            if photo_file.content_type.lower() in ('image/jpeg', 'image/png'):
+                # Prepare to save image
+                path = app_settings.EMPLOYEE_PHOTO_DIR
+
+                name = 'employee_{}'.format(employee_id)
+                if photo_file.content_type.lower() == 'image/jpeg':
+                    name += '.jpg'
+                if photo_file.content_type.lower() == 'image/png':
+                    name += '.png'
+
+                # Save image
+                with open(os.path.join(path, name), 'wb') as file:
+                    file.write(photo_file.read())
+
+                response_status = status.HTTP_204_NO_CONTENT
+
+        return response.Response(status=response_status)
 
 
 class KsoResponsiblesView(views.APIView):

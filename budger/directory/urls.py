@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     EntityListView, EntityRetrieveView,
     KsoListView, KsoRetrieveView,
-    KsoEmployeeListView, KsoEmployeeRetrieveUpdateView,
+    KsoEmployeeListView, KsoEmployeeRetrieveUpdateView, KsoEmployeeUploadPhotoView,
     EntitySubordinatesView,
     KsoResponsiblesView,
     EntityRegionalsView, EntityMunicipalsView,
@@ -27,5 +27,6 @@ urlpatterns = [
 
     path('kso-employee/', KsoEmployeeListView.as_view()),
     path('kso-employee/<int:pk>/', KsoEmployeeRetrieveUpdateView.as_view()),
+    path('kso-employee/<int:pk>/photo/', KsoEmployeeUploadPhotoView.as_view()),
     path('kso-employee/<int:pk>/superiors/', EmployeeSuperiorsView.as_view()),
 ]
