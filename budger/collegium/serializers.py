@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from .models import Meeting, Speaker
+from budger.directory.serializers import KsoEmployeeShortSerializer
 
 
 class SpeakerSerializer(serializers.ModelSerializer):
+    employee = KsoEmployeeShortSerializer()
+
     class Meta:
         model = Speaker
-        fields = '__all__'
+        fields = ['id', 'subjects', 'meeting', 'employee']
 
 
 class MeetingSerializer(serializers.ModelSerializer):
