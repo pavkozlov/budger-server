@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from budger.libs.dynamic_fields import DynamicFieldsModelSerializer
 from .models.entity import Entity, MunicipalBudget
-from .models.kso import Kso, KsoDepartment1, KsoEmployee
+from .models.kso import Kso, KsoDepartment1, KsoDepartment2, KsoEmployee
 
 
 class EntityListSerializer(DynamicFieldsModelSerializer):
@@ -122,13 +122,29 @@ class KsoEmployeeListSerializer(DynamicFieldsModelSerializer):
         fields = '__all__'
 
 
-class KsoEmployeeMediumSerializer(serializers.ModelSerializer):
+class KsoEmployeeSerializer(serializers.ModelSerializer):
     kso = KsoMediumSerializer()
-    department1 = KsoDepartment1Serializer()
+    department1 = KsoDepartment1ShortSerializer()
+    department2 = KsoDepartment2ShortSerializer()
 
     class Meta:
         model = KsoEmployee
-        exclude = ('department2',)
+        fields = '__all__'
+
+    def to_internal_value(self, employee):
+        if type(employee.get('kso')) is int:
+            obj = Kso.objects.get(pk=employee['kso'])
+            employee['kso'] = obj
+
+        if type(employee.get('department1')) is int:
+            obj = KsoDepartment1.objects.get(pk=employee['department1'])
+            employee['department1'] = obj
+
+        if type(employee.get('department2')) is int:
+            obj = KsoDepartment2.objects.get(pk=employee['department2'])
+            employee['department2'] = obj
+
+        return employee
 
 
 class MunicipalBudgetSerializer(serializers.ModelSerializer):

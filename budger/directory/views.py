@@ -9,13 +9,14 @@ from budger.directory.models.entity import Entity, MunicipalBudget, SPEC_EVENT_C
 from budger.directory.models.kso import Kso, KsoEmployee, KsoDepartment1
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 from budger.libs.pagination import UnlimitedResultsSetPagination
+from .permissions import CanUpdateEmployee
 
 
 from .serializers import (
     EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
     KsoListSerializer, KsoSerializer,
     KsoEmployeeListSerializer,
-    KsoEmployeeMediumSerializer,
+    KsoEmployeeSerializer,
     KsoDepartment1ShortSerializer, KsoDepartment2ShortSerializer,
     MunicipalBudgetSerializer,
     KsoDepartment1WithHeadSerializer
@@ -88,12 +89,14 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
         return queryset
 
 
-class KsoEmployeeRetrieveView(generics.RetrieveAPIView):
+class KsoEmployeeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     """
     GET Сведения о выбранном сотруднике КСО
+    PUT Обновление данных выбранного сотрудника КСО
     """
-    serializer_class = KsoEmployeeMediumSerializer
+    serializer_class = KsoEmployeeSerializer
     queryset = KsoEmployee.objects.all()
+    permission_classes = [CanUpdateEmployee]
 
 
 class KsoResponsiblesView(views.APIView):
