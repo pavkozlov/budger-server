@@ -83,7 +83,7 @@ class KsoListSerializer(DynamicFieldsModelSerializer):
         )
 
     def get_employees_count_fact(self, obj):
-        count = KsoEmployee.objects.filter(kso=obj).count()
+        count = KsoEmployee.objects.filter(kso=obj, inactive_title=None).count()
         return count
 
 
@@ -110,7 +110,7 @@ class KsoSerializer(serializers.ModelSerializer):
         exclude = ('title_search',)
 
     def get_employees_count_fact(self, obj):
-        count = KsoEmployee.objects.filter(kso=obj).count()
+        count = KsoEmployee.objects.filter(kso=obj, inactive_title=None).count()
         return count
 
 

@@ -128,8 +128,6 @@ class KsoEmployee(models.Model):
         null=True, blank=True
     )
 
-    read_only_fields = (user,)
-
     # Работает в организации...
     kso = models.ForeignKey(
         'Kso',
@@ -172,7 +170,9 @@ class KsoEmployee(models.Model):
     can_be_responsible = models.BooleanField(default=False, db_index=True)
 
     # Если пользоваталь отсутствует, сообщение о причине отсутствия (декрет, уход за ребенком что-то еще)
-    inactive_title = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    inactive_title = models.CharField(max_length=2000, db_index=True, null=True, blank=True, default=None)
+
+    read_only_fields = (user,)
 
     class Meta:
         ordering = ['name']
