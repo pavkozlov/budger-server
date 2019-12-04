@@ -8,8 +8,6 @@ from .models import (
     Event, Workflow,
     EVENT_STATUS_IN_WORK,
     EVENT_STATUS_ACCEPTED,
-    WORKFLOW_STATUS_REJECTED,
-    WORKFLOW_STATUS_ACCEPTED,
 )
 from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
@@ -39,13 +37,20 @@ class EnumsApiView(views.APIView):
         })
 
 
-class WorkflowView(views.APIView):
+class WorkflowsListCreateView(generics.ListCreateAPIView):
     """
+    GET Получить список Workflow для указанного пользователя
+    @_filter__recipient_id
+
     POST Создать запись в workflow
     """
+    serializer_class = WorkflowQuerySerializer
+    filter_backends = [WorkflowsFilter]
+    queryset = Workflow.objects.all()
+    permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
 
     @input_must_have(['employee_id', 'event_id', 'outcome'])
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         # Получить данные
         employee_id = request.data['employee_id']
         event_id = request.data['event_id']
@@ -70,7 +75,7 @@ class WorkflowView(views.APIView):
                 event_status = EVENT_STATUS_ACCEPTED
             else:
                 # Если отправитель не глава КСО, получатель = ближайший руководитель
-                recipient_id = superiors[1]['id']
+                recipient_id = superiors[0]['id']
                 recipient = KsoEmployee.objects.get(id=recipient_id)
                 event_status = EVENT_STATUS_IN_WORK
 
@@ -89,21 +94,10 @@ class WorkflowView(views.APIView):
 
         return response.Response(WorkflowSerializer(workflow).data)
 
-
-class WorkflowListView(generics.ListAPIView):
-    """
-    GET Получить список Workflow для указанного пользователя
-    @_filter__recipient_id
-    """
-    serializer_class = WorkflowQuerySerializer
-    filter_backends = [WorkflowsFilter]
-    queryset = Workflow.objects.all()
-    permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
-
     def list(self, request, *args, **kwargs):
         recipient_id = request.query_params.get('_filter__recipient_id', None)
 
         if recipient_id is None and not request.user.has_perm('schedules.view_all_workflows'):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return super(WorkflowListView, self).list(request, *args, **kwargs)
+        return super(WorkflowsListCreateView, self).list(request, *args, **kwargs)
