@@ -79,13 +79,16 @@ class UserPasswordUpdateView(views.APIView):
 
     def put(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')
-        user_password = request.data.get('password')
-        if user_id is not None and user_password is not None:
-            user = get_object_or_404(User, pk=user_id)
-            user.set_password(user_password)
-            return Response(status=HTTP_204_NO_CONTENT)
+        password = request.data.get('password')
 
-        return Response(status=HTTP_400_BAD_REQUEST)
+        if user_id is None or password is None:
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, pk=user_id)
+        user.set_password(password)
+        user.save()
+
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class EmployeeView(views.APIView):
