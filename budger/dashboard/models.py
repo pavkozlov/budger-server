@@ -22,7 +22,7 @@ class Job(models.Model):
     class Meta:
         db_table = 'jobs_log'
         ordering = ['-created']
-        permissions = [(CanViewJobs.CODE, 'Can view jobs list.')]
+        permissions = [(CanViewJobs.code, 'Can view jobs list.')]
 
     def __str__(self):
         return '{} - {}'.format(self.created, self.code,)

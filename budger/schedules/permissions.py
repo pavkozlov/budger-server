@@ -2,9 +2,12 @@ from rest_framework.permissions import BasePermission
 
 
 class CanViewAllWorkflows(BasePermission):
+
+    code = 'view_all_workflows'
+
     def has_permission(self, request, view):
 
-        if request.user.has_perm('schedules.view_all_workflows'):
+        if request.user.has_perm(self.code):
             return True
 
         return False

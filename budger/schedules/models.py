@@ -2,6 +2,7 @@ from django.db import models
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from django.contrib.postgres.fields import ArrayField
+from .permissions import CanViewAllWorkflows
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -233,6 +234,6 @@ class Workflow(models.Model):
 
     class Meta:
         permissions = [
-            ("view_all_workflows", "Can view all workflows."),
+            (CanViewAllWorkflows.code, 'Can view all workflows.'),
         ]
         ordering = ['-created']
