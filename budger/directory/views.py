@@ -123,7 +123,9 @@ class KsoEmployeeUploadPhotoView(views.APIView):
         employee_id = kwargs.get('pk')
 
         if employee_id is not None:
+            employee = get_object_or_404(KsoEmployee, pk=employee_id)
             photo_file = request.FILES['file']
+
             if photo_file.content_type.lower() in ('image/jpeg', 'image/png'):
                 # Prepare to save image
                 path = app_settings.EMPLOYEE_PHOTO_DIR
@@ -137,6 +139,10 @@ class KsoEmployeeUploadPhotoView(views.APIView):
                 # Save image
                 with open(os.path.join(path, name), 'wb') as file:
                     file.write(photo_file.read())
+
+                # Update Employee model
+                employee.photo_slug = name
+                employee.save()
 
                 response_status = status.HTTP_204_NO_CONTENT
 
