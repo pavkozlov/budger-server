@@ -30,6 +30,9 @@ class Meeting(models.Model):
 
 
 class Speaker(models.Model):
+    # Ключ сортировки
+    id = models.BigAutoField(primary_key=True)
+
     # Встреча
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE, related_name='speakers')
 
@@ -38,3 +41,6 @@ class Speaker(models.Model):
 
     # Вопросы докладчика
     subjects = ArrayField(models.TextField(), null=True, blank=True)
+
+    class Meta:
+        ordering = ['id']

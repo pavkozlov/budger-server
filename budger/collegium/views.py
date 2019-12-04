@@ -21,9 +21,9 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return super(MeetingViewSet, self).get_permissions()
 
-    @input_must_have('execute_date')
+    @input_must_have('exec_date')
     def create(self, request, *args, **kwargs):
-        meeting, _ = Meeting.objects.get_or_create(exec_date=request.data['execute_date'])
+        meeting, _ = Meeting.objects.get_or_create(exec_date=request.data['exec_date'])
         speakers = request.data.get('speakers', [])
 
         for speaker in speakers:
@@ -49,7 +49,8 @@ class MeetingViewSet(viewsets.ModelViewSet):
             )
 
         new_exec_date = request.data.get('exec_date', None)
-        if new_exec_date and Meeting.objects.filter(exex_date=new_exec_date).exists():
+        meetings = Meeting.objects.filter(exec_date=new_exec_date)
+        if meetings.exists() and meetings.first() != meeting:
             return response.Response('Дата проведения должна быть уникальной', status=status.HTTP_400_BAD_REQUEST)
 
         new_speakers = request.data.get('speakers', [])
