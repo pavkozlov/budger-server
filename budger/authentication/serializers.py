@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
+
+from django.contrib.auth.models import User, Permission
 from budger.directory.models.kso import KsoEmployee
 
 from budger.directory.serializers import KsoSerializer
@@ -14,9 +15,17 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        res = []
+        for p in obj.user_permissions.all():
+            res.append(p.codename)
+        return res
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'groups', 'user_permissions',)
+        fields = ('id', 'email', 'groups', 'permissions')
 
 
 class KsoEmployeeSerializer(serializers.ModelSerializer):

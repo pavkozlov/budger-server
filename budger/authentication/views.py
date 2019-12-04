@@ -22,7 +22,7 @@ class LoginView(views.APIView):
     def authenticate(email, password):
         """ Authenticate user by email/passwords and return User if okay and None if not okay. """
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email__icontains=email)
             if user.check_password(password):
                 return user
         except User.DoesNotExist:
@@ -99,22 +99,23 @@ class EmployeeView(views.APIView):
             @position
     """
 
-    def get_user(self, request):
+    def _get_employee(self, request):
         auth_user = request.user
 
         if auth_user is not None and type(auth_user) is not AnonymousUser:
             try:
-                return KsoEmployee.objects.get(user=auth_user)
+                employee = KsoEmployee.objects.get(user=auth_user)
+                return employee
             except KsoEmployee.DoesNotExist:
                 pass
 
         return None
 
     def get(self, request):
-        user = self.get_user(request)
-        if user:
+        employee = self._get_employee(request)
+        if employee is not None:
             return Response(
-                {'user': KsoEmployeeSerializer(user).data}
+                {'user': KsoEmployeeSerializer(employee).data}
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
