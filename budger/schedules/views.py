@@ -37,7 +37,7 @@ class EnumsApiView(views.APIView):
         })
 
 
-class WorkflowsListCreateView(generics.ListCreateAPIView):
+class WorkflowListCreateView(generics.ListCreateAPIView):
     """
     GET Получить список Workflow для указанного пользователя
     @_filter__recipient_id
@@ -100,4 +100,4 @@ class WorkflowsListCreateView(generics.ListCreateAPIView):
         if recipient_id is None and not request.user.has_perm('schedules.view_all_workflows'):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return super(WorkflowsListCreateView, self).list(request, *args, **kwargs)
+        return super(WorkflowListCreateView, self).list(request, *args, **kwargs)
