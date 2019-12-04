@@ -1,4 +1,4 @@
-from rest_framework import views
+from rest_framework import views, generics
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, AnonymousUser, update_last_login
 from rest_framework.authtoken.models import Token
@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from rest_framework.response import Response
 from budger.directory.models.kso import KsoEmployee
-from .serializers import TokenSerializer, KsoEmployeeSerializer
-from .permissions import CanUpdateUser
+from .serializers import TokenSerializer, KsoEmployeeSerializer, UserSerializer
+from .permissions import CanViewUser, CanUpdateUser
 
 
 class LoginView(views.APIView):
@@ -67,6 +67,12 @@ class LogoutView(views.APIView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response()
+
+
+class UserRetrieveView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [CanViewUser]
 
 
 class UserPasswordUpdateView(views.APIView):

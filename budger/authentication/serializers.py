@@ -18,14 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
 
     def get_permissions(self, obj):
-        res = []
-        for p in obj.user_permissions.all():
-            res.append(p.codename)
-        return res
+        return [] if obj.is_superuser else obj.get_all_permissions()
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'groups', 'permissions', 'is_superuser')
+        fields = ('id', 'email', 'permissions', 'is_superuser')
 
 
 class KsoEmployeeSerializer(serializers.ModelSerializer):

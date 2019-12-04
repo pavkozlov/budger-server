@@ -3,6 +3,7 @@ from .views import (
     EmployeeView,
     LoginView,
     LogoutView,
+    UserRetrieveView,
     UserPasswordUpdateView
 )
 
@@ -11,5 +12,6 @@ urlpatterns = [
     path('login', LoginView.as_view()),
     path('logout', LogoutView.as_view()),
     path('employee', EmployeeView.as_view()),
+    path('users/<int:pk>/', UserRetrieveView.as_view()),
     path('users/<int:pk>/password/', UserPasswordUpdateView.as_view()),
 ]
