@@ -19,7 +19,7 @@ def check_field(required_fields, data):
 
 def input_must_have(required_fields):
     def real_decorator(function):
-        def wrapper(*args):
+        def wrapper(*args, **kwargs):
             # Получаем request.data
             data = args[1].data
 

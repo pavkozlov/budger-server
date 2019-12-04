@@ -1,25 +1,8 @@
-from rest_framework.permissions import BasePermission
+# Создание и редактирование черновиков
+PERM_MANAGE_MEETING = 'collegium.manage_meeting'
 
+# Согласование плана заседания
+PERM_APPROVE_MEETING = 'collegium.approve_meeting'
 
-class CanApproveMeeting(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.has_perm('collegium.can_approve_meeting'):
-            return True
-
-        return False
-
-
-class CanViewMeeting(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.has_perm('collegium.view_meeting'):
-            return True
-
-        return False
-
-
-class CanManageMeeting(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.has_perm('collegium.can_manage_meeting'):
-            return True
-
-        return False
+# Просмотр согласованного плана заседания
+PERM_VIEW_MEETING = 'collegium.view_meeting'
