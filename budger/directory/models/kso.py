@@ -126,6 +126,9 @@ class KsoEmployee(models.Model):
         null=True, blank=True
     )
 
+    # Разработчик
+    is_developer = models.BooleanField(default=False, db_index=True)
+
     # Работает в организации...
     kso = models.ForeignKey(
         'Kso',

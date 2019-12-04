@@ -85,7 +85,7 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        queryset = KsoEmployee.objects.all()
+        queryset = KsoEmployee.objects.filter(is_developer=False)
 
         kso_filter = self.request.query_params.get('kso_id')  # TODO: remove it
         if kso_filter is not None:
@@ -103,9 +103,12 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
 
 
 class KsoEmployeeListCsv(DynaFieldsListAPIView):
+    """
+    GET Список всех сотрудников КСО, отрендеренные в csv
+    """
     serializer_class = KsoEmployeeListSerializer
     renderer_classes = [KsoEmployeeCsvRenderer, ]
-    queryset = KsoEmployee.objects.all()
+    queryset = KsoEmployee.objects.filter(is_developer=False)
 
 
 class KsoEmployeeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
