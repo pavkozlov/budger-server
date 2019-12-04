@@ -1,13 +1,15 @@
 from rest_framework.permissions import BasePermission
 
 
+VIEW_JOBS = 'view_jobs'
+
+
 class CanViewJobs(BasePermission):
-    code = 'view_jobs'
 
     def has_permission(self, request, view):
         u = request.user
 
-        if u.has_perm(self.code):
+        if u.has_perm(VIEW_JOBS):
             return True
 
         return False

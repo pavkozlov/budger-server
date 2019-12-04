@@ -1,6 +1,6 @@
 from django.db import models
 from .managers import JobManager
-from .permissions import CanViewJobs
+from .permissions import VIEW_JOBS
 
 
 JOB_STATUS_ENUM = [
@@ -20,9 +20,10 @@ class Job(models.Model):
     description = models.CharField(max_length=2000, null=True, blank=True)
 
     class Meta:
+        managed = False
         db_table = 'jobs_log'
         ordering = ['-created']
-        permissions = [(CanViewJobs.code, 'Can view jobs list.')]
+        permissions = [(VIEW_JOBS, 'Can view jobs list.')]
 
     def __str__(self):
         return '{} - {}'.format(self.created, self.code,)

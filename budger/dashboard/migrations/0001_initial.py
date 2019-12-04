@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(blank=True, max_length=2000, null=True)),
             ],
             options={
+                'managed': False,
                 'db_table': 'jobs_log',
                 'ordering': ['-created'],
                 'permissions': [('dashboard.can_view_jobs', 'Can view jobs list.')],
