@@ -1,12 +1,13 @@
 from rest_framework import views
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, AnonymousUser, update_last_login
-# from .models import Profile
-from budger.directory.models.kso import KsoEmployee
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
-from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from rest_framework.response import Response
+from budger.directory.models.kso import KsoEmployee
 from .serializers import TokenSerializer, KsoEmployeeSerializer
+from .permissions import CanUpdateUser
 
 
 class LoginView(views.APIView):
@@ -60,7 +61,7 @@ class LoginView(views.APIView):
 
 class LogoutView(views.APIView):
     """
-    POST Выход пользователя из системы.
+    POST    Выход пользователя из системы.
     """
 
     def post(self, request):
@@ -68,14 +69,34 @@ class LogoutView(views.APIView):
         return Response()
 
 
+class UserPasswordUpdateView(views.APIView):
+    """
+    PUT     Сохранение пароля пользователя.
+            Отдельный эндпойнт (без CRUD) реализаван потому, что все эти действия выполняются в рамках работы
+            с employee.
+    """
+    permission_classes = [CanUpdateUser]
+
+    def put(self, request, *args, **kwargs):
+        user_id = kwargs.get('pk')
+        user_password = request.data.get('password')
+        if user_id is not None and user_password is not None:
+            user = get_object_or_404(User, pk=user_id)
+            user.set_password(user_password)
+            return Response(status=HTTP_204_NO_CONTENT)
+
+        return Response(status=HTTP_400_BAD_REQUEST)
+
+
 class EmployeeView(views.APIView):
     """
-    GET Сведения о текущем работнике.
-    POST Сохранение данных текущего работника:
-        @last_name
-        @first_name
-        @second_name
-        @position
+    GET     Сведения о текущем работнике.
+
+    POST    Сохранение данных текущего работника:
+            @last_name
+            @first_name
+            @second_name
+            @position
     """
 
     def get_user(self, request):
@@ -97,16 +118,3 @@ class EmployeeView(views.APIView):
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
-
-    def post(self, request):
-        user = self.get_user(request)
-
-        if user and 'user' in request.data:
-            user_data = request.data['user']
-            user.name = user_data.get('name', '')
-            user.position = user_data.get('position', '')
-            user.save()
-
-        return Response(
-            {'user': KsoEmployeeSerializer(user).data}
-        )
