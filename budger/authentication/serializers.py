@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'groups', 'permissions')
+        fields = ('id', 'email', 'groups', 'permissions', 'is_superuser')
 
 
 class KsoEmployeeSerializer(serializers.ModelSerializer):
