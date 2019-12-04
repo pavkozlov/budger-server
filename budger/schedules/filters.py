@@ -9,4 +9,4 @@ class WorkflowsFilter(filters.BaseFilterBackend):
         if employee_filter:
             return queryset.filter(recipient_id=employee_filter).order_by('event_id').distinct('event_id')
 
-        return queryset.all().order_by('event_id').distinct('event_id')
+        return queryset.all().order_by('event_id', '-created').distinct('event_id')

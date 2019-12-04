@@ -28,6 +28,7 @@ from .serializers import (
 )
 
 from .filters import EntityFilter
+from .renderers import KsoEmployeeCsvRenderer
 
 
 class EntityListView(DynaFieldsListAPIView):
@@ -99,6 +100,12 @@ class KsoEmployeeListView(DynaFieldsListAPIView):
             queryset = queryset.filter(name__icontains=name_filter)
 
         return queryset.order_by('name')
+
+
+class KsoEmployeeListCsv(DynaFieldsListAPIView):
+    serializer_class = KsoEmployeeListSerializer
+    renderer_classes = [KsoEmployeeCsvRenderer, ]
+    queryset = KsoEmployee.objects.all()
 
 
 class KsoEmployeeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
