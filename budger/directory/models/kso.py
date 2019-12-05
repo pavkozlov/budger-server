@@ -224,13 +224,7 @@ class KsoEmployee(models.Model):
 
         result = []
 
-        kso_head = self.kso.head
-        if self == kso_head:
-            result.append(_get_employee(self))
-
-        else:
-            result.append(_get_employee(self))
-
+        if self != self.kso.head:
             dep2_head = _get_head(self.department2)
             if dep2_head:
                 result.append(dep2_head)
@@ -239,6 +233,6 @@ class KsoEmployee(models.Model):
             if dep1_head:
                 result.append(dep1_head)
 
-            result.append(_get_employee(kso_head))
+            result.append(_get_employee(self.kso.head))
 
         return result
