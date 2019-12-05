@@ -7,19 +7,72 @@ from .models import (
     EVENT_MODE_ENUM,
     Event, Workflow,
     EVENT_STATUS_IN_WORK,
-    EVENT_STATUS_ACCEPTED,
+    EVENT_STATUS_APPROVED,
+    EVENT_STATUS_DRAFT
 )
 from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
 from .filters import WorkflowsFilter
-from .permissions import CanViewAllWorkflows, CanViewOwnWorkflows
+from .permissions import (
+    CanViewAllWorkflows,
+    CanViewOwnWorkflows,
+    PERM_USE_EVENT,
+    PERM_APPROVE_EVENT,
+    PERM_MANAGE_EVENT,
+)
 
 
 class EventViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet имеет три разрешения:
+        - manage_event
+        - approve_event
+        - use_event
+    """
     serializer_class = EventFullSerializer
-    queryset = Event.objects.all()
+
+    def get_queryset(self):
+        u = self.request.user
+        qs = Event.objects.none()
+
+        if u.has_perm(PERM_MANAGE_EVENT):
+            qsa = Event.objects.filter(status=EVENT_STATUS_DRAFT)
+            qs = qs | qsa
+
+        if u.has_perm(PERM_APPROVE_EVENT):
+            qsa = Event.objects.filter(status=EVENT_STATUS_IN_WORK)
+            qs = qs | qsa
+
+        if u.has_perm(PERM_USE_EVENT):
+            qsa = Event.objects.filter(status=EVENT_STATUS_APPROVED)
+            qs = qs | qsa
+
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        u = self.request.user
+
+        if u.has_perm(PERM_MANAGE_EVENT):
+            return super(EventViewSet, self).create(request, *args, **kwargs)
+
+        return response.Response(status=status.HTTP_403_FORBIDDEN)
+
+    def update(self, request, *args, **kwargs):
+        u = self.request.user
+        obj = self.get_object()
+
+        if obj.status == EVENT_STATUS_DRAFT and not u.has_perm(PERM_MANAGE_EVENT):
+            return response.Response(status=status.HTTP_403_FORBIDDEN)
+
+        if obj.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
+            return response.Response(status=status.HTTP_403_FORBIDDEN)
+
+        if obj.status == EVENT_STATUS_APPROVED and not u.has_perm(PERM_USE_EVENT):
+            return response.Response(status=status.HTTP_403_FORBIDDEN)
+
+        return super(EventViewSet, self).update(request, *args, **kwargs)
 
 
 class EnumsApiView(views.APIView):
@@ -72,7 +125,7 @@ class WorkflowListCreateView(generics.ListCreateAPIView):
             if sender.is_head():
                 # Если отправитель глава КСО, статус = согласовано
                 recipient = sender
-                event_status = EVENT_STATUS_ACCEPTED
+                event_status = EVENT_STATUS_APPROVED
             else:
                 # Если отправитель не глава КСО, получатель = ближайший руководитель
                 recipient_id = superiors[0]['id']
