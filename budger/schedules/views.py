@@ -15,13 +15,11 @@ from .serializers import EventSerializer, WorkflowSerializer, WorkflowQuerySeria
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
-from .filters import WorkflowsFilter
 from .permissions import (
-    CanViewAllWorkflows,
-    CanViewOwnWorkflows,
     PERM_USE_EVENT,
     PERM_APPROVE_EVENT,
     PERM_MANAGE_EVENT,
+    PERM_VIEWALL_WORKFLOW
 )
 
 from budger.libs.shortcuts import get_object_or_none
@@ -116,9 +114,17 @@ class WorkflowListCreateView(generics.ListCreateAPIView):
     POST Создать запись в workflow
     """
     serializer_class = WorkflowQuerySerializer
-    filter_backends = [WorkflowsFilter]
-    queryset = Workflow.objects.all()
-    permission_classes = [CanViewAllWorkflows | CanViewOwnWorkflows]
+
+    def get_queryset(self):
+        u = self.request.user
+
+        if u.has_perm(PERM_VIEWALL_WORKFLOW):
+            return Workflow.objects.all()
+
+        return Workflow.objects.filter(
+            recipient=u.ksoemployee,
+            status=WORKFLOW_STATUS_IN_WORK
+        )
 
     @input_must_have(['employee_id', 'event_id', 'outcome'])
     def create(self, request, *args, **kwargs):
@@ -165,10 +171,3 @@ class WorkflowListCreateView(generics.ListCreateAPIView):
 
         return response.Response(WorkflowSerializer(workflow).data)
 
-    def list(self, request, *args, **kwargs):
-        recipient_id = request.query_params.get('_filter__recipient_id', None)
-
-        if recipient_id is None and not request.user.has_perm('schedules.view_all_workflows'):
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return super(WorkflowListCreateView, self).list(request, *args, **kwargs)

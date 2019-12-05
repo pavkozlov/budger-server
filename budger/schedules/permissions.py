@@ -9,6 +9,9 @@ PERM_APPROVE_EVENT = 'schedules.approve_event'
 # Просмотр согласованного мероприятия
 PERM_USE_EVENT = 'schedules.use_event'
 
+# Просмотр всех согласований
+PERM_VIEWALL_WORKFLOW = 'schedules.viewall_workflow'
+
 
 class CanViewAllWorkflows(BasePermission):
     code = 'view_all_workflows'

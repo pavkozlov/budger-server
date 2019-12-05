@@ -2,7 +2,12 @@ from django.db import models
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from django.contrib.postgres.fields import ArrayField
-from .permissions import CanViewAllWorkflows, PERM_APPROVE_EVENT, PERM_MANAGE_EVENT, PERM_USE_EVENT
+from .permissions import (
+    PERM_APPROVE_EVENT,
+    PERM_MANAGE_EVENT,
+    PERM_USE_EVENT,
+    PERM_VIEWALL_WORKFLOW
+)
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -233,7 +238,11 @@ class Workflow(models.Model):
         on_delete=models.CASCADE
     )
 
-    status = models.PositiveSmallIntegerField(choices=WORKFLOW_STATUS_ENUM)
+    status = models.PositiveSmallIntegerField(
+        choices=WORKFLOW_STATUS_ENUM,
+        default=WORKFLOW_STATUS_IN_WORK,
+        db_index=True
+    )
 
     memo = models.TextField(null=True, blank=True)
 
@@ -241,6 +250,6 @@ class Workflow(models.Model):
 
     class Meta:
         permissions = [
-            (CanViewAllWorkflows.code, 'Can view all workflows.'),
+            (PERM_VIEWALL_WORKFLOW.split('.')[1], 'Просмотр всех согласований.'),
         ]
-        ordering = ['-created']
+        ordering = ['created']
