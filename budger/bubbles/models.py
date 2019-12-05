@@ -14,8 +14,8 @@ class BudgetAbstract(models.Model):
     # Сумма
     amount = models.FloatField()
 
-    # Год, даты утверждения, начала действия записи, окончания действия записи
-    year = models.IntegerField()
+    # Год
+    year = models.IntegerField(db_index=True)
 
     # Информация о кодах разделов\подразделов классификации расходов бюджетов
     rzpr_code = models.CharField(max_length=4, db_index=True)
@@ -63,7 +63,7 @@ class BudgetFact(BudgetAbstract):
 
 class BudgetTitle(models.Model):
     """
-    Модель для работы с заголовками:
+    Модель для работы с заголовками бюджетов:
     разделов\подразделов классификации расходов бюджетов,
     видах расходов бюджета
     кодах целевых статей расходов бюджета.
@@ -94,3 +94,24 @@ class BudgetTitle(models.Model):
     )
 
     title = models.CharField(max_length=2000)
+
+
+class EntityBudget(models.Model):
+    """
+    Модель агрегированного бюджета (план и факт) для объекта контроля.
+    """
+
+    # Отношение к объекту контроля
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+
+    # Год
+    year = models.IntegerField(db_index=True)
+
+    # Сумма плановая
+    amount_plan = models.FloatField(null=True, blank=True)
+
+    # Сумма фактическая
+    amount_fact = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('entity', 'year')
