@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import EventViewSet, EnumsApiView, WorkflowListCreateView
 
 router = DefaultRouter()
-router.register('', EventViewSet)
+router.register('', EventViewSet, basename='Event')
 
 urlpatterns = [
     path('events/', include(router.urls)),

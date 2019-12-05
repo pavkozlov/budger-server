@@ -2,7 +2,7 @@ from django.db import models
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from django.contrib.postgres.fields import ArrayField
-from .permissions import CanViewAllWorkflows
+from .permissions import CanViewAllWorkflows, PERM_APPROVE_EVENT, PERM_MANAGE_EVENT, PERM_USE_EVENT
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -12,12 +12,12 @@ ANNUAL_STATUS_ENUM = [
 
 EVENT_STATUS_DRAFT = 10
 EVENT_STATUS_IN_WORK = 20
-EVENT_STATUS_ACCEPTED = 30
+EVENT_STATUS_APPROVED = 30
 
 EVENT_STATUS_ENUM = [
     (EVENT_STATUS_DRAFT, 'Черновик'),
     (EVENT_STATUS_IN_WORK, 'В работе'),
-    (EVENT_STATUS_ACCEPTED, 'Согласовано'),
+    (EVENT_STATUS_APPROVED, 'Согласовано'),
 ]
 
 EVENT_TYPE_ENUM = [
@@ -203,6 +203,11 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['-exec_from']
+        permissions = [
+            (PERM_MANAGE_EVENT.split('.')[1], 'Создание и редактирование черновиков.'),
+            (PERM_APPROVE_EVENT.split('.')[1], 'Согласование мероприятия.'),
+            (PERM_USE_EVENT.split('.')[1], 'Просмотр согласованного мероприятия.'),
+        ]
 
 
 class Workflow(models.Model):
