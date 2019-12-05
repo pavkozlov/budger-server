@@ -8,7 +8,7 @@ class SpeakerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Speaker
-        fields = ['id', 'subjects', 'meeting', 'employee']
+        fields = ['id', 'subjects', 'employee']
 
 
 class MeetingSerializer(serializers.ModelSerializer):

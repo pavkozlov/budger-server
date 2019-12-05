@@ -27,44 +27,55 @@ class MeetingViewSet(viewsets.ModelViewSet):
         approve_meeting
         view_meeting
     """
-    queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
 
     def get_queryset(self):
         u = self.request.user
+        qs = Meeting.objects.none()
+
         if u.has_perm(PERM_MANAGE_MEETING):
-            return Meeting.objects.all()
-        elif u.has_perm(PERM_APPROVE_MEETING):
-            return Meeting.objects.filter(status=MEETING_STATUS_APPROVING)
-        elif u.has_perm(PERM_USE_MEETING):
-            return Meeting.objects.filter(status=MEETING_STATUS_PUBLISHED)
+            qsa = Meeting.objects.filter(status=MEETING_STATUS_DRAFT)
+            qs = qs | qsa
+
+        if u.has_perm(PERM_APPROVE_MEETING):
+            qsa = Meeting.objects.filter(status=MEETING_STATUS_APPROVING)
+            qs = qs | qsa
+
+        if u.has_perm(PERM_USE_MEETING):
+            qsa = Meeting.objects.filter(status=MEETING_STATUS_PUBLISHED)
+            qs = qs | qsa
+
+        return qs
 
     @input_must_have('exec_date')
     def create(self, request, *args, **kwargs):
         u = self.request.user
-        if not u.has_perm('manage_meeting'):
+        if not u.has_perm(PERM_MANAGE_MEETING):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
         # Guard: meeting date has to be unique.
         m1 = get_object_or_none(Meeting, exec_date=request.data['exec_date'])
         if m1:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response({"a": 1}, status=status.HTTP_400_BAD_REQUEST)
 
-        meeting = Meeting.objects.create(exec_date=request.data['exec_date'])
+        obj = Meeting.objects.create(exec_date=request.data['exec_date'])
         speakers = request.data.get('speakers', [])
 
         for s in speakers:
             employee = get_object_or_none(KsoEmployee, pk=s['employee']['id'])
             if employee:
                 Speaker.objects.create(
-                    meeting=meeting,
+                    meeting=obj,
                     employee=employee,
                     subjects=s['subjects']
                 )
             else:
-                return response.Response(status=status.HTTP_400_BAD_REQUEST)
+                return response.Response({"a": 2}, status=status.HTTP_400_BAD_REQUEST)
 
-        return super(MeetingViewSet, self).create(request, *args, **kwargs)
+        obj.save()
+        serializer = self.get_serializer(obj)
+
+        return response.Response(serializer.data)
 
     @input_must_have('exec_date')
     def update(self, request, *args, **kwargs):

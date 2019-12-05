@@ -3,7 +3,7 @@ from .views import MeetingViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('meeting', MeetingViewSet)
+router.register('meeting', MeetingViewSet, basename='Meeting')
 
 urlpatterns = [
     path('', include(router.urls)),
