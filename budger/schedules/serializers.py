@@ -31,7 +31,7 @@ class EventListSerializer(DynamicFieldsModelSerializer):
         fields = '__all__'
 
 
-class EventFullSerializer(serializers.ModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     # controlled_entities = EntityListShortSerializer(many=True)
 
     class Meta:
@@ -39,7 +39,7 @@ class EventFullSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_representation(self, instance):
-        repr = super(EventFullSerializer, self).to_representation(instance)
+        repr = super(EventSerializer, self).to_representation(instance)
 
         repr['responsible_employees'] = KsoEmployeeShortSerializer(
             instance.responsible_employees, many=True

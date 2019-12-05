@@ -8,9 +8,10 @@ from .models import (
     Event, Workflow,
     EVENT_STATUS_IN_WORK,
     EVENT_STATUS_APPROVED,
-    EVENT_STATUS_DRAFT
+    EVENT_STATUS_DRAFT,
+    WORKFLOW_STATUS_IN_WORK
 )
-from .serializers import EventFullSerializer, WorkflowSerializer, WorkflowQuerySerializer
+from .serializers import EventSerializer, WorkflowSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
 from django.shortcuts import get_object_or_404
 from budger.libs.input_decorator import input_must_have
@@ -23,6 +24,8 @@ from .permissions import (
     PERM_MANAGE_EVENT,
 )
 
+from budger.libs.shortcuts import get_object_or_none
+
 
 class EventViewSet(viewsets.ModelViewSet):
     """
@@ -31,7 +34,7 @@ class EventViewSet(viewsets.ModelViewSet):
         - approve_event
         - use_event
     """
-    serializer_class = EventFullSerializer
+    serializer_class = EventSerializer
 
     def get_queryset(self):
         u = self.request.user
@@ -61,16 +64,31 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         u = self.request.user
-        obj = self.get_object()
+        event = self.get_object()
 
-        if obj.status == EVENT_STATUS_DRAFT and not u.has_perm(PERM_MANAGE_EVENT):
+        if event.status == EVENT_STATUS_DRAFT and not u.has_perm(PERM_MANAGE_EVENT):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        if obj.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
+        if event.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        if obj.status == EVENT_STATUS_APPROVED and not u.has_perm(PERM_USE_EVENT):
+        if event.status == EVENT_STATUS_APPROVED and not u.has_perm(PERM_USE_EVENT):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
+
+        if event.status == EVENT_STATUS_DRAFT and request.data.get('status') == EVENT_STATUS_IN_WORK and event.author == request.user.ksoemployee:
+            if not event.author.is_head():
+                # Create first workflow.
+                # Get recipient
+                sender = event.author
+                superiors = sender.get_superiors()
+                recipient = get_object_or_none(KsoEmployee, pk=superiors[0]['id'])
+                if recipient is not None:
+                    Workflow.objects.create(
+                        event=event,
+                        sender=sender,
+                        recipient=recipient,
+                        status=WORKFLOW_STATUS_IN_WORK
+                    )
 
         return super(EventViewSet, self).update(request, *args, **kwargs)
 
