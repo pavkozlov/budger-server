@@ -1,5 +1,4 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, response, status
+from rest_framework import viewsets, response, status
 
 from budger.libs.input_decorator import input_must_have
 from budger.libs.shortcuts import get_object_or_none
@@ -9,8 +8,8 @@ from .models import (
     Meeting,
     Speaker,
     MEETING_STATUS_DRAFT,
-    MEETING_STATUS_APPROVING,
-    MEETING_STATUS_PUBLISHED,
+    MEETING_STATUS_IN_WORK,
+    MEETING_STATUS_APPROVED,
 )
 from .serializers import MeetingSerializer
 from .permission import (
@@ -22,10 +21,11 @@ from .permission import (
 
 class MeetingViewSet(viewsets.ModelViewSet):
     """
-    ViewSet имеет три разрешения:
-        manage_meeting
-        approve_meeting
-        view_meeting
+    ViewSet
+                имеет три разрешения:
+                - manage_meeting
+                - approve_meeting
+                - use_meeting
     """
     serializer_class = MeetingSerializer
 
@@ -38,11 +38,11 @@ class MeetingViewSet(viewsets.ModelViewSet):
             qs = qs | qsa
 
         if u.has_perm(PERM_APPROVE_MEETING):
-            qsa = Meeting.objects.filter(status=MEETING_STATUS_APPROVING)
+            qsa = Meeting.objects.filter(status=MEETING_STATUS_IN_WORK)
             qs = qs | qsa
 
         if u.has_perm(PERM_USE_MEETING):
-            qsa = Meeting.objects.filter(status=MEETING_STATUS_PUBLISHED)
+            qsa = Meeting.objects.filter(status=MEETING_STATUS_APPROVED)
             qs = qs | qsa
 
         return qs
@@ -85,10 +85,10 @@ class MeetingViewSet(viewsets.ModelViewSet):
         if meeting.status == MEETING_STATUS_DRAFT and not user.has_perm('manage_meeting'):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
-        if meeting.status == MEETING_STATUS_APPROVING and not user.has_perm('approve_meeting'):
+        if meeting.status == MEETING_STATUS_IN_WORK and not user.has_perm('approve_meeting'):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
         
-        if meeting.status == MEETING_STATUS_PUBLISHED and not user.has_perm('view_meeting'):
+        if meeting.status == MEETING_STATUS_APPROVED and not user.has_perm('view_meeting'):
             return response.Response(status=status.HTTP_403_FORBIDDEN)
 
         # Guard: meeting date has to be unique.
