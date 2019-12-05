@@ -4,7 +4,7 @@ from budger.directory.models.kso import KsoEmployee
 from .permission import (
     PERM_MANAGE_MEETING,
     PERM_APPROVE_MEETING,
-    PERM_VIEW_MEETING
+    PERM_USE_MEETING
 )
 
 MEETING_STATUS_DRAFT = 1
@@ -27,9 +27,18 @@ class Meeting(models.Model):
     class Meta:
         ordering = ['exec_date']
         permissions = [
-            (PERM_MANAGE_MEETING.split('.')[1], 'Создание и редактирование черновиков.'),
-            (PERM_APPROVE_MEETING.split('.')[1], 'Согласование плана заседания.'),
-            # (PERM_VIEW_MEETING.split('.')[1], 'Просмотр согласованного плана заседания.'),
+            (
+                PERM_MANAGE_MEETING.split('.')[1],
+                'Создание, редактирование и отправка на согласование черновика плана заседания.'
+            ),
+            (
+                PERM_APPROVE_MEETING.split('.')[1],
+                'Согласование плана заседания.'
+            ),
+            (
+                PERM_USE_MEETING.split('.')[1],
+                'Просмотр согласованного плана заседания.'
+            ),
         ]
 
     def __str__(self):

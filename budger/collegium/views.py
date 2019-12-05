@@ -16,7 +16,7 @@ from .serializers import MeetingSerializer
 from .permission import (
     PERM_MANAGE_MEETING,
     PERM_APPROVE_MEETING,
-    PERM_VIEW_MEETING
+    PERM_USE_MEETING
 )
 
 
@@ -36,7 +36,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
             return Meeting.objects.all()
         elif u.has_perm(PERM_APPROVE_MEETING):
             return Meeting.objects.filter(status=MEETING_STATUS_APPROVING)
-        elif u.has_perm(PERM_VIEW_MEETING):
+        elif u.has_perm(PERM_USE_MEETING):
             return Meeting.objects.filter(status=MEETING_STATUS_PUBLISHED)
 
     @input_must_have('exec_date')
