@@ -30,6 +30,7 @@ class EventViewSet(viewsets.ModelViewSet):
         - use_event
     """
     serializer_class = EventSerializer
+    paginator = None
 
     def get_queryset(self):
         qs = Event.objects.exclude(status=EVENT_STATUS_DRAFT)
