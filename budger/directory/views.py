@@ -62,9 +62,9 @@ class KsoListView(DynaFieldsListAPIView):
     """
     serializer_class = KsoListSerializer
     queryset = Kso.objects.all()
-    pagination_class = UnlimitedResultsSetPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['title_search']
+    paginator = None
 
 
 class KsoRetrieveView(generics.RetrieveAPIView):
