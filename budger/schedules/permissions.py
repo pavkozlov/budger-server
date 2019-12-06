@@ -1,5 +1,3 @@
-from rest_framework.permissions import BasePermission
-
 # Создание и редактирование черновиков
 PERM_MANAGE_EVENT = 'schedules.manage_event'
 
