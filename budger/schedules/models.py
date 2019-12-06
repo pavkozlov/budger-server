@@ -220,7 +220,7 @@ class Event(models.Model):
 
 class Workflow(models.Model):
     """
-    Воркфлоу согласования документа с Event
+    Воркфлоу согласования документа с Event.
     """
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
