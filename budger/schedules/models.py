@@ -1,12 +1,13 @@
 from django.db import models
 from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
+from budger.libs.shortcuts import get_object_or_none
 from django.contrib.postgres.fields import ArrayField
 from .permissions import (
     PERM_APPROVE_EVENT,
     PERM_MANAGE_EVENT,
     PERM_USE_EVENT,
-    PERM_VIEWALL_WORKFLOW
+    PERM_MANAGE_WORKFLOW
 )
 
 ANNUAL_STATUS_ENUM = [
@@ -250,6 +251,45 @@ class Workflow(models.Model):
 
     class Meta:
         permissions = [
-            (PERM_VIEWALL_WORKFLOW.split('.')[1], 'Просмотр всех согласований.'),
+            (PERM_MANAGE_WORKFLOW.split('.')[1], 'Управление согласованиями.'),
         ]
         ordering = ['created']
+
+    def get_next_link_model(self):
+        """
+        Создаение нового согласования на основе предыдущего.
+        Логика следующая: если предыдуший WF согласован, следующий WF отправляется на согласование начальнику.
+        Если же предыдуший WF отклонен, следующий WF отправляется на доработку начальнику.
+
+        ВНИМАНИЕ!
+        ЕСЛИ после текущего WF уже имеются согласования, ничего не предпринимается.
+        """
+
+        if not self.id:
+            return None
+
+        next_workflow = Workflow.objects.filter(
+            id__gt=self.id,
+            event=self.event,
+            sender=self.recipient,
+        )[:1]
+        if next_workflow:
+            return None
+
+        if self.status == WORKFLOW_STATUS_REJECTED:
+            return Workflow(
+                event=self.event,
+                sender=self.recipient,
+                recipient=self.sender
+            )
+
+        if self.status == WORKFLOW_STATUS_ACCEPTED:
+            superiors = self.recipient.get_superiors()
+            if len(superiors) > 0:
+                new_recipient = get_object_or_none(KsoEmployee, pk=superiors[0].get('id'))
+                if new_recipient:
+                    return Workflow(
+                        event=self.event,
+                        sender=self.recipient,
+                        recipient=new_recipient
+                    )

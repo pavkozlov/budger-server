@@ -1,12 +1,12 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import EventViewSet, EnumsApiView, WorkflowListCreateView
+from .views import EventViewSet, EnumsApiView, WorkflowViewSet
 
 router = DefaultRouter()
-router.register('', EventViewSet, basename='Event')
+router.register('events', EventViewSet, basename='Event')
+router.register('workflows', WorkflowViewSet, basename='Workflow')
 
 urlpatterns = [
-    path('events/', include(router.urls)),
     path('_enums/', EnumsApiView.as_view()),
-    path('workflows/', WorkflowListCreateView.as_view()),
+    path('', include(router.urls)),
 ]

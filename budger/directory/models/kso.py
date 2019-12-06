@@ -193,6 +193,9 @@ class KsoEmployee(models.Model):
             :param employee:
             :return: dict
             """
+            if employee is None:
+                return None
+
             data = {
                 'id': employee.id,
                 'name': employee.name,
