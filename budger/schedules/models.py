@@ -4,9 +4,7 @@ from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from budger.libs.shortcuts import get_object_or_none
 from django.contrib.postgres.fields import ArrayField
 from .permissions import (
-    PERM_APPROVE_EVENT,
     PERM_MANAGE_EVENT,
-    PERM_USE_EVENT,
     PERM_MANAGE_WORKFLOW
 )
 
@@ -213,8 +211,6 @@ class Event(models.Model):
         ordering = ['-exec_from']
         permissions = [
             (PERM_MANAGE_EVENT.split('.')[1], 'Создание и редактирование черновиков.'),
-            (PERM_APPROVE_EVENT.split('.')[1], 'Согласование мероприятия.'),
-            (PERM_USE_EVENT.split('.')[1], 'Просмотр согласованного мероприятия.'),
         ]
 
 

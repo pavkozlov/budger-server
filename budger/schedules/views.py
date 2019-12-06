@@ -1,4 +1,5 @@
-from rest_framework import views, viewsets, response, generics, status
+from rest_framework import views, viewsets, status
+from rest_framework.response import Response
 from .models import (
     ANNUAL_STATUS_ENUM,
     EVENT_STATUS_ENUM,
@@ -11,13 +12,9 @@ from .models import (
     EVENT_STATUS_DRAFT,
     WORKFLOW_STATUS_IN_WORK
 )
-from .serializers import EventSerializer, WorkflowSerializer, WorkflowQuerySerializer
+from .serializers import EventSerializer, WorkflowQuerySerializer
 from budger.directory.models.kso import KsoEmployee
-from django.shortcuts import get_object_or_404
-from budger.libs.input_decorator import input_must_have
 from .permissions import (
-    PERM_USE_EVENT,
-    PERM_APPROVE_EVENT,
     PERM_MANAGE_EVENT,
     PERM_MANAGE_WORKFLOW
 )
@@ -35,20 +32,11 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
 
     def get_queryset(self):
+        qs = Event.objects.exclude(status=EVENT_STATUS_DRAFT)
         u = self.request.user
-        qs = Event.objects.none()
 
         if u.has_perm(PERM_MANAGE_EVENT):
-            qsa = Event.objects.filter(status=EVENT_STATUS_DRAFT)
-            qs = qs | qsa
-
-        if u.has_perm(PERM_APPROVE_EVENT):
-            qsa = Event.objects.filter(status=EVENT_STATUS_IN_WORK)
-            qs = qs | qsa
-
-        if u.has_perm(PERM_USE_EVENT):
-            qsa = Event.objects.filter(status=EVENT_STATUS_APPROVED)
-            qs = qs | qsa
+            qs = qs | Event.objects.all()
 
         return qs
 
@@ -58,24 +46,24 @@ class EventViewSet(viewsets.ModelViewSet):
         if u.has_perm(PERM_MANAGE_EVENT):
             return super(EventViewSet, self).create(request, *args, **kwargs)
 
-        return response.Response(status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
         u = self.request.user
         event = self.get_object()
 
         if event.status == EVENT_STATUS_DRAFT and not u.has_perm(PERM_MANAGE_EVENT):
-            return response.Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if event.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
-            return response.Response(status=status.HTTP_403_FORBIDDEN)
+        # if event.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
+        #    return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if event.status == EVENT_STATUS_APPROVED and not u.has_perm(PERM_USE_EVENT):
-            return response.Response(status=status.HTTP_403_FORBIDDEN)
+        if event.status == EVENT_STATUS_APPROVED and not u.is_superuser:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         if event.status == EVENT_STATUS_DRAFT and request.data.get('status') == EVENT_STATUS_IN_WORK and event.author == request.user.ksoemployee:
             # Если автор event изменил статус с DRAFT на IN_WORK, автоматически создать согласование
-            # TODO: вынести это в сигналы?
+            # TODO: Вынести это в сигналы.
             if not event.author.is_head():
                 # Create first workflow.
                 # Get recipient
@@ -99,7 +87,7 @@ class EnumsApiView(views.APIView):
     """
 
     def get(self, request):
-        return response.Response({
+        return Response({
             'ANNUAL_STATUS_ENUM': ANNUAL_STATUS_ENUM,
             'EVENT_STATUS_ENUM': EVENT_STATUS_ENUM,
             'EVENT_TYPE_ENUM': EVENT_TYPE_ENUM,
