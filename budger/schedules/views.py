@@ -61,7 +61,11 @@ class EventViewSet(viewsets.ModelViewSet):
         if event.status == EVENT_STATUS_APPROVED and not u.is_superuser:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if event.status == EVENT_STATUS_DRAFT and request.data.get('status') == EVENT_STATUS_IN_WORK and event.author == request.user.ksoemployee:
+        response = super(EventViewSet, self).update(request, *args, **kwargs)
+
+        if response.status_code == 200 and \
+                event.status == EVENT_STATUS_DRAFT and request.data.get('status') == EVENT_STATUS_IN_WORK and \
+                event.author == request.user.ksoemployee:
             # Если автор event изменил статус с DRAFT на IN_WORK, автоматически создать согласование
             # TODO: Вынести это в сигналы.
             if not event.author.is_head():
@@ -78,7 +82,7 @@ class EventViewSet(viewsets.ModelViewSet):
                         status=WORKFLOW_STATUS_IN_WORK
                     )
 
-        return super(EventViewSet, self).update(request, *args, **kwargs)
+        return response
 
 
 class EnumsApiView(views.APIView):

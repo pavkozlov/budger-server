@@ -51,7 +51,7 @@ WORKFLOW_STATUS_REJECTED = 2
 WORKFLOW_STATUS_ENUM = [
     (WORKFLOW_STATUS_IN_WORK, 'В работе'),
     (WORKFLOW_STATUS_ACCEPTED, 'Согласовано'),
-    (WORKFLOW_STATUS_REJECTED, 'Не согласовано'),
+    (WORKFLOW_STATUS_REJECTED, 'Отклонено'),
 ]
 
 '''
