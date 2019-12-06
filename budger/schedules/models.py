@@ -196,10 +196,8 @@ class Event(models.Model):
     # Объекты контроля
     controlled_entities = models.ManyToManyField(Entity, blank=True)
 
-    author = models.ForeignKey(
-        KsoEmployee,
-        on_delete=models.CASCADE, null=True, default=None, blank=True
-    )
+    # Работник, создавший мероприятие
+    author = models.ForeignKey(KsoEmployee, on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
