@@ -69,12 +69,20 @@ class KsoDepartment1(models.Model):
     can_participate_in_events = models.BooleanField(default=False)
 
     # Глава
-    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
-                             related_name='headed_department')
+    head = models.ForeignKey(
+        'KsoEmployee',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='headed_department'
+    )
 
     # Куратор подразделения
-    curator = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
-                                related_name='curated_department')
+    curator = models.ForeignKey(
+        'KsoEmployee',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='curated_department'
+    )
 
     class Meta:
         ordering = ['title']
@@ -103,8 +111,12 @@ class KsoDepartment2(models.Model):
     title = models.CharField(max_length=255)
 
     # Глава
-    head = models.ForeignKey('KsoEmployee', on_delete=models.SET_NULL, null=True, blank=True,
-                             related_name='headed_department2')
+    head = models.ForeignKey(
+        'KsoEmployee',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='headed_department2'
+    )
 
     class Meta:
         ordering = ['title']
@@ -187,12 +199,13 @@ class KsoEmployee(models.Model):
     def get_superiors(self):
         """Функция для получения руководителей работника КСО"""
 
-        def _get_employee(employee):
+        def _get_employee_dict(employee):
             """
             Функция принимает работника ксо, возвращает в виде dict его департаменты (id + title), id, name. position
             :param employee:
             :return: dict
             """
+
             if employee is None:
                 return None
 
@@ -213,29 +226,21 @@ class KsoEmployee(models.Model):
                     'id': employee.department2.id,
                     'title': employee.department2.title
                 }
-            return data
 
-        def _get_head(department):
-            """
-            Функция получает департамент, возвращает его главу в виде dict
-            :param department:
-            :return: dict
-            """
-            if department is not None:
-                department_head = department.head
-                return _get_employee(department_head)
+            return data
 
         result = []
 
         if self != self.kso.head:
-            dep2_head = _get_head(self.department2)
-            if dep2_head:
-                result.append(dep2_head)
+            if self.department2 is not None and self != self.department2.head:
+                result.append(_get_employee_dict(self.department2.head))
 
-            dep1_head = _get_head(self.department1)
-            if dep1_head:
-                result.append(dep1_head)
+            if self.department1 is not None:
+                if self != self.department1.head:
+                    result.append(_get_employee_dict(self.department1.head))
+                if self != self.department1.curator:
+                    result.append(_get_employee_dict(self.department1.curator))
 
-            result.append(_get_employee(self.kso.head))
+            result.append(_get_employee_dict(self.kso.head))
 
         return result
