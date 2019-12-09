@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views, parsers, status
 from django.db.models import Q
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
-from budger.libs.pagination import UnlimitedResultsSetPagination
 import budger.app_settings as app_settings
 from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from .models.kso import Kso, KsoEmployee, KsoDepartment1
@@ -27,7 +26,7 @@ from .serializers import (
     KsoDepartment1WithHeadSerializer
 )
 
-from .filters import EntityFilter
+from .filters import EntityFilter, KsoEmployeeFilter
 from .renderers import KsoEmployeeCsvRenderer
 
 
@@ -59,6 +58,7 @@ class EntityRetrieveView(generics.RetrieveAPIView):
 class KsoListView(DynaFieldsListAPIView):
     """
     GET Список КСО.
+    @search
     """
     serializer_class = KsoListSerializer
     queryset = Kso.objects.all()
@@ -77,29 +77,15 @@ class KsoRetrieveView(generics.RetrieveAPIView):
 
 class KsoEmployeeListView(DynaFieldsListAPIView):
     """
-    GET Список сотрудников КСО.
+    GET         Список сотрудников КСО.
+    @search - поиск по имени
     @_filter__kso_id - фильтр по полю kso.id
+    @_filter__name - фильтр по имени
     """
     serializer_class = KsoEmployeeListSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, KsoEmployeeFilter]
     search_fields = ['name']
-
-    def get_queryset(self):
-        queryset = KsoEmployee.objects.filter(is_developer=False)
-
-        kso_filter = self.request.query_params.get('kso_id')  # TODO: remove it
-        if kso_filter is not None:
-            queryset = queryset.filter(kso__id=kso_filter)
-
-        kso_filter = self.request.query_params.get('_filter__kso_id')
-        if kso_filter is not None:
-            queryset = queryset.filter(kso__id=kso_filter)
-
-        name_filter = self.request.query_params.get('_filter__name')
-        if name_filter is not None:
-            queryset = queryset.filter(name__icontains=name_filter)
-
-        return queryset.order_by('name')
+    queryset = KsoEmployee.objects.filter(is_developer=False)
 
 
 class KsoEmployeeListCsv(DynaFieldsListAPIView):
