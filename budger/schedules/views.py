@@ -86,8 +86,8 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_object()
 
         if event.status == EVENT_STATUS_DRAFT and not (
-                user.has_perm(PERM_MANAGE_EVENT) or
-                user.employee == event.author
+            user.has_perm(PERM_MANAGE_EVENT) or
+            user.employee == event.author
         ):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
