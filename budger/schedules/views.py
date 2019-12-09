@@ -48,7 +48,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
         if event.status == EVENT_STATUS_DRAFT and not (
             user.has_perm(PERM_MANAGE_EVENT) or
-            user.employee == event.author
+            user.ksoemployee == event.author
         ):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
@@ -87,11 +87,12 @@ class EventViewSet(viewsets.ModelViewSet):
 
         if event.status == EVENT_STATUS_DRAFT and not (
             user.has_perm(PERM_MANAGE_EVENT) or
-            user.employee == event.author
+            user.ksoemployee == event.author
         ):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         return super(EventViewSet, self).retrieve(request, *args, **kwargs)
+
 
 class EnumsApiView(views.APIView):
     """
