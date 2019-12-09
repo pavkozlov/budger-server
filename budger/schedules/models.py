@@ -3,10 +3,17 @@ from budger.directory.models.entity import Entity
 from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from budger.libs.shortcuts import get_object_or_none
 from django.contrib.postgres.fields import ArrayField
-from .permissions import (
-    PERM_MANAGE_EVENT,
-    PERM_MANAGE_WORKFLOW
-)
+
+
+# Создание, редактирование и удаление черновиков
+PERM_MANAGE_EVENT = 'schedules.manage_event'
+
+# Встроенное
+PERM_ADD_EVENT = 'schedules.add_event'
+
+# Просмотр всех согласований
+PERM_MANAGE_WORKFLOW = 'schedules.manage_workflow'
+
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -262,6 +269,7 @@ class Workflow(models.Model):
         if not self.id:
             return None
 
+        # Если WF не последний в цепочке, не делаем ничего
         next_workflow = Workflow.objects.filter(
             id__gt=self.id,
             event=self.event,
@@ -270,6 +278,7 @@ class Workflow(models.Model):
         if next_workflow:
             return None
 
+        # Если новый статус WF -- отклонено, создаем WF, направленный sender'у.
         if self.status == WORKFLOW_STATUS_REJECTED:
             return Workflow(
                 event=self.event,
@@ -277,6 +286,7 @@ class Workflow(models.Model):
                 recipient=self.sender
             )
 
+        # Если новый статус WF -- согласовано, создаем WF, направленный следующему из superiors.
         if self.status == WORKFLOW_STATUS_ACCEPTED:
             superiors = self.recipient.get_superiors()
             if len(superiors) > 0:
