@@ -104,19 +104,8 @@ class EnumsApiView(views.APIView):
 
 class WorkflowViewSet(viewsets.ModelViewSet):
     """
-    ViewSet для Workflow
-    При отсутствии PERM_VIEWALL_WORKFLOW и PERM_MANAGEALL_WORKFLOW операции производятся только с согласованиями,
-    направленными непосредственно пользователю.
+    ViewSet для Workflow.
     """
     serializer_class = WorkflowQuerySerializer
     filter_backends = [WorkflowFilter]
-
-    def get_queryset(self):
-        u = self.request.user
-
-        if u.has_perm(PERM_MANAGE_WORKFLOW):
-            return Workflow.objects.all()
-
-        return Workflow.objects.filter(
-            recipient=u.ksoemployee
-        )
+    queryset = Workflow.objects.all()

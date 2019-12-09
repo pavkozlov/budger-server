@@ -8,6 +8,9 @@ class WorkflowFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         qs = queryset
 
+        if request.query_params.get('_filter__recipient'):
+            qs = qs.filter(recipient=request.query_params.get('_filter__recipient'))
+
         if request.query_params.get('_filter__status'):
             qs = qs.filter(status=request.query_params.get('_filter__status'))
 
