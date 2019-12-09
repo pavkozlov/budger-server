@@ -10,7 +10,7 @@ class Command(BaseCommand):
         employees = KsoEmployee.objects.filter(kso_id=1)
 
         for employee in employees:
-            if len(employee.email) < 1 or employee.email is None:
+            if employee.email is None or len(employee.email) < 1:
                 continue
 
             u_data = {
