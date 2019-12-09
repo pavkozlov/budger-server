@@ -280,7 +280,7 @@ class Workflow(models.Model):
         if self.status == WORKFLOW_STATUS_ACCEPTED:
             superiors = self.recipient.get_superiors()
             if len(superiors) > 0:
-                new_recipient = get_object_or_none(KsoEmployee, pk=superiors[0].get('id'))
+                new_recipient = get_object_or_none(KsoEmployee, pk=superiors[0].id)
                 if new_recipient:
                     return Workflow(
                         event=self.event,
