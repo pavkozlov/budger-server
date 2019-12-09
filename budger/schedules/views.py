@@ -38,36 +38,6 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [CanCreateEvent | CanRetrieveEvent | CanUpdateEvent | CanDeleteEvent]
     queryset = Event.objects.all()
 
-    def update(self, request, *args, **kwargs):
-        user = self.request.user
-        event = self.get_object()
-
-        response = super(EventViewSet, self).update(request, *args, **kwargs)
-
-        if (
-            response.status_code == 200 and
-            event.status == EVENT_STATUS_DRAFT and
-            request.data.get('status') == EVENT_STATUS_IN_WORK and
-            event.author == user.ksoemployee
-        ):
-            # Если автор event изменил статус с DRAFT на IN_WORK, автоматически создать согласование
-            # TODO: Вынести это в сигналы.
-            if not event.author.is_head():
-                # Create first workflow.
-                # Get recipient
-                sender = event.author
-                superiors = sender.get_superiors()
-                if len(superiors) > 0:
-                    recipient = superiors[0]
-                    Workflow.objects.create(
-                        event=event,
-                        sender=sender,
-                        recipient=recipient,
-                        status=WORKFLOW_STATUS_IN_WORK
-                    )
-
-        return response
-
 
 class EnumsApiView(views.APIView):
     """

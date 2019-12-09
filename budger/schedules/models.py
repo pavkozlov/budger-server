@@ -258,9 +258,11 @@ class Workflow(models.Model):
 
     def get_next_link_model(self):
         """
-        Создаение нового согласования на основе предыдущего.
-        Логика следующая: если предыдуший WF согласован, следующий WF отправляется на согласование начальнику.
-        Если же предыдуший WF отклонен, следующий WF отправляется на доработку начальнику.
+        Создание нового согласования на основе предыдущего.
+
+        Логика следующая:
+            - Если предыдуший WF согласован, следующий WF отправляется на согласование начальнику.
+            - Если предыдуший WF отклонен, следующий WF отправляется на доработку предыдущему отправителю.
 
         ВНИМАНИЕ!
         ЕСЛИ после текущего WF уже имеются согласования, ничего не предпринимается.
@@ -278,16 +280,8 @@ class Workflow(models.Model):
         if next_workflow:
             return None
 
-        # Если новый статус WF -- отклонено, создаем WF, направленный sender'у.
-        if self.status == WORKFLOW_STATUS_REJECTED:
-            return Workflow(
-                event=self.event,
-                sender=self.recipient,
-                recipient=self.sender
-            )
-
-        # Если новый статус WF -- согласовано, создаем WF, направленный следующему из superiors.
         if self.status == WORKFLOW_STATUS_ACCEPTED:
+            # Согоасование согласована, создаем WF, направленный следующему из superiors.
             superiors = self.recipient.get_superiors()
             if len(superiors) > 0:
                 new_recipient = get_object_or_none(KsoEmployee, pk=superiors[0].id)
@@ -297,3 +291,21 @@ class Workflow(models.Model):
                         sender=self.recipient,
                         recipient=new_recipient
                     )
+
+        if self.status == WORKFLOW_STATUS_REJECTED:
+            # Согласование отклонено, передаем эстафету направившеиу "кривую" версию.
+            last_accepted_workflow = Workflow.objects.filter(
+                event=self.event,
+                recipient=self.recipient,
+                status=WORKFLOW_STATUS_ACCEPTED
+            ).order_by('-created')[:1]
+            if last_accepted_workflow:
+                recipient = last_accepted_workflow[0].sender
+            else:
+                recipient = self.sender
+
+            return Workflow(
+                event=self.event,
+                sender=self.recipient,
+                recipient=recipient
+            )
