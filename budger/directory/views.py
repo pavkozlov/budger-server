@@ -242,45 +242,10 @@ class EntitySubordinatesView(views.APIView):
 
 
 class EmployeeSuperiorsView(views.APIView):
-    def get_employee(self, employee):
-        data = {
-            'id': employee.id,
-            'name': employee.name,
-            'position': employee.position,
-        }
-
-        if employee.department1 is not None:
-            data['ksodepartment1'] = KsoDepartment1ShortSerializer(employee.department1).data
-
-        if employee.department2 is not None:
-            data['ksodepartment2'] = KsoDepartment2ShortSerializer(employee.department2).data
-
-        return data
-
-    def get_head(self, department):
-        if department is not None:
-            department_head = department.head
-            return self.get_employee(department_head)
-
     def get(self, request, pk):
-        data = []
-
         employee = get_object_or_404(KsoEmployee, id=pk)
-        kso_head = employee.kso.head
-
-        if employee != kso_head:
-
-            dep2_head = self.get_head(employee.department2)
-            if dep2_head:
-                data.append(dep2_head)
-
-            dep1_head = self.get_head(employee.department1)
-            if dep1_head:
-                data.append(dep1_head)
-
-            data.append(self.get_employee(kso_head))
-
-        return response.Response(data)
+        superiors = employee.get_superiors()
+        return response.Response(superiors)
 
 
 class EnumsView(views.APIView):
