@@ -1,5 +1,6 @@
 from rest_framework import filters
 from django.db.models import Q
+from budger.libs.shortcuts import can_be_int
 
 
 class EntityFilter(filters.BaseFilterBackend):
@@ -31,15 +32,13 @@ class KsoEmployeeFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         qs = queryset
 
-        if request.query_params.get('kso_id') is not None:
-            qs = qs.filter(
-                kso__id=request.query_params.get('kso_id')
-            )
+        p = request.query_params.get('kso_id')
+        if can_be_int(p):
+            qs = qs.filter(kso=p)
 
-        if request.query_params.get('_filter__kso_id') is not None:
-            qs = qs.filter(
-                kso__id=request.query_params.get('_filter__kso_id')
-            )
+        p = request.query_params.get('_filter__kso_id')
+        if can_be_int(p):
+            qs = qs.filter(kso=p)
 
         if request.query_params.get('_filter__name') is not None:
             qs = qs.filter(

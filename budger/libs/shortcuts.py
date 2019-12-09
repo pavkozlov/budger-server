@@ -6,3 +6,14 @@ def get_object_or_none(model, *args, **kwargs):
         return obj
     except model.DoesNotExist:
         return None
+
+
+def can_be_int(s):
+    if s is None:
+        return False
+
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
