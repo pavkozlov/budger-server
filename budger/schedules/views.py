@@ -20,6 +20,7 @@ from .permissions import (
 )
 
 from budger.libs.shortcuts import get_object_or_none
+from .filters import WorkflowFilter
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -108,6 +109,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     направленными непосредственно пользователю.
     """
     serializer_class = WorkflowQuerySerializer
+    filter_backends = [WorkflowFilter]
 
     def get_queryset(self):
         u = self.request.user
