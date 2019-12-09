@@ -32,15 +32,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     serializer_class = EventSerializer
     paginator = None
-
-    def get_queryset(self):
-        qs = Event.objects.exclude(status=EVENT_STATUS_DRAFT)
-        u = self.request.user
-
-        if u.has_perm(PERM_MANAGE_EVENT):
-            qs = qs | Event.objects.all()
-
-        return qs
+    queryset = Event.objects.all()
 
     def create(self, request, *args, **kwargs):
         u = self.request.user
@@ -51,16 +43,19 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
-        u = self.request.user
+        user = self.request.user
         event = self.get_object()
 
-        if event.status == EVENT_STATUS_DRAFT and not u.has_perm(PERM_MANAGE_EVENT):
+        if event.status == EVENT_STATUS_DRAFT and not (
+            user.has_perm(PERM_MANAGE_EVENT) or
+            user.employee == event.author
+        ):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         # if event.status == EVENT_STATUS_IN_WORK and not u.has_perm(PERM_APPROVE_EVENT):
         #    return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if event.status == EVENT_STATUS_APPROVED and not u.is_superuser:
+        if event.status == EVENT_STATUS_APPROVED and not user.is_superuser:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         response = super(EventViewSet, self).update(request, *args, **kwargs)
@@ -86,6 +81,17 @@ class EventViewSet(viewsets.ModelViewSet):
 
         return response
 
+    def retrieve(self, request, *args, **kwargs):
+        user = self.request.user
+        event = self.get_object()
+
+        if event.status == EVENT_STATUS_DRAFT and not (
+                user.has_perm(PERM_MANAGE_EVENT) or
+                user.employee == event.author
+        ):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        return super(EventViewSet, self).retrieve(request, *args, **kwargs)
 
 class EnumsApiView(views.APIView):
     """
