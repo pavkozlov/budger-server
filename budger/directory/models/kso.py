@@ -197,50 +197,19 @@ class KsoEmployee(models.Model):
         return True if self.kso.head == self else False
 
     def get_superiors(self):
-        """Функция для получения руководителей работника КСО"""
-
-        def _get_employee_dict(employee):
-            """
-            Функция принимает работника ксо, возвращает в виде dict его департаменты (id + title), id, name. position
-            :param employee:
-            :return: dict
-            """
-
-            if employee is None:
-                return None
-
-            data = {
-                'id': employee.id,
-                'name': employee.name,
-                'position': employee.position,
-            }
-
-            if employee.department1 is not None:
-                data['ksodepartment1'] = {
-                    'id': employee.department1.id,
-                    'title': employee.department1.title
-                }
-
-            if employee.department2 is not None:
-                data['ksodepartment2'] = {
-                    'id': employee.department2.id,
-                    'title': employee.department2.title
-                }
-
-            return data
-
+        """Список руководителей работника КСО"""
         result = []
 
         if self != self.kso.head:
             if self.department2 is not None and self != self.department2.head:
-                result.append(_get_employee_dict(self.department2.head))
+                result.append(self.department2.head)
 
             if self.department1 is not None:
                 if self != self.department1.head:
-                    result.append(_get_employee_dict(self.department1.head))
+                    result.append(self.department1.head)
                 if self != self.department1.curator:
-                    result.append(_get_employee_dict(self.department1.curator))
+                    result.append(self.department1.curator)
 
-            result.append(_get_employee_dict(self.kso.head))
+            result.append(self.kso.head)
 
         return result

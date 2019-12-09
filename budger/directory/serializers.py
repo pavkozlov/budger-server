@@ -38,6 +38,25 @@ class KsoEmployeeShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'position', 'photo_slug',)
 
 
+class KsoEmployeeSsuperiorsSerializer(serializers.ModelSerializer):
+    class _KsoDepartment1Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = KsoDepartment1
+            fields = ('id', 'title',)
+
+    class _KsoDepartment2Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = KsoDepartment2
+            fields = ('id', 'title',)
+
+    class Meta:
+        model = KsoEmployee
+        fields = ('id', 'name', 'position', 'photo_slug', 'department1', 'department2')
+
+    department1 = _KsoDepartment1Serializer()
+    department2 = _KsoDepartment2Serializer()
+
+
 class KsoDepartment1ShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoDepartment1

@@ -75,8 +75,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 # Get recipient
                 sender = event.author
                 superiors = sender.get_superiors()
-                recipient = get_object_or_none(KsoEmployee, pk=superiors[0]['id'])
-                if recipient is not None:
+                if len(superiors) > 0:
+                    recipient = superiors[0]
                     Workflow.objects.create(
                         event=event,
                         sender=sender,
