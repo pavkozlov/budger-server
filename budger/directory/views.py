@@ -18,7 +18,7 @@ from .serializers import (
     KsoListSerializer, KsoSerializer,
     KsoEmployeeListSerializer,
     KsoEmployeeSerializer,
-    KsoEmployeeSsuperiorsSerializer,
+    KsoEmployeeSuperiorsSerializer,
     MunicipalBudgetSerializer,
     KsoDepartment1WithHeadSerializer
 )
@@ -228,7 +228,7 @@ class EmployeeSuperiorsView(views.APIView):
     def get(self, request, pk):
         employee = get_object_or_404(KsoEmployee, id=pk)
         superiors = employee.get_superiors()
-        serializer = KsoEmployeeSsuperiorsSerializer(superiors, many=True)
+        serializer = KsoEmployeeSuperiorsSerializer(superiors, many=True)
         return response.Response(serializer.data)
 
 

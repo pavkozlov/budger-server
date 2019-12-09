@@ -38,7 +38,7 @@ class KsoEmployeeShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'position', 'photo_slug',)
 
 
-class KsoEmployeeSsuperiorsSerializer(serializers.ModelSerializer):
+class KsoEmployeeSuperiorsSerializer(serializers.ModelSerializer):
     class _KsoDepartment1Serializer(serializers.ModelSerializer):
         class Meta:
             model = KsoDepartment1

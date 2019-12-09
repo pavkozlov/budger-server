@@ -201,13 +201,14 @@ class KsoEmployee(models.Model):
         result = []
 
         if self != self.kso.head:
-            if self.department2 is not None and self != self.department2.head:
+            if self != self.department2.head and self.department2 is not None:
                 result.append(self.department2.head)
 
             if self.department1 is not None:
-                if self != self.department1.head:
+                if self != self.department1.head and self.department1.head is not None:
                     result.append(self.department1.head)
-                if self != self.department1.curator:
+
+                if self != self.department1.curator and self.department1.curator is not None:
                     result.append(self.department1.curator)
 
             result.append(self.kso.head)
