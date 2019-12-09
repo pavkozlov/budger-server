@@ -10,18 +10,23 @@ class Command(BaseCommand):
         employees = KsoEmployee.objects.filter(kso_id=1)
 
         for employee in employees:
-            if employee.email is None or len(employee.email) < 1:
-                continue
+            if employee.email not in [None, ''] and '@' in employee.email:
+                print('{} ... '.format(employee.name), end='')
 
-            u_data = {
-                'username': employee.email.split('@')[0].lower(),
-                'email': employee.email.lower(),
-                'password': 'admin'
-            }
+                data = {
+                    'username': employee.email.split('@')[0].lower(),
+                    'email': employee.email.lower(),
+                    'password': 'admin'
+                }
 
-            u = User.objects.filter(username=u_data['username'], email=u_data['email'])
+                try:
+                    user = User.objects.get(email=data['email'])
+                    print(user, 'applied.')
+                except User.DoesNotExist:
+                    user = User.objects.create_user(data)
+                    print('created.')
 
-            user = User.objects.create_user(u_data) if not u.exists else u.first()
+                employee.user = user
+                employee.save()
 
-            employee.user = user
-            employee.save()
+
