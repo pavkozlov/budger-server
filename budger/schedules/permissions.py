@@ -1,8 +1,8 @@
 from rest_framework import permissions
 from .models import (
     Workflow,
-    EVENT_STATUS_DRAFT,
-    EVENT_STATUS_APPROVED,
+    EVENT_STATUS_DRAFT, EVENT_STATUS_IN_WORK, EVENT_STATUS_APPROVED,
+    WORKFLOW_STATUS_IN_WORK,
     PERM_MANAGE_EVENT, PERM_ADD_EVENT
 )
 
@@ -60,24 +60,26 @@ class CanUpdateEvent(permissions.BasePermission):
         Мероприятие можно редактировать когда
             - пользователь имеет специальное разрешение
             - оно является черновиком, а пользователь является его автором или
-            - пользователь находится в списке согласователей.
+            - статус последней записи FW - в работе, а пользователь являетя получаетелем
         """
         if request.method in ('PUT', 'PATCH'):
             if request.user.is_superuser or request.user.has_perm(PERM_MANAGE_EVENT):
                 return True
 
-            if event.status == EVENT_STATUS_DRAFT:
-                if event.author == request.user.ksoemployee:
-                    # Пользователь является автором
-                    return True
+            if (
+                event.status == EVENT_STATUS_DRAFT and
+                event.author == request.user.ksoemployee
+            ):
+                # Пользователь является автором, а event - черновиком
+                return True
 
-                # Загружаем список согласователей
-                event_recipients = Workflow.objects.filter(
-                    event=event,
-                    recipient=request.user.ksoemployee
-                )
-                if event_recipients:
-                    # пользователь находится в списке его согласователей
+            if event.status == EVENT_STATUS_IN_WORK:
+                wf = Workflow.objects.filter(event=event).order_by('created').last()
+                if (
+                    wf.status == WORKFLOW_STATUS_IN_WORK and
+                    wf.recipient == request.user.ksoemployee
+                ):
+                    # статус последней записи FW - отклонено, а пользователь являетя получаетелем
                     return True
 
         return False
