@@ -3,10 +3,11 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, AnonymousUser, update_last_login
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
-from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 from rest_framework.response import Response
 from budger.directory.models.kso import KsoEmployee
-from .serializers import TokenSerializer, KsoEmployeeSerializer, UserSerializer
+from .serializers import TokenSerializer, UserSerializer
+from budger.directory.serializers import KsoEmployeeSerializer
 from .permissions import CanViewUser, CanUpdateUser
 
 
@@ -100,12 +101,6 @@ class UserPasswordUpdateView(views.APIView):
 class EmployeeView(views.APIView):
     """
     GET     Сведения о текущем работнике.
-
-    POST    Сохранение данных текущего работника:
-            @last_name
-            @first_name
-            @second_name
-            @position
     """
 
     def _get_employee(self, request):
@@ -128,3 +123,22 @@ class EmployeeView(views.APIView):
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
+
+
+class CurrentUserView(generics.RetrieveAPIView):
+    """
+    GET     Сведения о текущем пользователе.
+    """
+
+    def retrieve(self, request, *args, **kwargs):
+        user = request.user
+        if user is None or type(user) is AnonymousUser:
+            return Response(status=HTTP_404_NOT_FOUND)
+        else:
+            employee = user.ksoemployee
+            if employee is not None:
+                return Response({
+                    'user': UserSerializer(user).data,
+                    'employee': KsoEmployeeSerializer(employee).data,
+                    'superiors': KsoEmployeeSerializer(employee.get_superiors(), many=True).data,
+                })
