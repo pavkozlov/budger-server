@@ -3,11 +3,11 @@ from rest_framework.response import Response
 from .models import (
     Event, Workflow,
     ANNUAL_STATUS_ENUM,
-
     EVENT_STATUS_ENUM,
     EVENT_TYPE_ENUM,
     EVENT_INITIATOR_ENUM,
-    EVENT_MODE_ENUM
+    EVENT_MODE_ENUM,
+    EVENT_STATUS_APPROVED
 )
 from .serializers import EventSerializer, WorkflowQuerySerializer
 from .permissions import (
@@ -17,21 +17,7 @@ from .permissions import (
     CanDeleteEvent
 )
 
-from budger.libs.shortcuts import get_object_or_none
 from .filters import WorkflowFilter
-
-
-class EventViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet имеет три разрешения:
-        - manage_event
-        - approve_event
-        - use_event
-    """
-    serializer_class = EventSerializer
-    paginator = None
-    permission_classes = [CanCreateEvent | CanRetrieveEvent | CanUpdateEvent | CanDeleteEvent]
-    queryset = Event.objects.all()
 
 
 class EnumsApiView(views.APIView):
@@ -47,6 +33,19 @@ class EnumsApiView(views.APIView):
             'EVENT_INITIATOR_ENUM': EVENT_INITIATOR_ENUM,
             'EVENT_MODE_ENUM': EVENT_MODE_ENUM,
         })
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet имеет три разрешения:
+        - manage_event
+        - approve_event
+        - use_event
+    """
+    serializer_class = EventSerializer
+    paginator = None
+    permission_classes = [CanCreateEvent | CanRetrieveEvent | CanUpdateEvent | CanDeleteEvent]
+    queryset = Event.objects.all(status=EVENT_STATUS_APPROVED)
 
 
 class WorkflowViewSet(viewsets.ModelViewSet):
