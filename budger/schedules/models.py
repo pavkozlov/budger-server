@@ -114,6 +114,9 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
+    # Порядковый номер мероприятия
+    number = models.SmallIntegerField(blank=True, null=True, db_index=True)
+
     # Статус мероприятия
     status = models.PositiveSmallIntegerField(
         db_index=True,
