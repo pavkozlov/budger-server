@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 from rest_framework.response import Response
 from budger.directory.models.kso import KsoEmployee
-from .serializers import TokenSerializer, UserSerializer
+from .serializers import TokenSerializer, UserSerializer, KsoEmployeeSerializer as _KsoEmployeeSerializer
 from budger.directory.serializers import KsoEmployeeSerializer
 from .permissions import CanViewUser, CanUpdateUser
 
@@ -119,7 +119,7 @@ class EmployeeView(views.APIView):
         employee = self._get_employee(request)
         if employee is not None:
             return Response(
-                {'user': KsoEmployeeSerializer(employee).data}
+                {'user': _KsoEmployeeSerializer(employee).data}
             )
         else:
             return Response(status=HTTP_403_FORBIDDEN)
