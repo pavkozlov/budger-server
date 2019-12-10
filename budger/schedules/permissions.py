@@ -62,7 +62,7 @@ class CanUpdateEvent(permissions.BasePermission):
             - оно является черновиком, а пользователь является его автором или
             - пользователь находится в списке согласователей.
         """
-        if request.method in ('UPDATE', 'PATCH'):
+        if request.method in ('PUT', 'PATCH'):
             if request.user.is_superuser or request.user.has_perm(PERM_MANAGE_EVENT):
                 return True
 
