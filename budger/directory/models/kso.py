@@ -20,7 +20,7 @@ class Kso(models.Model):
     # Адреса и контакты
     addr_legal = models.CharField(max_length=200)
     addr_fact = models.CharField(max_length=200)
-    www = models.CharField(max_length=100)
+    www = models.CharField(max_length=100, blank=True, null=True)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
 
