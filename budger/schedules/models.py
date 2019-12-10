@@ -213,7 +213,7 @@ class Event(models.Model):
         return '{} - {}'.format(self.exec_from, self.exec_to)
 
     class Meta:
-        ordering = ['-exec_from']
+        ordering = ['exec_from']
         permissions = [
             (PERM_MANAGE_EVENT.split('.')[1], 'Создание и редактирование черновиков.'),
         ]
