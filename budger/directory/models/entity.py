@@ -149,6 +149,9 @@ class Entity(models.Model):
     # Дата акруальности данных
     relevance_date = models.DateTimeField(null=True, blank=True)
 
+    # Признак, указывающий, является ли организация Органом государственной власти.
+    is_ogv = models.BooleanField(default=False, db_index=True)
+
     class Meta:
         ordering = ['title_full']
 
