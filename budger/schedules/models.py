@@ -167,6 +167,22 @@ class Event(models.Model):
         related_name='owned_events'
     )
 
+    # Ответственный за мероприятие
+    responsible_employee = models.ForeignKey(
+        KsoEmployee,
+        on_delete=models.CASCADE,
+        blank=True, null=True,
+        related_name='responded_events'
+    )
+
+    # Ответственное структурное подразделение
+    responsible_department = models.ForeignKey(
+        KsoDepartment1,
+        on_delete=models.CASCADE,
+        blank=True, null=True,
+        related_name='responded_events'
+    )
+
     # Привлекаемые структурные подразделения
     attendant_departments = models.ManyToManyField(
         KsoDepartment1,
