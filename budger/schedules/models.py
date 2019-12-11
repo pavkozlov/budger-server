@@ -161,13 +161,7 @@ class Event(models.Model):
     exec_from = models.DateField(db_index=True)
     exec_to = models.DateField(db_index=True)
 
-    # Ответственный за мероприятие
-    responsible_employees = models.ManyToManyField(
-        KsoEmployee,
-        related_name='owned_events'
-    )
-
-    # Ответственный за мероприятие
+    # Ответственный за мероприятие сотрудник
     responsible_employee = models.ForeignKey(
         KsoEmployee,
         on_delete=models.CASCADE,
@@ -175,7 +169,7 @@ class Event(models.Model):
         related_name='responded_events'
     )
 
-    # Ответственное структурное подразделение
+    # Ответственное за мероприятие структурное подразделение
     responsible_department = models.ForeignKey(
         KsoDepartment1,
         on_delete=models.CASCADE,
@@ -202,12 +196,6 @@ class Event(models.Model):
         Kso,
         related_name='together_participated_events',
         blank=True
-    )
-
-    # Ответственное структурное подразделение
-    responsible_departments = models.ManyToManyField(
-        KsoDepartment1,
-        related_name='owned_events'
     )
 
     # Форма проведения
