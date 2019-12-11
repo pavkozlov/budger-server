@@ -93,6 +93,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 class WorkflowQuerySerializer(serializers.ModelSerializer):
     sender = KsoEmployeeShortSerializer()
+    recipient = KsoEmployeeShortSerializer()
     event = EventShortSerializer()
 
     class Meta:
