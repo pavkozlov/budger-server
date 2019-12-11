@@ -145,7 +145,7 @@ class Event(models.Model):
     title = models.CharField(max_length=2000)
 
     # Основания для проведения мероприятия
-    initiator = models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM, null=True, blank=True)
+    initiators = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), null=True, blank=True)
 
     # Проверяемый период
     period_from = models.DateField(db_index=True, null=True, blank=True)

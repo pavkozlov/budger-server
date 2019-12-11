@@ -112,10 +112,11 @@ class Entity(models.Model):
     addr_housing = models.CharField(max_length=50, null=True, blank=True)
     addr_office = models.CharField(max_length=50, null=True, blank=True)
 
-    # Руководитель
+    # Руководитель: должность, имя, дата вступления, фото
     head_position = models.CharField(max_length=300, null=True, blank=True)
     head_name = models.CharField(max_length=200, null=True, blank=True)
     head_accession_date = models.DateField(null=True, blank=True)
+    head_photo_slug = models.CharField(max_length=200, null=True, blank=True)
 
     # Код статуса организации.
     org_status_code = models.CharField(max_length=1, choices=ORG_STATUS_ENUM, db_index=True)
