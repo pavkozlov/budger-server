@@ -41,12 +41,12 @@ class EventSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         repr = super(EventSerializer, self).to_representation(instance)
 
-        repr['responsible_employees'] = KsoEmployeeShortSerializer(
-            instance.responsible_employees, many=True
+        repr['responsible_employee'] = KsoEmployeeShortSerializer(
+            instance.responsible_employee
         ).data
 
-        repr['responsible_departments'] = KsoDepartment1ShortSerializer(
-            instance.responsible_departments, many=True
+        repr['responsible_department'] = KsoDepartment1ShortSerializer(
+            instance.responsible_department
         ).data
 
         repr['attendant_departments'] = KsoDepartment1ShortSerializer(
