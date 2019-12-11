@@ -1,14 +1,19 @@
 from rest_framework import filters
 from django.db.models import Q
 from budger.libs.shortcuts import can_be_int
+import re
 
 
 class EntityFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         qs = queryset.all()
         if request.query_params.get('_filter__title'):
+            filter_title = request.query_params.get('_filter__title')
+            filter_title = re.sub(r'[^\w\d\s]', ' ', filter_title)
+            filter_title = re.sub(r'\s+', ' ', filter_title).strip()
+
             qs = qs.filter(
-                title_search__icontains=request.query_params.get('_filter__title')
+                title_search__icontains=filter_title
             )
 
         if request.query_params.get('_filter__inn'):
