@@ -76,6 +76,11 @@ class EventSerializer(serializers.ModelSerializer):
             if attrs['period_to'] <= attrs['period_from']:
                 raise serializers.ValidationError({'message': 'Period range setup error.'})
 
+        if attrs.get('type') == 1 and attrs.get('group') not in [1, 2, 3, 4]:
+            raise serializers.ValidationError({'group': 'Invalid group for this event type'})
+        elif attrs.get('type') == 2 and attrs.get('group') not in [5, 6, 7, 8]:
+            raise serializers.ValidationError({'group': 'Invalid group for this event type'})
+
         return attrs
 
 
