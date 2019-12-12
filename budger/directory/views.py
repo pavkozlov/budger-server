@@ -216,7 +216,6 @@ class EntitySubordinatesView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
     """
-
     def get(self, request, pk):
         parent = get_object_or_404(Entity, pk=pk)
         queryset = Entity.objects.filter(pk__in=parent.subordinates)

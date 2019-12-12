@@ -17,13 +17,19 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
 class EntityShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'org_status_code')
+        fields = ('id', 'title_full', 'inn', 'ogrn', 'ofk_code', 'org_status_code')
 
 
 class EntitySubordinatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ('id', 'title_full', 'title_short', 'inn', 'ogrn', 'ofk_code', 'kbk_code', 'subordinates')
+        fields = (
+            'id',
+            'title_full',
+            'inn', 'ogrn', 'ofk_code', 'kbk_code',
+            'head_name', 'head_position',
+            'subordinates'
+        )
 
 
 class EntitySerializer(serializers.ModelSerializer):
