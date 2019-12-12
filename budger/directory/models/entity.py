@@ -169,6 +169,12 @@ class MunicipalBudget(models.Model):
     # Следующий уровень муниципального дерева ОК
     subordinates = ArrayField(models.IntegerField(), blank=True, null=True)
 
+    administration = models.ForeignKey(
+        Entity,
+        blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+
     class Meta:
         ordering = ['title_display']
 

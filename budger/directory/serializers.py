@@ -179,10 +179,11 @@ class KsoEmployeeSerializer(serializers.ModelSerializer):
 
 class MunicipalBudgetSerializer(serializers.ModelSerializer):
     title_full = serializers.SerializerMethodField()
+    administration = EntityListSerializer()
 
     def get_title_full(self, obj):
         return obj.title_display
 
     class Meta:
         model = MunicipalBudget
-        fields = ('title_full', 'subordinates', 'code',)
+        fields = ('title_full', 'subordinates', 'code', 'administration')
