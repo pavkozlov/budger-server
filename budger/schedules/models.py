@@ -4,7 +4,6 @@ from budger.directory.models.kso import Kso, KsoDepartment1, KsoEmployee
 from budger.libs.shortcuts import get_object_or_none
 from django.contrib.postgres.fields import ArrayField
 
-
 # Создание, редактирование и удаление черновиков
 PERM_MANAGE_EVENT = 'schedules.manage_event'
 
@@ -13,7 +12,6 @@ PERM_ADD_EVENT = 'schedules.add_event'
 
 # Просмотр всех согласований
 PERM_MANAGE_WORKFLOW = 'schedules.manage_workflow'
-
 
 ANNUAL_STATUS_ENUM = [
     (1, 'В работе'),
@@ -97,6 +95,17 @@ EVENT_WAY_ENUM = [
     (2, 'Камерально')
 ]
 
+EVENT_GROUP_ENUM = [
+    (1, 'Контрольные мероприятия. Последующий контроль за исполнением бюджета Московской области'),
+    (2, 'Последующий контроль за исполнением бюджета Территориального фонда обязательного медицинского страхования Московской области'),
+    (3, 'Последующий контроль за исполнением бюджетов муниципальных образований, в бюджетах которых доля дотаций из других бюджетов бюджетной системы Российской Федерации и (или) налоговых доходов по дополнительным нормативам отчислений в размере, не превышающем расчетного объема дотации на выравнивание бюджетной обеспеченности (части расчетного объема дотации), замененной дополнительными нормативами отчислений, в течение двух из трех последних отчетных финансовых лет превышала 50 процентов объема собственных доходов местных бюджетов, а также в муниципальных образованиях, которые не имеют годовой отчетности об исполнении местного бюджета за один год и более из трех последних отчетных финансовых лет'),
+    (4, 'Тематические контрольные мероприятия'),
+    (5, 'Экспертно-аналитические мероприятия. Последующий контроль за исполнением бюджета Московской области'),
+    (6, 'Оперативный контроль за исполнением бюджета Московской области'),
+    (7, 'Оперативный контроль за исполнением бюджета Территориального фонда обязательного медицинского страхования Московской области'),
+    (8, 'Тематические экспертно-аналитические мероприятия'),
+]
+
 
 class Annual(models.Model):
     year = models.PositiveSmallIntegerField(db_index=True)
@@ -114,8 +123,8 @@ class Annual(models.Model):
 
 
 class Event(models.Model):
-    # Порядковый номер мероприятия
-    number = models.SmallIntegerField(blank=True, null=True, db_index=True)
+    # Группа меропрития
+    group = models.PositiveSmallIntegerField(choices=EVENT_GROUP_ENUM, blank=True, null=True)
 
     # Статус мероприятия
     status = models.PositiveSmallIntegerField(
@@ -220,7 +229,7 @@ class Event(models.Model):
         return '{} - {}'.format(self.exec_from, self.exec_to)
 
     class Meta:
-        ordering = ['number']
+        ordering = ['exec_from']
         permissions = [
             (PERM_MANAGE_EVENT.split('.')[1], 'Создание и редактирование черновиков.'),
         ]

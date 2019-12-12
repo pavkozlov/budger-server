@@ -45,7 +45,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     paginator = None
     permission_classes = [CanCreateEvent | CanRetrieveEvent | CanUpdateEvent | CanDeleteEvent]
-    queryset = Event.objects.filter(status=EVENT_STATUS_APPROVED)
+    queryset = Event.objects.filter(status=EVENT_STATUS_APPROVED).order_by('group', 'exec_from', 'responsible_department')
 
 
 class WorkflowViewSet(viewsets.ModelViewSet):
