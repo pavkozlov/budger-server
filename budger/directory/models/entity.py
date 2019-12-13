@@ -180,3 +180,11 @@ class MunicipalBudget(models.Model):
 
     def __str__(self):
         return self.title_display
+
+
+class EntityGroup(models.Model):
+    """
+    Кэширование информации о группировке объектов контроля по различным признакам.
+    """
+    code = models.CharField(max_length=100, db_index=True, unique=True)
+    data = ArrayField(models.IntegerField())
