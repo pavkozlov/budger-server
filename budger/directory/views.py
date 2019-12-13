@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
 
+from django.db import connection
 import os
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, response, views, parsers, status
@@ -229,6 +230,30 @@ class EmployeeSuperiorsView(views.APIView):
         superiors = employee.get_superiors()
         serializer = KsoEmployeeSuperiorsSerializer(superiors, many=True)
         return response.Response(serializer.data)
+
+
+class EntityAggregationsView(views.APIView):
+    """
+    GET агрегатор единого реестра объектов контроля
+    """
+
+    def get(self, request):
+
+        cursor = connection.cursor()
+        sql = 'SELECT opf_code, COUNT(id) AS cnt FROM directory_entity {} GROUP BY opf_code ORDER BY cnt DESC'
+        where_sql_stat = ''
+        params = None
+
+        if request.query_params.get('_filter__title') is not None:
+            title = request.query_params['_filter__title']
+            params = ('%{}%'.format(title),)
+            where_sql_stat = 'WHERE UPPER(title_search) LIKE UPPER(%s)'
+
+        cursor.execute(sql.format(where_sql_stat), params)
+
+        return response.Response(
+            {opf_code: count for opf_code, count in cursor.fetchall()}
+        )
 
 
 class EnumsView(views.APIView):

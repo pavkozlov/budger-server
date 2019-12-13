@@ -7,6 +7,7 @@ from .views import (
     KsoResponsiblesView,
     EntityRegionalsView, EntityMunicipalsView,
     EmployeeSuperiorsView,
+    EntityAggregationsView,
     EnumsView,
     KsoEmployeeListCsv
 )
@@ -21,6 +22,7 @@ urlpatterns = [
     path('entity/regionals/', EntityRegionalsView.as_view()),
     path('entity/municipals/', EntityMunicipalsView.as_view()),
     path('entity/<int:pk>/subordinates/', EntitySubordinatesView.as_view()),
+    path('entity/aggregations/', EntityAggregationsView.as_view()),
 
     path('kso/', KsoListView.as_view()),
     path('kso/<int:pk>/', KsoRetrieveView.as_view()),
