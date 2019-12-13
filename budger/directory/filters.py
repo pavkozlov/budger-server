@@ -36,11 +36,11 @@ class EntityFilter(filters.BaseFilterBackend):
                 Q(head_name__icontains=term)
             )
 
-        if request.query_params.get('_filter__municipals'):
+        if request.query_params.get('_filter__group') == 'municipals':
             group = EntityGroup.objects.get(code='municipals')
             queryset = queryset.filter(id__in=group.data)
 
-        if request.query_params.get('_filter__regionals'):
+        if request.query_params.get('_filter__group') == 'regionals':
             group = EntityGroup.objects.get(code='regionals')
             queryset = queryset.filter(id__in=group.data)
 
