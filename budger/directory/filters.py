@@ -24,7 +24,7 @@ class EntityFilter(filters.BaseFilterBackend):
 
         if request.query_params.get('_filter__opf'):
             queryset = queryset.filter(
-                opf_code=request.query_param['_filter__opf']
+                opf_code__in=request.query_params['_filter__opf'].split(',')
             )
 
         if request.query_params.get('_filter__1'):
