@@ -87,9 +87,9 @@ class Entity(models.Model):
     title_short = models.CharField(max_length=2000, null=True, blank=True)
 
     # ИНН, КПП, ОГРН
-    inn = models.CharField(max_length=12, null=True, blank=True, db_index=True)
-    kpp = models.CharField(max_length=9, null=True, blank=True)
-    ogrn = models.CharField(max_length=13, null=True, blank=True)
+    inn = models.CharField(max_length=12, db_index=True, null=True, blank=True)
+    kpp = models.CharField(max_length=9, db_index=True, null=True, blank=True)
+    ogrn = models.CharField(max_length=13, db_index=True, null=True, blank=True)
 
     # Справочник ОКТМО
     oktmo_code = models.CharField(max_length=11, null=True, blank=True)

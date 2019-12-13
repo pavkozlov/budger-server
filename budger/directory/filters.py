@@ -1,41 +1,50 @@
 from rest_framework import filters
 from django.db.models import Q
 from budger.libs.shortcuts import can_be_int
+from .models.entity import EntityGroup
 import re
 
 
 class EntityFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        qs = queryset.all()
+
         if request.query_params.get('_filter__title'):
             filter_title = request.query_params.get('_filter__title')
             filter_title = re.sub(r'[^\w\d\s]', ' ', filter_title)
             filter_title = re.sub(r'\s+', ' ', filter_title).strip()
 
-            qs = qs.filter(
+            queryset = queryset.filter(
                 title_search__icontains=filter_title
             )
 
         if request.query_params.get('_filter__inn'):
-            qs = qs.filter(
+            queryset = queryset.filter(
                 inn__contains=request.query_params.get('_filter__inn')
             )
 
         if request.query_params.get('_filter__opf'):
-            qs = qs.filter(
+            queryset = queryset.filter(
                 opf_code=request.query_param['_filter__opf']
             )
 
         if request.query_params.get('_filter__1'):
             term = request.query_params.get('_filter__1')
-            qs = qs.filter(
+            queryset = queryset.filter(
                 Q(title_search__icontains=term) |
                 Q(inn__contains=term) |
                 Q(ogrn__contains=term) |
                 Q(head_name__icontains=term)
             )
 
-        return qs
+        if request.query_params.get('_filter__municipals'):
+            group = EntityGroup.objects.get(code='municipals')
+            queryset = queryset.filter(id__in=group.data)
+
+        if request.query_params.get('_filter__regionals'):
+            group = EntityGroup.objects.get(code='regionals')
+            queryset = queryset.filter(id__in=group.data)
+
+        return queryset
 
 
 class KsoEmployeeFilter(filters.BaseFilterBackend):

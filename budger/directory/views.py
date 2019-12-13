@@ -8,10 +8,9 @@ import os
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, views, parsers, status
 from rest_framework.response import Response
-from django.db.models import Q
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 import budger.app_settings as app_settings
-from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
+from .models.entity import Entity, EntityGroup, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from .models.kso import Kso, KsoEmployee, KsoDepartment1
 from .permissions import CanUpdateEmployee
 
@@ -160,27 +159,17 @@ class KsoResponsiblesView(views.APIView):
 class EntityRegionalsView(views.APIView):
     """
     GET Список муниципальных объектов контроля - ГРБС.
-    @_filter__title__inn Фильтр по названию и ИНН.
     """
-
     def get(self, request):
-        terms = request.query_params.get('_filter__title__inn', None)
+        qs = Entity.objects.filter(
+            parent_id__isnull=True,
+            opf_code__in=['75201', '75203', '75204'],
+            org_type_code__in=['01', '02'],
+            budget_lvl_code__in=['20', '50'],
+            org_status_code__in=['1', '4'],
+        )
 
-        if terms is not None:
-            queryset = Entity.objects.filter(
-                (Q(title_search__icontains=terms) | Q(inn=terms)) &
-                Q(budget_lvl_code__in=['20', '50'])
-            )
-        else:
-            queryset = Entity.objects.filter(
-                parent_id__isnull=True,
-                opf_code__in=['75201', '75203', '75204'],
-                org_type_code__in=['01', '02'],
-                budget_lvl_code__in=['20', '50'],
-                org_status_code__in=['1', '4'],
-            )
-
-        serializer = EntitySubordinatesSerializer(queryset, many=True)
+        serializer = EntitySubordinatesSerializer(qs, many=True)
         return Response(serializer.data)
 
 
@@ -188,28 +177,18 @@ class EntityMunicipalsView(views.APIView):
     """
     GET Список групп верхнего уровня муниципальных объектов контроля.
     @_filter__budget_code Список муниципальных объектов контроля с заданным budget_code.
-    @_filter__title__inn Фильтр по названию и ИНН.
     """
-
     def get(self, request):
-        terms_budget = request.query_params.get('_filter__budget_code', None)
-        terms_title = request.query_params.get('_filter__title__inn', None)
+        # TODO: move to filters.py?
+        fi_budget = request.query_params.get('_filter__budget_code')
 
-        if terms_budget is not None:
-            parent = get_object_or_404(MunicipalBudget, code=terms_budget)
-            queryset = Entity.objects.filter(pk__in=parent.subordinates)
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
-
-        elif terms_title is not None:
-            queryset = Entity.objects.filter(
-                (Q(title_search__icontains=terms_title) | Q(inn=terms_title)) &
-                Q(budget_lvl_code__in=['31', '32'])
-            )
-            serializer = EntitySubordinatesSerializer(queryset, many=True)
-
+        if fi_budget is not None:
+            parent = get_object_or_404(MunicipalBudget, code=fi_budget)
+            qs = Entity.objects.filter(pk__in=parent.subordinates)
+            serializer = EntitySubordinatesSerializer(qs, many=True)
         else:
-            queryset = MunicipalBudget.objects.all()
-            serializer = MunicipalBudgetSerializer(queryset, many=True)
+            qs = MunicipalBudget.objects.all()
+            serializer = MunicipalBudgetSerializer(qs, many=True)
 
         return Response(serializer.data)
 
