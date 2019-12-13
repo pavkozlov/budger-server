@@ -234,12 +234,11 @@ class EmployeeSuperiorsView(views.APIView):
 
 class EntityAggregationsView(views.APIView):
     """
-    GET агрегатор единого реестра объектов контроля
+    GET агрегатор единого реестра объектов контроля.
     """
-
     def get(self, request):
-
         cursor = connection.cursor()
+
         sql = 'SELECT opf_code, COUNT(id) AS cnt FROM directory_entity {} GROUP BY opf_code ORDER BY cnt DESC'
         where_sql_stat = ''
         params = None
@@ -251,9 +250,9 @@ class EntityAggregationsView(views.APIView):
 
         cursor.execute(sql.format(where_sql_stat), params)
 
-        return response.Response(
-            {opf_code: count for opf_code, count in cursor.fetchall()}
-        )
+        return response.Response({
+            opf_code: count for opf_code, count in cursor.fetchall()
+        })
 
 
 class EnumsView(views.APIView):
