@@ -21,8 +21,13 @@ class EntityFilter(filters.BaseFilterBackend):
                 inn__contains=request.query_params.get('_filter__inn')
             )
 
-        if request.query_params.get('_complex_filter_1'):
-            term = request.query_params.get('_complex_filter_1')
+        if request.query_params.get('_filter__opf'):
+            qs = qs.filter(
+                opf_code=request.query_param['_filter__opf']
+            )
+
+        if request.query_params.get('_filter__1'):
+            term = request.query_params.get('_filter__1')
             qs = qs.filter(
                 Q(title_search__icontains=term) |
                 Q(inn__contains=term) |

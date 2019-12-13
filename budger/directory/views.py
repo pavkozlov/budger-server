@@ -6,7 +6,8 @@ from django.views.decorators.cache import cache_page
 from django.db import connection
 import os
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, filters, response, views, parsers, status
+from rest_framework import generics, filters, views, parsers, status
+from rest_framework.response import Response
 from django.db.models import Q
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 import budger.app_settings as app_settings
@@ -140,7 +141,7 @@ class KsoEmployeeUploadPhotoView(views.APIView):
 
                 response_status = status.HTTP_204_NO_CONTENT
 
-        return response.Response(status=response_status)
+        return Response(status=response_status)
 
 
 class KsoResponsiblesView(views.APIView):
@@ -151,9 +152,9 @@ class KsoResponsiblesView(views.APIView):
     def get(self, request):
         kso = request.user.ksoemployee.kso
         departments = KsoDepartment1.objects.filter(kso=kso, can_participate_in_events=True)
-        data = KsoDepartment1WithHeadSerializer(departments, many=True).data
+        serializer = KsoDepartment1WithHeadSerializer(departments, many=True)
 
-        return response.Response({'departments': data})
+        return Response({'departments': serializer.data})
 
 
 class EntityRegionalsView(views.APIView):
@@ -179,8 +180,8 @@ class EntityRegionalsView(views.APIView):
                 org_status_code__in=['1', '4'],
             )
 
-        data = EntitySubordinatesSerializer(queryset, many=True).data
-        return response.Response(data)
+        serializer = EntitySubordinatesSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class EntityMunicipalsView(views.APIView):
@@ -197,20 +198,20 @@ class EntityMunicipalsView(views.APIView):
         if terms_budget is not None:
             parent = get_object_or_404(MunicipalBudget, code=terms_budget)
             queryset = Entity.objects.filter(pk__in=parent.subordinates)
-            data = EntitySubordinatesSerializer(queryset, many=True).data
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
 
         elif terms_title is not None:
             queryset = Entity.objects.filter(
                 (Q(title_search__icontains=terms_title) | Q(inn=terms_title)) &
                 Q(budget_lvl_code__in=['31', '32'])
             )
-            data = EntitySubordinatesSerializer(queryset, many=True).data
+            serializer = EntitySubordinatesSerializer(queryset, many=True)
 
         else:
             queryset = MunicipalBudget.objects.all()
-            data = MunicipalBudgetSerializer(queryset, many=True).data
+            serializer = MunicipalBudgetSerializer(queryset, many=True)
 
-        return response.Response(data)
+        return Response(serializer.data)
 
 
 class EntitySubordinatesView(views.APIView):
@@ -220,8 +221,8 @@ class EntitySubordinatesView(views.APIView):
     def get(self, request, pk):
         parent = get_object_or_404(Entity, pk=pk)
         queryset = Entity.objects.filter(pk__in=parent.subordinates)
-        data = EntitySubordinatesSerializer(queryset, many=True).data
-        return response.Response(data)
+        serializer = EntitySubordinatesSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class EmployeeSuperiorsView(views.APIView):
@@ -229,7 +230,7 @@ class EmployeeSuperiorsView(views.APIView):
         employee = get_object_or_404(KsoEmployee, id=pk)
         superiors = employee.get_superiors()
         serializer = KsoEmployeeSuperiorsSerializer(superiors, many=True)
-        return response.Response(serializer.data)
+        return Response(serializer.data)
 
 
 class EntityAggregationsView(views.APIView):
@@ -243,14 +244,21 @@ class EntityAggregationsView(views.APIView):
         where_sql_stat = ''
         params = None
 
-        if request.query_params.get('_filter__title') is not None:
-            title = request.query_params['_filter__title']
-            params = ('%{}%'.format(title),)
-            where_sql_stat = 'WHERE UPPER(title_search) LIKE UPPER(%s)'
+        if request.query_params.get('_filter__1') is not None:
+            fi = request.query_params['_filter__1']
+
+            where_sql_stat = '''
+                WHERE UPPER(title_search) LIKE UPPER(%s) OR
+                inn LIKE %s OR
+                ogrn LIKE %s OR
+                UPPER(head_name) LIKE UPPER(%s)
+            '''
+
+            params = ('%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi))
 
         cursor.execute(sql.format(where_sql_stat), params)
 
-        return response.Response({
+        return Response({
             opf_code: count for opf_code, count in cursor.fetchall()
         })
 
@@ -261,6 +269,6 @@ class EnumsView(views.APIView):
     """
 
     def get(self, request):
-        return response.Response({
+        return Response({
             'SPEC_EVENT_CODE_ENUM': SPEC_EVENT_CODE_ENUM
         })
