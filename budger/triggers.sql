@@ -13,6 +13,8 @@ CREATE FUNCTION entity_save() RETURNS trigger AS $entity_save$
         title_short := REGEXP_REPLACE(NEW.title_short, '[^\w\d\s]+', ' ', 'g');
         title_search := UPPER(CONCAT(title_full, ' ', title_short));
         title_search := REGEXP_REPLACE(title_search, '\s+', ' ', 'g');
+        NEW.title_short := REGEXP_REPLACE(NEW.title_short, '\s+', ' ', 'g');
+        NEW.title_full := REGEXP_REPLACE(NEW.title_full, '\s+', ' ', 'g');
         NEW.title_search := title_search;
         RETURN NEW;
     END;
