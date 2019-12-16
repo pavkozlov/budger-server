@@ -3,14 +3,14 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 """
 
-from django.db import connection
 import os
+from django.db import connection
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, views, parsers, status
 from rest_framework.response import Response
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
 import budger.app_settings as app_settings
-from .models.entity import Entity, EntityGroup, MunicipalBudget, SPEC_EVENT_CODE_ENUM
+from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from .models.kso import Kso, KsoEmployee, KsoDepartment1
 from .permissions import CanUpdateEmployee
 
