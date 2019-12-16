@@ -215,25 +215,38 @@ class EmployeeSuperiorsView(views.APIView):
 class EntityAggregationsView(views.APIView):
     """
     GET агрегатор единого реестра объектов контроля.
+        @_filter__1 - фильтр по названию / ИНН / ОГРН / имя руководителя
+        @__filter__municipals - рабатать только с подмножеством "муниципальные ОК"
+        @_filter__regionals - рабатать только с подмножеством "региональные ОК"
     """
     def get(self, request):
         cursor = connection.cursor()
 
         sql = 'SELECT opf_code, COUNT(id) AS cnt FROM directory_entity {} GROUP BY opf_code ORDER BY cnt DESC'
         where_sql_stat = ''
-        params = None
+        params = []
 
         if request.query_params.get('_filter__1') is not None:
             fi = request.query_params['_filter__1']
 
             where_sql_stat = '''
-                WHERE UPPER(title_search) LIKE UPPER(%s) OR
-                inn LIKE %s OR
-                ogrn LIKE %s OR
-                UPPER(head_name) LIKE UPPER(%s)
+                WHERE (
+                    UPPER(title_search) LIKE UPPER(%s) OR
+                    inn LIKE %s OR
+                    ogrn LIKE %s OR
+                    UPPER(head_name) LIKE UPPER(%s)
+                )
             '''
 
-            params = ('%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi))
+            params += ['%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi)]
+
+        if request.query_params.get('_filter__municipals') is not None:
+            where_sql_stat += ' WHERE ' if where_sql_stat == '' else ' AND '
+            where_sql_stat += 'id=ANY(ARRAY(SELECT data FROM directory_entitygroup WHERE code = \'municipals\'))'
+
+        if request.query_params.get('_filter__regionals') is not None:
+            where_sql_stat += ' WHERE ' if where_sql_stat == '' else ' AND '
+            where_sql_stat += 'id=ANY(ARRAY(SELECT data FROM directory_entitygroup WHERE code = \'regionals\'))'
 
         cursor.execute(sql.format(where_sql_stat), params)
 
