@@ -30,13 +30,19 @@ class NatProject:
     @staticmethod
     def get_queryset():
         def _t(s):
-            m = re.search(r'(.+ .+ .+?) - (.+)', s)
-            return {'name': m.group(1), 'position': m.group(2)} if m else s
+            print('asd', s)
+            if s:
+                m = re.search('(.+ .+ .+?) - (.+)', s)
+                if m:
+                    return {'name': m.group(1), 'position': m.group(2)}
+            return s
 
         result = []
         for p in NAT_PROJECTS:
-            p['curator'] = _t(p['curator'])
-            p['responsible'] = _t(p['responsible'])
+            if type(p['curator']) is str:
+                p['curator'] = _t(p['curator'])
+            if type(p['responsible']) is str:
+                p['responsible'] = _t(p['responsible'])
             result.append(p)
         return result
 
