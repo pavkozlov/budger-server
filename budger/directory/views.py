@@ -240,11 +240,11 @@ class EntityAggregationsView(views.APIView):
 
             params += ['%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi), '%{}%'.format(fi)]
 
-        if request.query_params.get('_filter__municipals') is not None:
+        if request.query_params.get('_filter__group') == 'municipals':
             where_sql_stat += ' WHERE ' if where_sql_stat == '' else ' AND '
             where_sql_stat += 'id=ANY(ARRAY(SELECT data FROM directory_entitygroup WHERE code = \'municipals\'))'
 
-        if request.query_params.get('_filter__regionals') is not None:
+        if request.query_params.get('_filter__group') == 'regionals':
             where_sql_stat += ' WHERE ' if where_sql_stat == '' else ' AND '
             where_sql_stat += 'id=ANY(ARRAY(SELECT data FROM directory_entitygroup WHERE code = \'regionals\'))'
 

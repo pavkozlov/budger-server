@@ -114,8 +114,7 @@ USE_TZ = True
 
 django_heroku.settings(locals())
 
-"""
-LOGGING = {
+_LOGGING = {
     'version': 1,
     'loggers': {
         'django.db.backends': {
@@ -130,7 +129,6 @@ LOGGING = {
         },
     },
 }
-"""
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
