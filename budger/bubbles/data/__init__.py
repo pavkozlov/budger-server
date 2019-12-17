@@ -1,16 +1,85 @@
 import re
 from budger.bubbles.data.nat_projects import NAT_PROJECTS
 from budger.bubbles.data.reg_projects import REG_PROJECTS
+from collections import defaultdict
 
 
 class RegProject:
     queryset = REG_PROJECTS
 
     @staticmethod
+    def transform(p):
+        """
+        Функция принимает региональный проект, трансформирует его в json заданного вида
+        """
+        def _aggregate_results(results):
+            """
+            Функция аггрегирует finsupports по годам
+            """
+            generated_results = []
+
+            for item in results:
+                result = {
+                    'title': item['name'],
+                    'responsible': item['respexec'],
+                    'fin': defaultdict(float)
+                }
+                for finsupport in item['finsupports']:
+                    result['fin']['2019'] += float(finsupport['fo2019'])
+                    result['fin']['2020'] += float(finsupport['fo2020'])
+                    result['fin']['2021'] += float(finsupport['fo2021'])
+                    result['fin']['2022'] += float(finsupport['fo2022'])
+                    result['fin']['2023'] += float(finsupport['fo2023'])
+                    result['fin']['2024'] += float(finsupport['fo2024'])
+                generated_results.append(result)
+
+            return generated_results
+
+        def _aggregate_total(results):
+            """
+            Функция аггрегирует results по годам и по finsupports
+            """
+            result_total_fin = {
+                'money': defaultdict(float),
+                'fin': defaultdict(float)
+            }
+            for item in results:
+                for finsupport in item['finsupports']:
+                    result_total_fin['money']['2019'] += float(finsupport['fo2019'])
+                    result_total_fin['money']['2020'] += float(finsupport['fo2020'])
+                    result_total_fin['money']['2021'] += float(finsupport['fo2021'])
+                    result_total_fin['money']['2022'] += float(finsupport['fo2022'])
+                    result_total_fin['money']['2023'] += float(finsupport['fo2023'])
+                    result_total_fin['money']['2024'] += float(finsupport['fo2024'])
+
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2019'])
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2020'])
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2021'])
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2022'])
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2023'])
+                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2024'])
+
+            return result_total_fin
+
+        m = re.search('(.+ .+ .+?) - (.+)', p['curator'])
+        curator = {'name': m.group(1), 'position': m.group(2)} if m else p['curator']
+
+        m = re.search('(.+ .+ .+?) - (.+)', p['responsible'])
+        responsible = {'name': m.group(1), 'position': m.group(2)} if m else p['responsible']
+
+        return {
+            'title_full': p['title_full'],
+            'curator': curator,
+            'responsible': responsible,
+            'results': _aggregate_results(p['results']),
+            'total': _aggregate_total(p['results'])
+        }
+
+    @staticmethod
     def get_by_id(id):
         for p in RegProject.queryset:
             if id == p['id']:
-                return p
+                return RegProject.transform(p)
         return None
 
     @staticmethod
