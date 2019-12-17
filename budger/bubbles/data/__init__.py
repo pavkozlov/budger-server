@@ -1,7 +1,12 @@
 from budger.bubbles.data.nat_projects import NAT_PROJECTS
 from budger.bubbles.data.reg_projects import REG_PROJECTS
 from collections import defaultdict
-from .name_str_to_dict import name_str_to_dict
+import re
+
+
+def name_str_to_dict(s):
+    m = re.search('(.+ .+ .+?) - (.+)', s)
+    return {'name': m.group(1), 'position': m.group(2)} if m else s
 
 
 class RegProject:
