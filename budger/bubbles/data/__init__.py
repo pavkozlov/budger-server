@@ -1,7 +1,7 @@
-import re
 from budger.bubbles.data.nat_projects import NAT_PROJECTS
 from budger.bubbles.data.reg_projects import REG_PROJECTS
 from collections import defaultdict
+from .name_str_to_dict import name_str_to_dict
 
 
 class RegProject:
@@ -58,19 +58,12 @@ class RegProject:
                     result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2022'])
                     result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2023'])
                     result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2024'])
-
             return result_total_fin
-
-        m = re.search('(.+ .+ .+?) - (.+)', p['curator'])
-        curator = {'name': m.group(1), 'position': m.group(2)} if m else p['curator']
-
-        m = re.search('(.+ .+ .+?) - (.+)', p['responsible'])
-        responsible = {'name': m.group(1), 'position': m.group(2)} if m else p['responsible']
 
         return {
             'title_full': p['title_full'],
-            'curator': curator,
-            'responsible': responsible,
+            'curator': name_str_to_dict(p['curator']),
+            'responsible': name_str_to_dict(p['responsible']),
             'results': _aggregate_results(p['results']),
             'total': _aggregate_total(p['results'])
         }
@@ -98,20 +91,12 @@ class RegProject:
 class NatProject:
     @staticmethod
     def get_queryset():
-        def _t(s):
-            print('asd', s)
-            if s:
-                m = re.search('(.+ .+ .+?) - (.+)', s)
-                if m:
-                    return {'name': m.group(1), 'position': m.group(2)}
-            return s
-
         result = []
         for p in NAT_PROJECTS:
             if type(p['curator']) is str:
-                p['curator'] = _t(p['curator'])
+                p['curator'] = name_str_to_dict(p['curator'])
             if type(p['responsible']) is str:
-                p['responsible'] = _t(p['responsible'])
+                p['responsible'] = name_str_to_dict(p['responsible'])
             result.append(p)
         return result
 
