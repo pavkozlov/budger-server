@@ -5,7 +5,7 @@ import re
 
 
 def name_str_to_dict(s):
-    m = re.search('(.+ .+ .+?) - (.+)', s)
+    m = re.search('([а-яА-Я]+ [а-яА-Я]+ [а-яА-Я]+?) - (.+)', s)
     return {'name': m.group(1), 'position': m.group(2) + ' РФ'} if m else s
 
 
@@ -129,18 +129,12 @@ class NatProject:
             reg_projects = RegProject.get_by_code(p['code'])
             if reg_projects:
 
-                curator = p['curator']
-                if isinstance(name_str_to_dict(curator['name']), dict):
-                    _curator = name_str_to_dict(curator['name'])
-                    curator['name'] = _curator['name']
-                    curator['position'] = ' - '.join([_curator['position'], curator['position']])
-
                 result.append(
                     {
                         'id': p['id'],
                         'code': p['code'],
                         'title_short': p['title_short'],
-                        'curator': curator,
+                        'curator': p['curator'],
                         'responsible': p['responsible'],
                         'reg_projects': reg_projects,
                     }
