@@ -17,6 +17,7 @@ class NatProjectsView(views.APIView):
 class RegProjectsView(views.APIView):
     """
     GET Список региональных проектов.
+    @_filter__grbs - филтр проектов пр ГРБС
     """
 
     def get(self, request, *args, **kwargs):
@@ -28,13 +29,8 @@ class RegProjectsView(views.APIView):
                 return Response(p)
 
         if request.query_params.get('_filter__grbs'):
-            grbs_id = request.query_params.get('_filter__grbs')
-            try:
-                grbs = Entity.objects.get(id=grbs_id)
-                grbs_title = grbs.title_full
-                p_list = RegProject.get_by_grbs(grbs_title)
-                return Response([RegProject.transform(p) for p in p_list])
-            except Entity.DoesNotExist:
-                return Response(status=HTTP_404_NOT_FOUND)
+            grbs_id = int(request.query_params.get('_filter__grbs'))
+            p_list = RegProject.get_by_grbs(grbs_id)
+            return Response([RegProject.transform(p) for p in p_list])
 
         return Response(status=HTTP_404_NOT_FOUND)

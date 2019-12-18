@@ -73,6 +73,8 @@ class RegProject:
 
         return {
             'title_full': p['title_full'],
+            'title_short': p['title_short'],
+            'grbs_title': p['grbs']['name'],
             'curator': name_str_to_dict(p['curator']),
             'responsible': name_str_to_dict(p['responsible']),
             'fpcode': p['fpcode'],
@@ -88,10 +90,10 @@ class RegProject:
         return None
 
     @staticmethod
-    def get_by_grbs(grbs_title):
+    def get_by_grbs(grbs_id):
         projects = []
         for p in RegProject.queryset:
-            if p['grbs']['name'] == grbs_title:
+            if p['grbs']['grbs_id'] == grbs_id:
                 projects.append(p)
         return projects
 
