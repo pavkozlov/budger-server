@@ -17,6 +17,7 @@ class RegProject:
         """
         Функция принимает региональный проект, трансформирует его в json заданного вида
         """
+
         def _aggregate_results(results):
             """
             Функция аггрегирует finsupports по годам
@@ -26,6 +27,7 @@ class RegProject:
             for item in results:
                 result = {
                     'title': item['name'],
+                    'end_date': item['result_end_date'],
                     'responsible': item['respexec'],
                     'fin': defaultdict(float)
                 }
@@ -46,8 +48,9 @@ class RegProject:
             """
             result_total_fin = {
                 'money': defaultdict(float),
-                'fin': defaultdict(float)
             }
+            fin_dict = defaultdict(float)
+
             for item in results:
                 for finsupport in item['finsupports']:
                     result_total_fin['money']['2019'] += float(finsupport['fo2019'])
@@ -57,18 +60,22 @@ class RegProject:
                     result_total_fin['money']['2023'] += float(finsupport['fo2023'])
                     result_total_fin['money']['2024'] += float(finsupport['fo2024'])
 
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2019'])
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2020'])
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2021'])
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2022'])
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2023'])
-                    result_total_fin['fin'][finsupport['finsource']] += float(finsupport['fo2024'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2019'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2020'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2021'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2022'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2023'])
+                    fin_dict[finsupport['finsource']] += float(finsupport['fo2024'])
+
+                fin_list = zip(fin_dict.keys(), fin_dict.values())
+                result_total_fin['fin'] = [{'title': i[0], 'sum': i[1]} for i in fin_list]
             return result_total_fin
 
         return {
             'title_full': p['title_full'],
             'curator': name_str_to_dict(p['curator']),
             'responsible': name_str_to_dict(p['responsible']),
+            'fpcode': p['fpcode'],
             'results': _aggregate_results(p['results']),
             'total': _aggregate_total(p['results'])
         }
@@ -79,6 +86,14 @@ class RegProject:
             if id == p['id']:
                 return RegProject.transform(p)
         return None
+
+    @staticmethod
+    def get_by_grbs(grbs_title):
+        projects = []
+        for p in RegProject.queryset:
+            if p['grbs']['name'] == grbs_title:
+                projects.append(p)
+        return projects
 
     @staticmethod
     def get_by_code(code):
