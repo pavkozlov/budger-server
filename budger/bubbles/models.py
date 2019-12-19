@@ -115,3 +115,21 @@ class EntityBudget(models.Model):
 
     class Meta:
         unique_together = ('entity', 'year')
+
+
+class EntityBubble(models.Model):
+    """
+    Модель агрегированных параметров объекта контроля для РОП.
+    """
+
+    # Отношение к объекту контроля
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+
+    # Дата актуальности данных
+    date = models.DateField(db_index=True)
+
+    # Сумма бюджета плановая
+    budget_amount_plan = models.FloatField(null=True, blank=True)
+
+    # Сумма бюджета фактическая
+    amount_fact = models.FloatField(null=True, blank=True)
