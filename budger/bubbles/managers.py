@@ -10,7 +10,7 @@ INSPECTION_5 = 286
 INSPECTION_6 = 287
 
 
-class EntityBubbleManager(models.Manager):
+class AggregationManager(models.Manager):
 
     ogrn = {
         INSPECTION_1: ["1025002870837", "1027739562256"],
@@ -44,6 +44,6 @@ class EntityBubbleManager(models.Manager):
             if department_id == self.INSPECTION_5:
                 entities_id += EntityGroup.objects.get(code='municipals').data
 
-            return super(EntityBubbleManager, self).get_queryset().filter(entity_id__in=entities_id)
+            return super(AggregationManager, self).get_queryset().filter(entity_id__in=entities_id)
 
-        return super(EntityBubbleManager, self).none()
+        return super(AggregationManager, self).none()
