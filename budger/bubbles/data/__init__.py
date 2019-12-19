@@ -5,8 +5,8 @@ import re
 
 
 def name_str_to_dict(s):
-    m = re.search('([а-яА-Я]+ [а-яА-Я]+ [а-яА-Я]+?) - (.+)', s)
-    return {'name': m.group(1), 'position': m.group(2) + ' РФ'} if m else s
+    m = re.search(r'([а-яА-Я-]+\s+[а-яА-Я]+\s+[а-яА-Я]+?)\s+-\s+(.+)', s)
+    return {'name': m.group(1), 'position': m.group(2)} if m else s
 
 
 class RegProject:
@@ -117,8 +117,10 @@ class NatProject:
         for p in NAT_PROJECTS:
             if type(p['curator']) is str:
                 p['curator'] = name_str_to_dict(p['curator'])
+                p['curator']['position'] = ' '.join([p['curator']['position'], 'PФ'])
             if type(p['responsible']) is str:
                 p['responsible'] = name_str_to_dict(p['responsible'])
+                p['responsible']['position'] = ' '.join([p['responsible']['position'], 'PФ'])
             result.append(p)
         return result
 
