@@ -3,6 +3,20 @@ import json
 NAT_PROJECTS = json.loads('''
     [
         {
+            "id": "2059",
+            "code": "A",
+            "meta_id": "2059",
+            "start_date": "2019-06-04 01:23:52.0",
+            "end_date": "",
+            "title_full": "Национальный проект \\"Культура\\"",
+            "title_short": "Культура",
+            "curator": "Голодец Ольга Юрьевна  - Заместитель Председателя Правительства Российской Федерации",
+            "responsible": "МЕДИНСКИЙ ВЛАДИМИР РОСТИСЛАВОВИЧ - Министр культуры Российской Федерации",
+            "admin": "Ярилова Ольга Сергеевна - Заместитель Министра культуры Российской Федерации",
+            "project_start_date": "2019-01-01 00:00:00.0",
+            "project_end_date": "2024-12-31 00:00:00.0",
+            "updated_outer": "2019-12-13 10:44:44.0"
+        }, {
             "id": "2060",
             "code": "D",
             "meta_id": "2060",
@@ -16,8 +30,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2061",
             "code": "E",
             "meta_id": "2061",
@@ -31,8 +44,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-11-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2062",
             "code": "F",
             "meta_id": "2062",
@@ -46,8 +58,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2063",
             "code": "G",
             "meta_id": "2063",
@@ -61,8 +72,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2064",
             "code": "I",
             "meta_id": "2064",
@@ -76,8 +86,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-15 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2065",
             "code": "L",
             "meta_id": "2065",
@@ -91,8 +100,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2066",
             "code": "N",
             "meta_id": "2066",
@@ -106,8 +114,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2067",
             "code": "P",
             "meta_id": "2067",
@@ -121,8 +128,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2019-01-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2068",
             "code": "R",
             "meta_id": "2068",
@@ -136,8 +142,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-12-03 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2070",
             "code": "T",
             "meta_id": "2070",
@@ -151,8 +156,7 @@ NAT_PROJECTS = json.loads('''
             "project_start_date": "2018-10-01 00:00:00.0",
             "project_end_date": "2024-12-31 00:00:00.0",
             "updated_outer": "2019-12-13 10:44:44.0"
-        },
-        {
+        }, {
             "id": "2071",
             "code": "V",
             "meta_id": "2071",
