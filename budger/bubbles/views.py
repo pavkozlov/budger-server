@@ -2,14 +2,12 @@ from rest_framework import views
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.response import Response
 from .data import NatProject, RegProject
-from budger.directory.models.entity import Entity
 
 
 class NatProjectsView(views.APIView):
     """
     GET Список национальных проектов.
     """
-
     def get(self, request):
         return Response(NatProject.list())
 
@@ -19,7 +17,6 @@ class RegProjectsView(views.APIView):
     GET Список региональных проектов.
     @_filter__grbs - филтр проектов пр ГРБС
     """
-
     def get(self, request, *args, **kwargs):
 
         if kwargs.get('pk') is not None:
