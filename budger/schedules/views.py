@@ -18,6 +18,7 @@ from .permissions import (
 )
 
 from .filters import WorkflowFilter
+from .renderers import EsgfkXmlRenderer
 
 
 class EnumsApiView(views.APIView):
@@ -55,3 +56,18 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     serializer_class = WorkflowQuerySerializer
     filter_backends = [WorkflowFilter]
     queryset = Workflow.objects.all()
+
+
+class EsgfkXmlView(views.APIView):
+    """
+    Выгрузка XML для ЕИС ГФК.
+    @year - год, за который необходимо выгружать данные
+    """
+    renderer_classes = [EsgfkXmlRenderer]
+
+    def get(self, request):
+        events = Event.objects.all()
+        return Response(
+            events,
+            headers={'Content-Disposition': 'attachment; filename="export-for-esgfk.xml"'}
+        )
