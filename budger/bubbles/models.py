@@ -137,10 +137,10 @@ class Aggregation(models.Model):
     budget_amount_fact = models.FloatField(null=True, blank=True, db_index=True)
 
     # Количество выявленных нарушений.
-    violations_count = models.IntegerField(null=True, blank=True, db_index=True)
+    violations_count = models.BigIntegerField(null=True, blank=True, db_index=True)
 
     # Объем выявленных нарушений в руб.
-    violations_amount = models.IntegerField(null=True, blank=True, db_index=True)
+    violations_amount = models.BigIntegerField(null=True, blank=True, db_index=True)
 
     # Участие в рег. проекте.
     # Если ГРБС принимает участие в нескольких проектах, таблица содержит несколько записей.
