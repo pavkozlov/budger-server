@@ -30,4 +30,32 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='EntityBubble',
         ),
+        migrations.RemoveField(
+            model_name='aggregation',
+            name='reg_project_amount',
+        ),
+        migrations.RemoveField(
+            model_name='aggregation',
+            name='reg_project_participant',
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='regproj_amount_fact',
+            field=models.SmallIntegerField(blank=True, db_index=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='regproj_amount_plan',
+            field=models.SmallIntegerField(blank=True, db_index=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='regproj_amount_recd',
+            field=models.SmallIntegerField(blank=True, db_index=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='regproj_participant',
+            field=models.BooleanField(blank=True, db_index=True, null=True),
+        ),
     ]

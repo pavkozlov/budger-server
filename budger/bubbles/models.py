@@ -144,10 +144,12 @@ class Aggregation(models.Model):
 
     # Участие в рег. проекте.
     # Если ГРБС принимает участие в нескольких проектах, таблица содержит несколько записей.
-    reg_project_participant = models.BooleanField(null=True, blank=True, db_index=True)
+    regproj_participant = models.BooleanField(null=True, blank=True, db_index=True)
 
-    # Размер бюджета в рег проекте
-    reg_project_amount = models.BooleanField(null=True, blank=True, db_index=True)
+    # Размер бюджета в рег проекте (запланированно, доведено, освоено), руб
+    regproj_amount_plan = models.SmallIntegerField(null=True, blank=True, db_index=True)
+    regproj_amount_recd = models.SmallIntegerField(null=True, blank=True, db_index=True)
+    regproj_amount_fact = models.SmallIntegerField(null=True, blank=True, db_index=True)
 
     # Заметка о записи (any)
     memo = models.TextField(null=True, blank=True)
