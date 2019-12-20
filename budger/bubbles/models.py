@@ -102,16 +102,16 @@ class EntityBudget(models.Model):
     Модель агрегированного бюджета (план и факт) для объекта контроля.
     """
 
-    # Отношение к объекту контроля
+    # Отношение к объекту контроля.
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
 
-    # Год
+    # Год.
     year = models.IntegerField(db_index=True)
 
-    # Сумма плановая
+    # Сумма плановая.
     amount_plan = models.FloatField(null=True, blank=True)
 
-    # Сумма фактическая
+    # Сумма фактическая.
     amount_fact = models.FloatField(null=True, blank=True)
 
     class Meta:
@@ -124,22 +124,30 @@ class Aggregation(models.Model):
     """
     objects = AggregationManager()
 
-    # Отношение к объекту контроля
+    # Отношение к объекту контроля.
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
 
-    # Год даты актуальности данных
+    # Год даты актуальности данных.
     year = models.SmallIntegerField(db_index=True)
 
-    # Сумма бюджета плановая
+    # Сумма бюджета плановая.
     budget_amount_plan = models.FloatField(null=True, blank=True, db_index=True)
 
-    # Сумма бюджета фактическая
+    # Сумма бюджета фактическая.
     budget_amount_fact = models.FloatField(null=True, blank=True, db_index=True)
 
-    # Количество выявленных нарушений
+    # Количество выявленных нарушений.
     violations_count = models.SmallIntegerField(null=True, blank=True, db_index=True)
 
     # Объем выявленных нарушений в руб.
     violations_amount = models.SmallIntegerField(null=True, blank=True, db_index=True)
 
+    # Участие в рег. проекте.
+    # Если ГРБС принимает участие в нескольких проектах, таблица содержит несколько записей.
+    reg_project_participant = models.BooleanField(null=True, blank=True, db_index=True)
+
+    # Размер бюджета в рег проекте
+    reg_project_amount = models.BooleanField(null=True, blank=True, db_index=True)
+
+    # Заметка о записи (any)
     memo = models.TextField(null=True, blank=True)
