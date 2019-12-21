@@ -45,7 +45,7 @@ def aggregation_from_csv(apps, schema_editor):
     Entity = apps.get_model('directory', 'Entity')
     Aggregation = apps.get_model('bubbles', 'Aggregation')
 
-    with open('2017-2019plan.csv', 'r') as f:
+    with open('2017-2019plan.csv', 'r', encoding='UTF-8') as f:
         file = f.read().split('\n')
         file.pop(0)
         file.pop(-1)
@@ -73,7 +73,7 @@ def aggregation_from_csv(apps, schema_editor):
                 memo=memo,
                 entity=entity.first(),
                 year=year,
-                regproj_participant=True
+                regproj_participant=False
             )
 
 
