@@ -146,8 +146,15 @@ class Aggregation(models.Model):
     # Если ГРБС принимает участие в нескольких проектах, таблица содержит несколько записей.
     regproj_participant = models.BooleanField(null=True, blank=True, db_index=True)
 
-    # Размер бюджета в рег проекте (запланированно, доведено, освоено), руб
-    regproj_amount_plan = models.SmallIntegerField(null=True, blank=True, db_index=True)
+    # Федеральный бюджет
+    fed_amount_plan = models.BigIntegerField(null=True, blank=True)
+    # Бюджет московской области
+    mosobl_amount_plan = models.BigIntegerField(null=True, blank=True)
+    # Бюджеты государственных внебюджетных фондов
+    gos_amount_plan = models.BigIntegerField(null=True, blank=True)
+    # Внебюджетные источники
+    vne_amount_plan = models.BigIntegerField(null=True, blank=True)
+
     regproj_amount_recd = models.SmallIntegerField(null=True, blank=True, db_index=True)
     regproj_amount_fact = models.SmallIntegerField(null=True, blank=True, db_index=True)
 

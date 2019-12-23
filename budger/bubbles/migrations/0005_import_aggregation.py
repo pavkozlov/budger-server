@@ -4,6 +4,45 @@ import django.db.models.deletion
 from budger.bubbles.data.reg_projects import REG_PROJECTS
 import re
 import string
+from django.db import connection
+import os
+
+
+def clean_database(apps, schema_editor):
+    with connection.cursor() as cursor:
+        sql = """DELETE FROM bubbles_aggregation WHERE
+                    violations_count IS NOT null 
+                    OR regproj_participant IS NOT null"""
+        cursor.execute(sql)
+
+
+def get_amount_plan(res, year):
+    fed = ['межбюджетные трансферты в федеральный бюджет']
+    mosobl = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
+              'межбюджетные трансферты в МО других субъектов РФ',
+              'свод бюджетов Муниципальных образований, из них',
+              'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
+    gos = ['межбюджетные трансферты в ТФОМС', 'межбюджетные трансферты из ГВБФ (справочно)',
+           'межбюджетные трансферты в ГВБФ']
+    vne = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
+
+    fed_amount_plan = 0.0
+    mosobl_amount_plan = 0.0
+    gos_amount_plan = 0.0
+    vne_amount_plan = 0.0
+
+    for finsupport in res['finsupports']:
+        if finsupport['finsource'] in fed:
+            fed_amount_plan += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] in mosobl:
+            mosobl_amount_plan += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] in gos:
+            gos_amount_plan += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] in vne:
+            vne_amount_plan += float(finsupport['fo{}'.format(year)])
+
+    return {'vne_amount_plan': vne_amount_plan, 'mosobl_amount_plan': mosobl_amount_plan,
+            'gos_amount_plan': gos_amount_plan, 'fed_amount_plan': fed_amount_plan}
 
 
 def aggregation_from_json(apps, schema_editor):
@@ -14,7 +53,7 @@ def aggregation_from_json(apps, schema_editor):
     for p in queryset:
 
         for res in p['results']:
-            memo = '{} / {}'.format(p['title_full'], res['name'])
+            memo = ' / '.join([p['title_full'].strip(), res['name'].strip(), res['result_end_date'].strip()])
             entity_inn = res['GRBS']
             entity = None
             entity_with_inn = Entity.objects.filter(inn=entity_inn)
@@ -27,17 +66,22 @@ def aggregation_from_json(apps, schema_editor):
                         entity = obj
 
             if entity is None:
-                print('Неправильный ИНН {} в задаче {} проекта {}'.format(entity_inn, res['id'], p['id']))
+                print('Не найден ИНН {} в задаче id{} проекта id{}'.format(entity_inn, res['id'], p['id']))
                 continue
 
             years = range(2019, 2025)
 
             for year in years:
+                amount_plan = get_amount_plan(res, year)
                 Aggregation.objects.create(
                     memo=memo,
                     entity=entity,
                     year=year,
-                    regproj_participant=True
+                    regproj_participant=True,
+                    fed_amount_plan=amount_plan['fed_amount_plan'],
+                    mosobl_amount_plan=amount_plan['mosobl_amount_plan'],
+                    gos_amount_plan=amount_plan['gos_amount_plan'],
+                    vne_amount_plan=amount_plan['vne_amount_plan']
                 )
 
 
@@ -45,7 +89,8 @@ def aggregation_from_csv(apps, schema_editor):
     Entity = apps.get_model('directory', 'Entity')
     Aggregation = apps.get_model('bubbles', 'Aggregation')
 
-    with open('2017-2019plan.csv', 'r', encoding='UTF-8') as f:
+    filename = os.path.join('budger', 'bubbles', 'data', '2017-2019plan.csv')
+    with open(filename, 'r', encoding='UTF-8') as f:
         file = f.read().split('\n')
         file.pop(0)
         file.pop(-1)
@@ -54,7 +99,7 @@ def aggregation_from_csv(apps, schema_editor):
         l = line.split(';')
         violations_count, violations_amount = l[4], l[5]
         year = l[1]
-        memo = ' / '.join([l[0], l[3]])
+        memo = ' / '.join([l[0].strip(), l[3].strip()])
         entity_titles = l[2].split('|')
 
         for entity_title in entity_titles:
@@ -93,6 +138,31 @@ class Migration(migrations.Migration):
             name='violations_count',
             field=models.BigIntegerField(blank=True, db_index=True, null=True),
         ),
+        migrations.RemoveField(
+            model_name='aggregation',
+            name='regproj_amount_plan',
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='fed_amount_plan',
+            field=models.BigIntegerField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='gos_amount_plan',
+            field=models.BigIntegerField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='mosobl_amount_plan',
+            field=models.BigIntegerField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='aggregation',
+            name='vne_amount_plan',
+            field=models.BigIntegerField(blank=True, null=True),
+        ),
+        migrations.RunPython(clean_database),
         migrations.RunPython(aggregation_from_json),
         migrations.RunPython(aggregation_from_csv),
     ]
