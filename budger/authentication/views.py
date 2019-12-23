@@ -143,18 +143,20 @@ class CurrentUserView(generics.RetrieveAPIView):
 
             inspection = None
 
-            if employee.department1.id == defs.INSPECTION_1_ID:
-                inspection = '1'
-            elif employee.department1.id == defs.INSPECTION_2_ID:
-                inspection = '2'
-            elif employee.department1.id == defs.INSPECTION_3_ID:
-                inspection = '3'
-            elif employee.department1.id == defs.INSPECTION_4_ID:
-                inspection = '4'
-            elif employee.department1.id == defs.INSPECTION_5_ID:
-                inspection = '5'
-            elif employee.department1.id == defs.INSPECTION_6_ID:
-                inspection = '6'
+            if employee.department1 is not None:
+                d_id = employee.department1.id
+                if d_id == defs.INSPECTION_1_ID:
+                    inspection = '1'
+                elif d_id == defs.INSPECTION_2_ID:
+                    inspection = '2'
+                elif d_id == defs.INSPECTION_3_ID:
+                    inspection = '3'
+                elif d_id == defs.INSPECTION_4_ID:
+                    inspection = '4'
+                elif d_id == defs.INSPECTION_5_ID:
+                    inspection = '5'
+                elif d_id == defs.INSPECTION_6_ID:
+                    inspection = '6'
 
             if employee is not None:
                 return Response({
