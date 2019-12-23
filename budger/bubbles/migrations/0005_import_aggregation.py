@@ -26,23 +26,23 @@ def get_amount_plan(res, year):
            'межбюджетные трансферты в ГВБФ']
     vne = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
 
-    fed_amount_plan = 0.0
-    mosobl_amount_plan = 0.0
-    gos_amount_plan = 0.0
-    vne_amount_plan = 0.0
+    regproj_amount_plan_fed = 0.0
+    regproj_amount_plan_local = 0.0
+    regproj_amount_plan_gos = 0.0
+    regproj_amount_plan_out = 0.0
 
     for finsupport in res['finsupports']:
         if finsupport['finsource'] in fed:
-            fed_amount_plan += float(finsupport['fo{}'.format(year)])
+            regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
         elif finsupport['finsource'] in mosobl:
-            mosobl_amount_plan += float(finsupport['fo{}'.format(year)])
+            regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
         elif finsupport['finsource'] in gos:
-            gos_amount_plan += float(finsupport['fo{}'.format(year)])
+            regproj_amount_plan_gos += float(finsupport['fo{}'.format(year)])
         elif finsupport['finsource'] in vne:
-            vne_amount_plan += float(finsupport['fo{}'.format(year)])
+            regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
 
-    return {'vne_amount_plan': vne_amount_plan, 'mosobl_amount_plan': mosobl_amount_plan,
-            'gos_amount_plan': gos_amount_plan, 'fed_amount_plan': fed_amount_plan}
+    return {'regproj_amount_plan_out': regproj_amount_plan_out, 'regproj_amount_plan_local': regproj_amount_plan_local,
+            'regproj_amount_plan_gos': regproj_amount_plan_gos, 'regproj_amount_plan_fed': regproj_amount_plan_fed}
 
 
 def aggregation_from_json(apps, schema_editor):
@@ -78,10 +78,10 @@ def aggregation_from_json(apps, schema_editor):
                     entity=entity,
                     year=year,
                     regproj_participant=True,
-                    fed_amount_plan=amount_plan['fed_amount_plan'],
-                    mosobl_amount_plan=amount_plan['mosobl_amount_plan'],
-                    gos_amount_plan=amount_plan['gos_amount_plan'],
-                    vne_amount_plan=amount_plan['vne_amount_plan']
+                    regproj_amount_plan_fed=amount_plan['regproj_amount_plan_fed'],
+                    regproj_amount_plan_local=amount_plan['regproj_amount_plan_local'],
+                    regproj_amount_plan_gos=amount_plan['regproj_amount_plan_gos'],
+                    regproj_amount_plan_out=amount_plan['regproj_amount_plan_out']
                 )
 
 
@@ -144,22 +144,22 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='aggregation',
-            name='fed_amount_plan',
+            name='regproj_amount_plan_fed',
             field=models.BigIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='aggregation',
-            name='gos_amount_plan',
+            name='regproj_amount_plan_gos',
             field=models.BigIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='aggregation',
-            name='mosobl_amount_plan',
+            name='regproj_amount_plan_local',
             field=models.BigIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='aggregation',
-            name='vne_amount_plan',
+            name='regproj_amount_plan_out',
             field=models.BigIntegerField(blank=True, null=True),
         ),
         migrations.RunPython(clean_database),

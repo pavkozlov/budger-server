@@ -147,13 +147,13 @@ class Aggregation(models.Model):
     regproj_participant = models.BooleanField(null=True, blank=True, db_index=True)
 
     # Федеральный бюджет
-    fed_amount_plan = models.BigIntegerField(null=True, blank=True)
+    regproj_amount_plan_fed = models.BigIntegerField(null=True, blank=True)
     # Бюджет московской области
-    mosobl_amount_plan = models.BigIntegerField(null=True, blank=True)
+    regproj_amount_plan_local = models.BigIntegerField(null=True, blank=True)
     # Бюджеты государственных внебюджетных фондов
-    gos_amount_plan = models.BigIntegerField(null=True, blank=True)
+    regproj_amount_plan_gos = models.BigIntegerField(null=True, blank=True)
     # Внебюджетные источники
-    vne_amount_plan = models.BigIntegerField(null=True, blank=True)
+    regproj_amount_plan_out = models.BigIntegerField(null=True, blank=True)
 
     regproj_amount_recd = models.SmallIntegerField(null=True, blank=True, db_index=True)
     regproj_amount_fact = models.SmallIntegerField(null=True, blank=True, db_index=True)
