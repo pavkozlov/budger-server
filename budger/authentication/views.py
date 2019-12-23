@@ -11,6 +11,7 @@ from .permissions import CanViewUser, CanUpdateUser, IsOwner
 from .models import BacklogEntity
 from .serializers import BacklogEntitySerializer
 from django.shortcuts import get_object_or_404
+from budger.directory.models.entity import Entity
 
 
 class LoginView(views.APIView):
@@ -155,3 +156,21 @@ class BacklogEntityViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return BacklogEntity.objects.filter(employee=self.request.user.ksoemployee)
+
+    def create(self, request, *args, **kwargs):
+        employee = request.user.ksoemployee
+        entity_id = request.data.get('entity')
+        entity = get_object_or_404(Entity, id=entity_id)
+        if BacklogEntity.objects.filter(entity=entity, employee=employee).exists():
+            return Response('Такая запись уже существует', status=HTTP_400_BAD_REQUEST)
+        else:
+            return super(BacklogEntityViewset, self).create(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        employee = request.user.ksoemployee
+        entity_id = request.data.get('entity')
+        entity = get_object_or_404(Entity, id=entity_id)
+
+        BacklogEntity.objects.filter(entity=entity, employee=employee).delete()
+
+        return Response(status=HTTP_204_NO_CONTENT)
