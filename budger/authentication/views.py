@@ -1,5 +1,4 @@
-from rest_framework import views, generics
-from django.shortcuts import get_object_or_404
+from rest_framework import views, generics, viewsets
 from django.contrib.auth.models import User, AnonymousUser, update_last_login
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
@@ -8,7 +7,10 @@ from rest_framework.response import Response
 from budger.directory.models.kso import KsoEmployee
 from .serializers import TokenSerializer, UserSerializer, KsoEmployeeSerializer as _KsoEmployeeSerializer
 from budger.directory.serializers import KsoEmployeeSerializer
-from .permissions import CanViewUser, CanUpdateUser
+from .permissions import CanViewUser, CanUpdateUser, IsOwner
+from .models import BacklogEntity
+from .serializers import BacklogEntitySerializer
+from django.shortcuts import get_object_or_404
 
 
 class LoginView(views.APIView):
@@ -142,3 +144,14 @@ class CurrentUserView(generics.RetrieveAPIView):
                     'employee': KsoEmployeeSerializer(employee).data,
                     'superiors': KsoEmployeeSerializer(employee.get_superiors(), many=True).data,
                 })
+
+
+class BacklogEntityViewset(viewsets.ModelViewSet):
+    """
+    ViewSet для EntityBacklog.
+    """
+    serializer_class = BacklogEntitySerializer
+    permission_classes = [IsOwner, ]
+
+    def get_queryset(self):
+        return BacklogEntity.objects.filter(employee=self.request.user.ksoemployee)
