@@ -33,7 +33,7 @@ class AggregationManager(models.Manager):
         if department_id in self.ogrn:
             entities_id = _get_id_list(self.ogrn[department_id])
 
-            if department_id == self.INSPECTION_5:
+            if department_id == defs.INSPECTION_5_ID:
                 entities_id += EntityGroup.objects.get(code='municipals').data
 
             return super(AggregationManager, self).get_queryset().filter(entity_id__in=entities_id)
