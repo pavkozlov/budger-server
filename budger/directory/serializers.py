@@ -25,9 +25,19 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
 
 
 class EntityShortSerializer(serializers.ModelSerializer):
+    grbs_type = serializers.SerializerMethodField()
+
     class Meta:
         model = Entity
-        fields = ('id', 'title_full', 'inn', 'ogrn', 'ofk_code', 'org_status_code')
+        fields = ('id', 'title_full', 'inn', 'ogrn', 'ofk_code', 'org_status_code', 'grbs_type')
+
+    def get_grbs_type(self, obj):
+        if obj.title_full.upper() == obj.kbk_title.upper():
+            if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
+                return 'municipal'
+            else:
+                return 'regional'
+        return None
 
 
 class EntitySubordinatesSerializer(serializers.ModelSerializer):
