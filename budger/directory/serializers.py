@@ -6,12 +6,22 @@ from .models.kso import Kso, KsoDepartment1, KsoDepartment2, KsoEmployee
 
 
 class EntityListSerializer(DynamicFieldsModelSerializer):
+    grbs_type = serializers.SerializerMethodField()
+
     class Meta:
         model = Entity
         fields = (
             'id', 'reg_date', 'title_full', 'title_short', 'inn', 'ogrn',
-            'head_position', 'head_name', 'ofk_code', 'org_status_code', 'spec_event_code',
+            'head_position', 'head_name', 'ofk_code', 'org_status_code', 'spec_event_code', 'grbs_type'
         )
+
+    def get_grbs_type(self, obj):
+        if obj.title_full.upper() == obj.kbk_title.upper():
+            if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
+                return 'municipal'
+            else:
+                return 'regional'
+        return None
 
 
 class EntityShortSerializer(serializers.ModelSerializer):
