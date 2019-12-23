@@ -5,6 +5,17 @@ from .models.entity import Entity, MunicipalBudget
 from .models.kso import Kso, KsoDepartment1, KsoDepartment2, KsoEmployee
 
 
+def grbs_type(obj):
+    t1 = obj.kbk_title.upper()
+    t2 = t1 + ' МОСКОВСКОЙ ОБЛАСТИ' # бгг
+    if obj.title_full.upper() in [t1, t2]:
+        if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
+            return 'municipal'
+        else:
+            return 'regional'
+    return None
+
+
 class EntityListSerializer(DynamicFieldsModelSerializer):
     grbs_type = serializers.SerializerMethodField()
 
@@ -16,12 +27,7 @@ class EntityListSerializer(DynamicFieldsModelSerializer):
         )
 
     def get_grbs_type(self, obj):
-        if obj.title_full.upper() == obj.kbk_title.upper():
-            if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
-                return 'municipal'
-            else:
-                return 'regional'
-        return None
+        return grbs_type(obj)
 
 
 class EntityShortSerializer(serializers.ModelSerializer):
@@ -32,12 +38,7 @@ class EntityShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'title_full', 'inn', 'ogrn', 'ofk_code', 'org_status_code', 'grbs_type')
 
     def get_grbs_type(self, obj):
-        if obj.title_full.upper() == obj.kbk_title.upper():
-            if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
-                return 'municipal'
-            else:
-                return 'regional'
-        return None
+        return grbs_type(obj)
 
 
 class EntitySubordinatesSerializer(serializers.ModelSerializer):
