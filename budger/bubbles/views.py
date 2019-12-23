@@ -88,7 +88,10 @@ class AggregationView(generics.ListAPIView):
                 'title': tokens[0].strip(),
                 'results': [{
                     'title': tokens[1].strip(),
-                    'amount_plan': m.regproj_amount_plan,
+                    'amount_plan_fed': m.regproj_amount_plan_fed,
+                    'amount_plan_local': m.regproj_amount_plan_local,
+                    'amount_plan_gos': m.regproj_amount_plan_gos,
+                    'amount_plan_out': m.regproj_amount_plan_out,
                     'amount_fact': m.regproj_amount_fact,
                     'amount_recd': m.regproj_amount_recd
                 }]
