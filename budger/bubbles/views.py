@@ -1,6 +1,7 @@
 from rest_framework import views, generics
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.response import Response
+import budger.definitions as defs
 from .data import NatProject, RegProject
 from .models import Aggregation
 from .managers import AggregationManager
@@ -63,17 +64,17 @@ class AggregationView(generics.ListAPIView):
         qs = Aggregation.objects.all()
 
         if inspection == '1':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_1)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_1_ID)
         if inspection == '2':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_2)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_2_ID)
         if inspection == '3':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_3)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_3_ID)
         if inspection == '4':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_4)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_4_ID)
         if inspection == '5':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_5)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_5_ID)
         if inspection == '6':
-            qs = Aggregation.objects.get_entities_by_inspection(AggregationManager.INSPECTION_6)
+            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_6_ID)
 
         return qs
 
