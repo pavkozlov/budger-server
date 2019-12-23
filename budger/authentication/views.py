@@ -12,6 +12,7 @@ from .models import BacklogEntity
 from .serializers import BacklogEntitySerializer
 from django.shortcuts import get_object_or_404
 from budger.directory.models.entity import Entity
+import budger.definitions as defs
 
 
 class LoginView(views.APIView):
@@ -139,11 +140,28 @@ class CurrentUserView(generics.RetrieveAPIView):
             return Response(status=HTTP_404_NOT_FOUND)
         else:
             employee = user.ksoemployee
+
+            inspection = None
+
+            if employee.department1.id == defs.INSPECTION_1_ID:
+                inspection = '1'
+            elif employee.department1.id == defs.INSPECTION_2_ID:
+                inspection = '2'
+            elif employee.department1.id == defs.INSPECTION_3_ID:
+                inspection = '3'
+            elif employee.department1.id == defs.INSPECTION_4_ID:
+                inspection = '4'
+            elif employee.department1.id == defs.INSPECTION_5_ID:
+                inspection = '5'
+            elif employee.department1.id == defs.INSPECTION_6_ID:
+                inspection = '6'
+
             if employee is not None:
                 return Response({
                     'user': UserSerializer(user).data,
                     'employee': KsoEmployeeSerializer(employee).data,
                     'superiors': KsoEmployeeSerializer(employee.get_superiors(), many=True).data,
+                    'inspection': inspection
                 })
 
 
