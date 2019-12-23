@@ -42,7 +42,6 @@ class KsoEmployeeSerializer(serializers.ModelSerializer):
 class BacklogEntitySerializer(serializers.ModelSerializer):
     entity = EntityShortSerializer()
     employee = KsoEmployeeShortSerializer()
-    unique = ('employee', 'entity',)
 
     def to_internal_value(self, data):
         internal_data = {}
@@ -59,4 +58,4 @@ class BacklogEntitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BacklogEntity
-        fields = ['id', 'entity', 'employee', 'memo']
+        fields = ('id', 'entity', 'employee', 'memo',)
