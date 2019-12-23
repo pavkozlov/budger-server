@@ -1,11 +1,15 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from django.contrib.auth.models import User, Permission
-from budger.directory.models.kso import KsoEmployee
+from django.contrib.auth.models import User
 
 from budger.directory.serializers import KsoSerializer
 from budger.directory.serializers import KsoDepartment1WithHeadSerializer
+
+from .models import BacklogEntity
+from budger.directory.serializers import EntityShortSerializer, KsoEmployeeShortSerializer
+from budger.directory.models.kso import KsoEmployee
+from budger.directory.models.entity import Entity
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -33,3 +37,26 @@ class KsoEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = KsoEmployee
         fields = '__all__'
+
+
+class BacklogEntitySerializer(serializers.ModelSerializer):
+    entity = EntityShortSerializer()
+    employee = KsoEmployeeShortSerializer()
+    unique = ('employee', 'entity',)
+
+    def to_internal_value(self, data):
+        internal_data = {}
+
+        if data.get('entity'):
+            obj = Entity.objects.get(pk=data['entity'])
+            internal_data['entity'] = obj
+
+        if data.get('employee'):
+            obj = KsoEmployee.objects.get(pk=data['employee'])
+            internal_data['employee'] = obj
+
+        return internal_data
+
+    class Meta:
+        model = BacklogEntity
+        fields = ['id', 'entity', 'employee', 'memo']
