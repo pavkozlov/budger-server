@@ -160,3 +160,6 @@ class Aggregation(models.Model):
 
     # Заметка о записи (any)
     memo = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['entity__title_search', 'year']
