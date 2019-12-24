@@ -66,7 +66,8 @@ class RegProject:
                     'title': item['name'],
                     'end_date': item['result_end_date'],
                     'responsible': item['respexec'],
-                    'fin': defaultdict(float)
+                    'fin': defaultdict(float),
+                    'grbs': item['GRBS']
                 }
                 for finsupport in item['finsupports']:
                     result['fin']['2019'] += float(finsupport['fo2019'])
