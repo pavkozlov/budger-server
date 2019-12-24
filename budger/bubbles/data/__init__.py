@@ -13,6 +13,39 @@ class RegProject:
     queryset = REG_PROJECTS
 
     @staticmethod
+    def get_amount_plan(proj):
+        fed = ['межбюджетные трансферты в федеральный бюджет']
+        mosobl = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
+                  'межбюджетные трансферты в МО других субъектов РФ',
+                  'свод бюджетов Муниципальных образований, из них',
+                  'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
+        gos = ['межбюджетные трансферты в ТФОМС', 'межбюджетные трансферты из ГВБФ (справочно)',
+               'межбюджетные трансферты в ГВБФ', 'ТФОМС']
+        vne = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
+
+        regproj_amount_plan_fed = 0.0
+        regproj_amount_plan_local = 0.0
+        regproj_amount_plan_gos = 0.0
+        regproj_amount_plan_out = 0.0
+
+        for res in proj:
+            for finsupport in res['finsupports']:
+                for year in range(2019, 2025):
+                    if finsupport['finsource'] in fed:
+                        regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] in mosobl:
+                        regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] in gos:
+                        regproj_amount_plan_gos += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] in vne:
+                        regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
+
+        return {'Внебюджетные источники': regproj_amount_plan_out,
+                'Бюджет московской области': regproj_amount_plan_local,
+                'Бюджеты государственных внебюджетных фондов': regproj_amount_plan_gos,
+                'Федеральный бюджет': regproj_amount_plan_fed}
+
+    @staticmethod
     def transform(p):
         """
         Функция принимает региональный проект, трансформирует его в json заданного вида
@@ -49,7 +82,6 @@ class RegProject:
             result_total_fin = {
                 'money': defaultdict(float),
             }
-            fin_dict = defaultdict(float)
 
             for item in results:
                 for finsupport in item['finsupports']:
@@ -60,15 +92,7 @@ class RegProject:
                     result_total_fin['money']['2023'] += float(finsupport['fo2023'])
                     result_total_fin['money']['2024'] += float(finsupport['fo2024'])
 
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2019'])
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2020'])
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2021'])
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2022'])
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2023'])
-                    fin_dict[finsupport['finsource']] += float(finsupport['fo2024'])
-
-                fin_list = zip(fin_dict.keys(), fin_dict.values())
-                result_total_fin['fin'] = [{'title': i[0], 'sum': i[1]} for i in fin_list]
+                result_total_fin['fin'] = RegProject.get_amount_plan(results)
             return result_total_fin
 
         return {
