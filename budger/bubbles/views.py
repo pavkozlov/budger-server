@@ -143,7 +143,7 @@ class AggregationView(generics.ListAPIView):
         buff = {}
 
         for obj in queryset:
-            key = f'{obj.entity.id}-{obj.year}'
+            key = '{}-{}'.format(obj.entity.id, obj.year)
             if key in buff:
                 buff[key] = self._merge_models(
                     buff[key],

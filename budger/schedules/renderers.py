@@ -7,8 +7,8 @@ class EsgfkXmlRenderer(renderers.BaseRenderer):
 
     @staticmethod
     def _render_model(model):
-        xml = f'<title>{model.title}</title>'
-        return f'<model>{xml}</model>'
+        xml = '<title>{}</title>'.format(model.title)
+        return '<model>{}</model>'.format(xml)
 
     def render(self, data, media_type=None, renderer_context=None):
         xml = ''
