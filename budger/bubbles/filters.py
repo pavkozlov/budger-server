@@ -26,7 +26,7 @@ class AggregationFilter(filters.BaseFilterBackend):
         if self._param(request, 'budget_amount_fact') is not None:
             param = self._param(request, 'budget_amount_fact')
             if can_be_int(param):
-                queryset = queryset.filter(budget_amount_vact__gte=param)
+                queryset = queryset.filter(budget_amount_fact__gte=param)
 
         if self._param(request, 'violations_count') is not None:
             param = self._param(request, 'violations_count')
