@@ -43,11 +43,11 @@ class RegProject:
                     else:
                         other += float(finsupport['fo{}'.format(year)])
 
-        return {'Внебюджетные источники': regproj_amount_plan_out,
-                'Бюджет московской области': regproj_amount_plan_local,
-                'Бюджеты государственных внебюджетных фондов': regproj_amount_plan_gos,
-                'Федеральный бюджет': regproj_amount_plan_fed,
-                '': other}
+        return [{'title': 'Внебюджетные источники', 'sum': regproj_amount_plan_out},
+                {'title': 'Бюджет Московской области', 'sum': regproj_amount_plan_local},
+                {'title': 'Бюджеты государственных внебюджетных фондов', 'sum': regproj_amount_plan_gos},
+                {'title': 'Федеральный бюджет', 'sum': regproj_amount_plan_fed},
+                {'title': '', 'sum': other, }]
 
     @staticmethod
     def transform(p):
@@ -66,7 +66,8 @@ class RegProject:
                     'title': item['name'],
                     'end_date': item['result_end_date'],
                     'responsible': item['respexec'],
-                    'fin': defaultdict(float)
+                    'fin': defaultdict(float),
+                    'grbs': item['GRBS']
                 }
                 for finsupport in item['finsupports']:
                     result['fin']['2019'] += float(finsupport['fo2019'])
