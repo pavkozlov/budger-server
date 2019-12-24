@@ -27,6 +27,7 @@ class RegProject:
         regproj_amount_plan_local = 0.0
         regproj_amount_plan_gos = 0.0
         regproj_amount_plan_out = 0.0
+        other = 0.0
 
         for res in proj:
             for finsupport in res['finsupports']:
@@ -39,11 +40,14 @@ class RegProject:
                         regproj_amount_plan_gos += float(finsupport['fo{}'.format(year)])
                     elif finsupport['finsource'] in vne:
                         regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
+                    else:
+                        other += float(finsupport['fo{}'.format(year)])
 
         return {'Внебюджетные источники': regproj_amount_plan_out,
                 'Бюджет московской области': regproj_amount_plan_local,
                 'Бюджеты государственных внебюджетных фондов': regproj_amount_plan_gos,
-                'Федеральный бюджет': regproj_amount_plan_fed}
+                'Федеральный бюджет': regproj_amount_plan_fed,
+                '': other}
 
     @staticmethod
     def transform(p):
@@ -154,7 +158,6 @@ class NatProject:
         for p in NatProject.get_queryset():
             reg_projects = RegProject.get_by_code(p['code'])
             if reg_projects:
-
                 result.append(
                     {
                         'id': p['id'],
