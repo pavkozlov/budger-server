@@ -43,11 +43,11 @@ class RegProject:
                     else:
                         other += float(finsupport['fo{}'.format(year)])
 
-        return {'Внебюджетные источники': regproj_amount_plan_out,
-                'Бюджет московской области': regproj_amount_plan_local,
-                'Бюджеты государственных внебюджетных фондов': regproj_amount_plan_gos,
-                'Федеральный бюджет': regproj_amount_plan_fed,
-                '': other}
+        return [{'title': 'Внебюджетные источники', 'sum': regproj_amount_plan_out},
+                {'title': 'Бюджет московской области', 'sum': regproj_amount_plan_local},
+                {'title': 'Бюджеты государственных внебюджетных фондов', 'sum': regproj_amount_plan_gos},
+                {'title': 'Федеральный бюджет', 'sum': regproj_amount_plan_fed},
+                {'title': '', 'sum': other, }]
 
     @staticmethod
     def transform(p):
