@@ -7,7 +7,7 @@ from. models import Aggregation
 class AggregationFilter(filters.BaseFilterBackend):
     @staticmethod
     def _param(request, param_code):
-        return request.query_params.get(f'_filter__{param_code}')
+        return request.query_params.get('_filter__{}'.format(param_code))
 
     def filter_queryset(self, request, queryset, view):
         """
@@ -21,28 +21,54 @@ class AggregationFilter(filters.BaseFilterBackend):
                 year__in=[int(i) for i in years]
             )
 
-        if self._param(request, 'regproj_participant') is not None:
+        if self._param(request, 'regproj_participant_true') is not None:
             queryset = queryset.filter(regproj_participant=True)
 
-        if self._param(request, 'budget_amount_plan') is not None:
-            param = self._param(request, 'budget_amount_plan')
+        if self._param(request, 'regproj_participant_false') is not None:
+            queryset = queryset.filter(regproj_participant__isnull=True)
+
+        if self._param(request, 'budget_amount_plan_min') is not None:
+            param = self._param(request, 'budget_amount_plan_min')
             if can_be_int(param):
                 queryset = queryset.filter(budget_amount_plan__gte=param)
 
-        if self._param(request, 'budget_amount_fact') is not None:
-            param = self._param(request, 'budget_amount_fact')
+        if self._param(request, 'budget_amount_plan_max') is not None:
+            param = self._param(request, 'budget_amount_plan_max')
+            if can_be_int(param):
+                queryset = queryset.filter(budget_amount_plan__lte=param)
+
+        if self._param(request, 'budget_amount_fact_min') is not None:
+            param = self._param(request, 'budget_amount_fact_min')
             if can_be_int(param):
                 queryset = queryset.filter(budget_amount_fact__gte=param)
 
-        if self._param(request, 'violations_count') is not None:
-            param = self._param(request, 'violations_count')
+        if self._param(request, 'budget_amount_fact_max') is not None:
+            param = self._param(request, 'budget_amount_fact_max')
+            if can_be_int(param):
+                queryset = queryset.filter(budget_amount_fact__lte=param)
+
+        if self._param(request, 'violations_false') is not None:
+            queryset = queryset.filter(violations_count__isnull=True)
+
+        if self._param(request, 'violations_count_min') is not None:
+            param = self._param(request, 'violations_count_min')
             if can_be_int(param):
                 queryset = queryset.filter(violations_count__gte=param)
 
-        if self._param(request, 'violations_amount') is not None:
-            param = self._param(request, 'violations_amount')
+        if self._param(request, 'violations_count_max') is not None:
+            param = self._param(request, 'violations_count_max')
+            if can_be_int(param):
+                queryset = queryset.filter(violations_count__lte=param)
+
+        if self._param(request, 'violations_amount_min') is not None:
+            param = self._param(request, 'violations_amount_min')
             if can_be_int(param):
                 queryset = queryset.filter(violations_amount__gte=param)
+
+        if self._param(request, 'violations_amount_max') is not None:
+            param = self._param(request, 'violations_amount_max')
+            if can_be_int(param):
+                queryset = queryset.filter(violations_amount__lte=param)
 
         # Тут мы имеем только те записи из bubble_aggregation, что соответствуют запросу прользователя.
         # Однако, для корректного отображения необходимо запрашивать все данные для попавших в запрос ГРБС.

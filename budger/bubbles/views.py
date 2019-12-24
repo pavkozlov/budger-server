@@ -59,24 +59,35 @@ class AggregationView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        inspection = self.request.query_params.get('_filter__inspection')
+        # TODO: эту хрень можно смело двигать в filters
 
-        qs = Aggregation.objects.all()
+        qs = None
 
-        if inspection == '1':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_1_ID)
-        if inspection == '2':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_2_ID)
-        if inspection == '3':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_3_ID)
-        if inspection == '4':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_4_ID)
-        if inspection == '5':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_5_ID)
-        if inspection == '6':
-            qs = Aggregation.objects.get_entities_by_inspection(defs.INSPECTION_6_ID)
+        if self.request.query_params.get('_filter__inspection') is not None:
+            inspection = self.request.query_params.get('_filter__inspection')
+            inspections = inspection.split(',') if ',' in inspection else [inspection]
 
-        return qs
+            for inspection in inspections:
+                dep1 = None
+
+                if inspection == '1':
+                    dep1 = defs.INSPECTION_1_ID
+                elif inspection == '2':
+                    dep1 = defs.INSPECTION_2_ID
+                elif inspection == '3':
+                    dep1 = defs.INSPECTION_3_ID
+                elif inspection == '4':
+                    dep1 = defs.INSPECTION_4_ID
+                elif inspection == '5':
+                    dep1 = defs.INSPECTION_5_ID
+                elif inspection == '6':
+                    dep1 = defs.INSPECTION_6_ID
+
+                if dep1 is not None:
+                    qs1 = Aggregation.objects.get_entities_by_inspection(dep1)
+                    qs = qs1 if qs is None else qs | qs1
+
+        return qs if qs is not None else Aggregation.objects.all()
 
     @staticmethod
     def _transform_model(m):
