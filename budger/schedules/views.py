@@ -1,4 +1,4 @@
-from rest_framework import views, viewsets, status
+from rest_framework import views, viewsets, permissions
 from rest_framework.response import Response
 from .models import (
     Event, Workflow,
@@ -64,6 +64,7 @@ class EsgfkXmlView(views.APIView):
     @year - год, за который необходимо выгружать данные
     """
     renderer_classes = [EsgfkXmlRenderer]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         events = Event.objects.all()

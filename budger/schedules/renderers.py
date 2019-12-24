@@ -16,4 +16,4 @@ class EsgfkXmlRenderer(renderers.BaseRenderer):
         for model in data:
             xml += self._render_model(model)
 
-        return '<?xml version="1.0"?><root>{}</root>'.format(xml)
+        return '<?xml version="1.0"?>\n<root>{}</root>'.format(xml)
