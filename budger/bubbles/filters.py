@@ -1,4 +1,5 @@
 from rest_framework import filters
+from django.db.models import Q
 from budger.libs.shortcuts import can_be_int
 from. models import Aggregation
 
@@ -46,17 +47,13 @@ class AggregationFilter(filters.BaseFilterBackend):
         # Тут мы имеем только те записи из bubble_aggregation, что соответствуют запросу прользователя.
         # Однако, для корректного отображения необходимо запрашивать все данные для попавших в запрос ГРБС.
 
-        entity_ids = []
-        for rec in queryset.distinct('entity'):
-            entity_ids.append(rec.entity.id)
+        q = Q()
 
-        x_queryset = Aggregation.objects.filter(entity_id__in=entity_ids)
-
-        if self._param(request, 'year') is not None:
-            y = self._param(request, 'year')
-            years = y.split(',') if ',' in y else [y]
-            x_queryset = x_queryset.filter(
-                year__in=[int(i) for i in years]
+        for rec in queryset.distinct('year', 'entity'):
+            q1 = Q(
+                entity=rec.entity,
+                year=rec.year,
             )
+            q.add(q1, Q.OR)
 
-        return x_queryset.order_by('entity__search_name', 'year')
+        return Aggregation.objects.filter(q).order_by('entity__search_name', 'year')
