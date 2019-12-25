@@ -200,6 +200,29 @@ class AggregationView(generics.ListAPIView):
                     result1.append(obj)
             result = result1
 
+        # А еще блять надо фильтрануть по сумме количеств нарушений
+        if request.query_params.get('_filter__violations_count_min') is not None:
+            result1 = []
+            for obj in result:
+                vs = 0
+                if len(obj.violations) > 0:
+                    for v in obj.violations:
+                        vs += v.get('count', 0)
+                if vs >= int(request.query_params.get('_filter__violations_count_min', 0)):
+                    result1.append(obj)
+            result = result1
+
+        if request.query_params.get('_filter__violations_count_max') is not None:
+            result1 = []
+            for obj in result:
+                vs = 0
+                if len(obj.violations) > 0:
+                    for v in obj.violations:
+                        vs += v.get('count', 0)
+                if vs <= int(request.query_params.get('_filter__violations_count_max', 0)):
+                    result1.append(obj)
+            result = result1
+
         serializer = self.get_serializer(result, many=True)
 
         return Response(serializer.data)
