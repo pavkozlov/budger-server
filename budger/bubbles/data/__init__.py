@@ -44,14 +44,13 @@ class RegProject:
 
                     if finsupport['finsource'] == 'межбюджетные трансферты из федерального бюджета (справочно)':
                         regproj_amount_plan_fed_p += float(finsupport['fo{}'.format(year)])
-                    if finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
+                    elif finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
                         regproj_amount_plan_local_p += float(finsupport['fo{}'.format(year)])
-                    if finsupport['finsource'] == 'внебюджетные источники,из них':
+                    elif finsupport['finsource'] == 'внебюджетные источники,из них':
                         regproj_amount_plan_out_p += float(finsupport['fo{}'.format(year)])
-                    if finsupport['finsource'] == 'ТФОМС':
+                    elif finsupport['finsource'] == 'ТФОМС':
                         regproj_amount_plan_gos_p += float(finsupport['fo{}'.format(year)])
-
-                    if finsupport['finsource'] in FED:
+                    elif finsupport['finsource'] in FED:
                         regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
                     elif finsupport['finsource'] in MOSOBL:
                         regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
@@ -113,7 +112,7 @@ class RegProject:
 
             for item in results:
                 for finsupport in item['finsupports']:
-                    if finsupport['finsource'] not in [*FED, *MOSOBL, *VNE, *GOS, *PARENTS, '']:
+                    if finsupport['finsource'] not in [*FED, *MOSOBL, *VNE, *GOS, *PARENTS]:
                         continue
                     result_total_fin['money']['2019'] += float(finsupport['fo2019'])
                     result_total_fin['money']['2020'] += float(finsupport['fo2020'])

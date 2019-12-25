@@ -41,14 +41,13 @@ def get_amount_plan(res, year):
 
         if finsupport['finsource'] == 'межбюджетные трансферты из федерального бюджета (справочно)':
             fed_p += float(finsupport['fo{}'.format(year)])
-        if finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
+        elif finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
             local_p += float(finsupport['fo{}'.format(year)])
-        if finsupport['finsource'] == 'внебюджетные источники,из них':
+        elif finsupport['finsource'] == 'внебюджетные источники,из них':
             out_p += float(finsupport['fo{}'.format(year)])
-        if finsupport['finsource'] == 'ТФОМС':
+        elif finsupport['finsource'] == 'ТФОМС':
             gos_p += float(finsupport['fo{}'.format(year)])
-
-        if finsupport['finsource'] in fed:
+        elif finsupport['finsource'] in fed:
             regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
         elif finsupport['finsource'] in mosobl:
             regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
