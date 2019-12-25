@@ -21,11 +21,15 @@ class AggregationFilter(filters.BaseFilterBackend):
                 year__in=[int(i) for i in years]
             )
 
+        # Участие в регпроектах
+
         if self._param(request, 'regproj_participant_true') is not None:
             queryset = queryset.filter(regproj_participant=True)
 
         if self._param(request, 'regproj_participant_false') is not None:
             queryset = queryset.filter(regproj_participant__isnull=True)
+
+        # Бюджет
 
         if self._param(request, 'budget_amount_plan_min') is not None:
             param = self._param(request, 'budget_amount_plan_min')
@@ -47,8 +51,7 @@ class AggregationFilter(filters.BaseFilterBackend):
             if can_be_int(param):
                 queryset = queryset.filter(budget_amount_fact__lte=param)
 
-        if self._param(request, 'violations_false') is not None:
-            queryset = queryset.filter(violations_count__isnull=True)
+        # Проверки
 
         if self._param(request, 'violations_count_min') is not None:
             param = self._param(request, 'violations_count_min')
@@ -72,7 +75,7 @@ class AggregationFilter(filters.BaseFilterBackend):
 
         # Тут мы имеем только те записи из bubble_aggregation, что соответствуют запросу прользователя.
         # Однако, для корректного отображения необходимо запрашивать все данные для попавших в запрос ГРБС.
-
+        """
         q = Q()
 
         for rec in queryset.distinct('year', 'entity'):
@@ -83,3 +86,6 @@ class AggregationFilter(filters.BaseFilterBackend):
             q.add(q1, Q.OR)
 
         return Aggregation.objects.filter(q).order_by('entity__search_name', 'year')
+        """
+
+        return queryset.order_by('entity__search_name', 'year')

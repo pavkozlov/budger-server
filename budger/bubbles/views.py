@@ -153,8 +153,11 @@ class AggregationView(generics.ListAPIView):
 
         buff = {}
 
+        # Группировка записей по объекту/году
+
         for obj in queryset:
             key = '{}-{}'.format(obj.entity.id, obj.year)
+
             if key in buff:
                 buff[key] = self._merge_models(
                     buff[key],
@@ -163,9 +166,40 @@ class AggregationView(generics.ListAPIView):
             else:
                 buff[key] = self._transform_model(obj)
 
-        serializer = self.get_serializer(
-            [buff[k] for k in buff],
-            many=True
-        )
+        result = [buff[k] for k in buff]
+
+        # А тут блять надо фильтровать _filter__regproj_participant=(true|false)
+
+        if request.query_params.get('_filter__regproj_participant') == 'true':
+            result1 = []
+            for obj in result:
+                if len(obj.projects) > 0:
+                    result1.append(obj)
+            result = result1
+
+        elif request.query_params.get('_filter__regproj_participant') == 'false':
+            result1 = []
+            for obj in result:
+                if len(obj.projects) == 0:
+                    result1.append(obj)
+            result = result1
+
+        # А тут блять надо фильтровать _filter__revision_participant=(true|false)
+
+        if request.query_params.get('_filter__revision_participant') == 'true':
+            result1 = []
+            for obj in result:
+                if len(obj.violations) > 0:
+                    result1.append(obj)
+            result = result1
+
+        elif request.query_params.get('_filter__revision_participant') == 'false':
+            result1 = []
+            for obj in result:
+                if len(obj.violations) == 0:
+                    result1.append(obj)
+            result = result1
+
+        serializer = self.get_serializer(result, many=True)
 
         return Response(serializer.data)
