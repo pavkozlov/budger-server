@@ -110,17 +110,22 @@ class RegProject:
                 'money': defaultdict(float),
             }
 
+            parent = defaultdict(float)
+            child = defaultdict(float)
+
             for item in results:
                 for finsupport in item['finsupports']:
-                    if finsupport['finsource'] not in [*FED, *MOSOBL, *VNE, *GOS, *PARENTS]:
-                        continue
-                    result_total_fin['money']['2019'] += float(finsupport['fo2019'])
-                    result_total_fin['money']['2020'] += float(finsupport['fo2020'])
-                    result_total_fin['money']['2021'] += float(finsupport['fo2021'])
-                    result_total_fin['money']['2022'] += float(finsupport['fo2022'])
-                    result_total_fin['money']['2023'] += float(finsupport['fo2023'])
-                    result_total_fin['money']['2024'] += float(finsupport['fo2024'])
 
+                    if finsupport['finsource'] in PARENTS:
+                        for year in range(2019, 2025):
+                            parent[year] += float(finsupport['fo{}'.format(year)])
+
+                    elif finsupport['finsource'] in [*FED, *MOSOBL, *VNE, *GOS]:
+                        for year in range(2019, 2025):
+                            child[year] += float(finsupport['fo{}'.format(year)])
+
+            for year in range(2019, 2025):
+                result_total_fin['money'][year] += parent[year] if parent[year] != 0 else child[year]
                 result_total_fin['fin'] = RegProject.get_amount_plan(results)
             return result_total_fin
 
