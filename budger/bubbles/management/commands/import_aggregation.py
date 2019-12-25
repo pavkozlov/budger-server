@@ -88,8 +88,8 @@ def aggregation_from_json():
                 )
 
 
-def aggregation_from_csv():
-    filename = os.path.join('budger', 'bubbles', 'data', '2017-2019plan.csv')
+def aggregation_from_csv(file_name):
+    filename = os.path.join('budger', 'bubbles', 'data', file_name)
     with open(filename, 'r', encoding='UTF-8') as f:
         file = f.read().split('\n')
         file.pop(0)
@@ -97,7 +97,14 @@ def aggregation_from_csv():
 
     for line in file:
         l = line.split(';')
-        violations_count, violations_amount = l[4], l[5]
+
+        if ',' in l[5]:
+            violations_amount = l[5].split(',')[0]
+        else:
+            violations_amount = l[5]
+
+        violations_count = l[4]
+
         year = l[1]
         memo = ' / '.join([l[0].strip(), l[3].strip()])
         entity_titles = l[2].split('|')
@@ -109,7 +116,7 @@ def aggregation_from_csv():
 
             entity = Entity.objects.filter(title_search__contains=title_search)
             if entity.count() == 0:
-                print('!НЕ НАЙДЕНО: {}'.format(title_search))
+                # print('!НЕ НАЙДЕНО: {}'.format(title_search))
                 continue
 
             Aggregation.objects.create(
@@ -128,4 +135,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         clean_database()
         aggregation_from_json()
-        aggregation_from_csv()
+        aggregation_from_csv('2017-2019plan.csv')
+        aggregation_from_csv('2017-2019Нарушения.csv')
