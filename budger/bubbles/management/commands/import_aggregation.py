@@ -31,8 +31,23 @@ def get_amount_plan(res, year):
     regproj_amount_plan_gos = 0.0
     regproj_amount_plan_out = 0.0
 
+    # parent
+    fed_p = 0.0
+    local_p = 0.0
+    gos_p = 0.0
+    out_p = 0.0
+
     for finsupport in res['finsupports']:
-        if finsupport['finsource'] in fed:
+
+        if finsupport['finsource'] == 'межбюджетные трансферты из федерального бюджета (справочно)':
+            fed_p += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
+            local_p += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] == 'внебюджетные источники,из них':
+            out_p += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] == 'ТФОМС':
+            gos_p += float(finsupport['fo{}'.format(year)])
+        elif finsupport['finsource'] in fed:
             regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
         elif finsupport['finsource'] in mosobl:
             regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
@@ -41,8 +56,12 @@ def get_amount_plan(res, year):
         elif finsupport['finsource'] in vne:
             regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
 
-    return {'regproj_amount_plan_out': regproj_amount_plan_out, 'regproj_amount_plan_local': regproj_amount_plan_local,
-            'regproj_amount_plan_gos': regproj_amount_plan_gos, 'regproj_amount_plan_fed': regproj_amount_plan_fed}
+    return {
+        'regproj_amount_plan_out': regproj_amount_plan_out if out_p == 0 else out_p,
+        'regproj_amount_plan_local': regproj_amount_plan_local if local_p == 0 else local_p,
+        'regproj_amount_plan_gos': regproj_amount_plan_gos if gos_p == 0 else gos_p,
+        'regproj_amount_plan_fed': regproj_amount_plan_fed if fed_p == 0 else fed_p
+    }
 
 
 def aggregation_from_json():
