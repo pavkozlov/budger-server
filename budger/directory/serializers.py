@@ -7,7 +7,7 @@ from .models.kso import Kso, KsoDepartment1, KsoDepartment2, KsoEmployee
 
 def grbs_type(obj):
     t1 = obj.kbk_title.upper()
-    t2 = t1 + ' МОСКОВСКОЙ ОБЛАСТИ' # бгг
+    t2 = t1 + ' МОСКОВСКОЙ ОБЛАСТИ'  # бгг
     if obj.title_full.upper() in [t1, t2]:
         if obj.budget_lvl_code == '31' or obj.budget_lvl_code == '32':
             return 'municipal'
@@ -54,6 +54,11 @@ class EntitySubordinatesSerializer(serializers.ModelSerializer):
 
 
 class EntitySerializer(serializers.ModelSerializer):
+    grbs_type = serializers.SerializerMethodField()
+
+    def get_grbs_type(self, obj):
+        return grbs_type(obj)
+
     class Meta:
         model = Entity
         fields = '__all__'
