@@ -9,44 +9,67 @@ def name_str_to_dict(s):
     return {'name': m.group(1), 'position': m.group(2)} if m else s
 
 
+FED = ['межбюджетные трансферты в федеральный бюджет']
+MOSOBL = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
+          'межбюджетные трансферты в МО других субъектов РФ',
+          'свод бюджетов Муниципальных образований, из них',
+          'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
+GOS = ['межбюджетные трансферты в ТФОМС', 'межбюджетные трансферты из ГВБФ (справочно)',
+       'межбюджетные трансферты в ГВБФ']
+VNE = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
+PARENTS = ['межбюджетные трансферты из федерального бюджета (справочно)', 'консолидированный бюджет субъекта, из них',
+           'внебюджетные источники,из них', 'ТФОМС']
+
+
 class RegProject:
     queryset = REG_PROJECTS
 
     @staticmethod
     def get_amount_plan(proj):
-        fed = ['межбюджетные трансферты в федеральный бюджет']
-        mosobl = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
-                  'межбюджетные трансферты в МО других субъектов РФ',
-                  'свод бюджетов Муниципальных образований, из них',
-                  'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
-        gos = ['межбюджетные трансферты в ТФОМС', 'межбюджетные трансферты из ГВБФ (справочно)',
-               'межбюджетные трансферты в ГВБФ', 'ТФОМС']
-        vne = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
-
         regproj_amount_plan_fed = 0.0
         regproj_amount_plan_local = 0.0
         regproj_amount_plan_gos = 0.0
         regproj_amount_plan_out = 0.0
         other = 0.0
 
+        # parent
+        regproj_amount_plan_fed_p = 0.0
+        regproj_amount_plan_local_p = 0.0
+        regproj_amount_plan_gos_p = 0.0
+        regproj_amount_plan_out_p = 0.0
+
         for res in proj:
             for finsupport in res['finsupports']:
                 for year in range(2019, 2025):
-                    if finsupport['finsource'] in fed:
+
+                    if finsupport['finsource'] == 'межбюджетные трансферты из федерального бюджета (справочно)':
+                        regproj_amount_plan_fed_p += float(finsupport['fo{}'.format(year)])
+                    if finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
+                        regproj_amount_plan_local_p += float(finsupport['fo{}'.format(year)])
+                    if finsupport['finsource'] == 'внебюджетные источники,из них':
+                        regproj_amount_plan_out_p += float(finsupport['fo{}'.format(year)])
+                    if finsupport['finsource'] == 'ТФОМС':
+                        regproj_amount_plan_gos_p += float(finsupport['fo{}'.format(year)])
+
+                    if finsupport['finsource'] in FED:
                         regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] in mosobl:
+                    elif finsupport['finsource'] in MOSOBL:
                         regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] in gos:
+                    elif finsupport['finsource'] in GOS:
                         regproj_amount_plan_gos += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] in vne:
+                    elif finsupport['finsource'] in VNE:
                         regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
                     else:
                         other += float(finsupport['fo{}'.format(year)])
 
-        return [{'title': 'Внебюджетные источники', 'sum': regproj_amount_plan_out},
-                {'title': 'Бюджет Московской области', 'sum': regproj_amount_plan_local},
-                {'title': 'Бюджеты государственных внебюджетных фондов', 'sum': regproj_amount_plan_gos},
-                {'title': 'Федеральный бюджет', 'sum': regproj_amount_plan_fed},
+        return [{'title': 'Внебюджетные источники',
+                 'sum': regproj_amount_plan_out if regproj_amount_plan_out_p == 0 else regproj_amount_plan_out_p},
+                {'title': 'Бюджет Московской области',
+                 'sum': regproj_amount_plan_local if regproj_amount_plan_local_p == 0 else regproj_amount_plan_local_p},
+                {'title': 'Бюджеты государственных внебюджетных фондов',
+                 'sum': regproj_amount_plan_gos if regproj_amount_plan_gos_p == 0 else regproj_amount_plan_gos_p},
+                {'title': 'Федеральный бюджет',
+                 'sum': regproj_amount_plan_fed if regproj_amount_plan_fed_p == 0 else regproj_amount_plan_fed_p},
                 {'title': '', 'sum': other, }]
 
     @staticmethod
@@ -90,6 +113,8 @@ class RegProject:
 
             for item in results:
                 for finsupport in item['finsupports']:
+                    if finsupport['finsource'] not in [*FED, *MOSOBL, *VNE, *GOS, *PARENTS, '']:
+                        continue
                     result_total_fin['money']['2019'] += float(finsupport['fo2019'])
                     result_total_fin['money']['2020'] += float(finsupport['fo2020'])
                     result_total_fin['money']['2021'] += float(finsupport['fo2021'])
