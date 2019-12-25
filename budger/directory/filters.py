@@ -29,8 +29,10 @@ class EntityFilter(filters.BaseFilterBackend):
 
         if request.query_params.get('_filter__1'):
             term = request.query_params.get('_filter__1')
+            filter_title = re.sub(r'[^\w\d\s]', ' ', term)
+            filter_title = re.sub(r'\s+', ' ', filter_title).strip()
             queryset = queryset.filter(
-                Q(title_search__icontains=term) |
+                Q(title_search__icontains=filter_title) |
                 Q(inn__contains=term) |
                 Q(ogrn__contains=term) |
                 Q(head_name__icontains=term)
