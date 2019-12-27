@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, filters, views, parsers, status
 from rest_framework.response import Response
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
+from budger.libs.shortcuts import normalize_search_str
 import budger.app_settings as app_settings
 from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from .models.kso import Kso, KsoEmployee, KsoDepartment1
@@ -205,6 +206,9 @@ class EntitySubordinatesView(views.APIView):
 
 
 class EmployeeSuperiorsView(views.APIView):
+    """
+    GET Список руководителей работника.
+    """
     def get(self, request, pk):
         employee = get_object_or_404(KsoEmployee, id=pk)
         superiors = employee.get_superiors()
@@ -227,7 +231,7 @@ class EntityAggregationsView(views.APIView):
         params = []
 
         if request.query_params.get('_filter__1') is not None:
-            fi = request.query_params['_filter__1']
+            fi = normalize_search_str(request.query_params['_filter__1'])
 
             where_sql_stat = '''
                 WHERE (

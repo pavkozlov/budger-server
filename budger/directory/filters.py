@@ -1,20 +1,16 @@
 from rest_framework import filters
 from django.db.models import Q
-from budger.libs.shortcuts import can_be_int
+from budger.libs.shortcuts import can_be_int, normalize_search_str
 from .models.entity import EntityGroup
-import re
 
 
 class EntityFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
 
         if request.query_params.get('_filter__title'):
-            filter_title = request.query_params.get('_filter__title')
-            filter_title = re.sub(r'[^\w\d\s]', ' ', filter_title)
-            filter_title = re.sub(r'\s+', ' ', filter_title).strip()
-
+            term = request.query_params.get('_filter__title')
             queryset = queryset.filter(
-                title_search__icontains=filter_title
+                title_search__icontains=normalize_search_str(term)
             )
 
         if request.query_params.get('_filter__inn'):
@@ -29,13 +25,12 @@ class EntityFilter(filters.BaseFilterBackend):
 
         if request.query_params.get('_filter__1'):
             term = request.query_params.get('_filter__1')
-            filter_title = re.sub(r'[^\w\d\s]', ' ', term)
-            filter_title = re.sub(r'\s+', ' ', filter_title).strip()
+            normal_term = normalize_search_str(term)
             queryset = queryset.filter(
-                Q(title_search__icontains=filter_title) |
+                Q(title_search__icontains=normal_term) |
+                Q(head_name__icontains=normal_term) |
                 Q(inn__contains=term) |
-                Q(ogrn__contains=term) |
-                Q(head_name__icontains=term)
+                Q(ogrn__contains=term)
             )
 
         if request.query_params.get('_filter__group') == 'municipals':
