@@ -135,5 +135,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         clean_database()
         aggregation_from_json()
-        aggregation_from_csv('2017-2019plan.csv')
         aggregation_from_csv('2017-2019Нарушения.csv')
