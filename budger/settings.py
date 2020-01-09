@@ -4,7 +4,7 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -26,8 +27,8 @@ INSTALLED_APPS = [
     'budger.schedules',
     'budger.bubbles',
     'budger.dashboard',
-    'budger.t',
-    'budger.collegium'
+    'budger.collegium',
+    'budger.t'
 ]
 
 REST_FRAMEWORK = {
@@ -98,6 +99,7 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+STATIC_URL = '/static/'
 
 _LOGGING = {
     'version': 1,
@@ -119,11 +121,5 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 if 'BUDGER_DEV' in os.environ:
-
     DEBUG = True
     ALLOWED_HOSTS = ['*']
-
-    try:
-        del DATABASES['default']['OPTIONS']['sslmode']
-    except Exception:
-        pass
