@@ -19,12 +19,15 @@ MEETING_STATUS_ENUM = [
 
 class Meeting(models.Model):
     # Дата проведения заседания
-    exec_date = models.DateTimeField(unique=True, db_index=True)
+    exec_date = models.DateTimeField('Дата проведения заседания', unique=True, db_index=True)
 
     # Статус согласования плана заседания
-    status = models.PositiveSmallIntegerField(choices=MEETING_STATUS_ENUM, default=MEETING_STATUS_DRAFT)
+    status = models.PositiveSmallIntegerField('Статус согласования плана заседания', choices=MEETING_STATUS_ENUM,
+                                              default=MEETING_STATUS_DRAFT)
 
     class Meta:
+        verbose_name = 'Заседание'
+        verbose_name_plural = 'Заседания'
         ordering = ['exec_date']
         permissions = [
             (
@@ -50,13 +53,15 @@ class Speaker(models.Model):
     id = models.BigAutoField(primary_key=True)
 
     # Встреча
-    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE, related_name='speakers')
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE, related_name='speakers', verbose_name='Встреча')
 
     # Докладчик
-    employee = models.ForeignKey(KsoEmployee, on_delete=models.CASCADE)
+    employee = models.ForeignKey(KsoEmployee, on_delete=models.CASCADE, verbose_name='Докладчик')
 
     # Вопросы докладчика
-    subjects = ArrayField(models.TextField(), null=True, blank=True)
+    subjects = ArrayField(models.TextField(), null=True, blank=True, verbose_name='Вопросы докладчика')
 
     class Meta:
+        verbose_name = 'Спикер'
+        verbose_name_plural = 'Спикеры'
         ordering = ['id']
