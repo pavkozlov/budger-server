@@ -6,6 +6,6 @@ __pycache__/
 .idea/
 venv/
 
-staticfiles/
+static/
 
 /setenv.*
