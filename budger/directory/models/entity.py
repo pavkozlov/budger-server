@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-
 ORG_TYPE_ENUM = [
     ('01', 'фед. орган гос. власти, фед. гос. орган, орган гос. власти...'),
     ('02', 'орган управления государственным внебюджетным фондом'),
@@ -53,83 +52,92 @@ class Entity(models.Model):
     """
 
     # Учетный номер организации, присваиваемый в ОрФК
-    ofk_regnum = models.CharField(max_length=5, db_index=True)
+    ofk_regnum = models.CharField('Учетный номер организации, присваиваемый в ОрФК', max_length=5, db_index=True)
 
     # Код организации (обособленного подразделения) по Сводному реестру, присваиваемый в ОрФК
-    ofk_code = models.CharField(max_length=8, db_index=True)
+    ofk_code = models.CharField('Код организации по сводному реестру, присваиваемый в ОрФК', max_length=8,
+                                db_index=True)
 
     # Ссылка на вышестоящую организацию (вычисляется по полю "Код вышестоящего УБП по Сводному реестру")
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True,
+                               verbose_name='Ссылка на вышестоящую организацию')
 
     # Дата регистрации
-    reg_date = models.DateField(null=True, blank=True)
+    reg_date = models.DateField('Дата регистрации', null=True, blank=True)
 
     # Дата прекращения
-    term_date = models.DateField(null=True, blank=True)
+    term_date = models.DateField('Дата прекращения', null=True, blank=True)
 
     # Наименование и код ОПФ
-    opf_title = models.CharField(max_length=250, null=True, blank=True)
-    opf_code = models.CharField(max_length=5, null=True, blank=True, db_index=True)
+    opf_title = models.CharField('Наименование ОПФ', max_length=250, null=True, blank=True)
+    opf_code = models.CharField('Код ОПФ', max_length=5, null=True, blank=True, db_index=True)
 
     # Код и Наименование по ОКФС
-    okfs_title = models.CharField(max_length=250)
-    okfs_code = models.CharField(max_length=2)
+    okfs_title = models.CharField('Наименование по ОКФС', max_length=250)
+    okfs_code = models.CharField('Код по ОКФС', max_length=2)
 
     # Код и наименование КБК
-    kbk_title = models.CharField(max_length=2000, null=True, blank=True)
-    kbk_code = models.CharField(max_length=3, null=True, blank=True)
+    kbk_title = models.CharField('Наименование КБК', max_length=2000, null=True, blank=True)
+    kbk_code = models.CharField('Код КБК', max_length=3, null=True, blank=True)
 
     # Код и наименование типа организации
-    org_type_code = models.CharField(max_length=2, choices=ORG_TYPE_ENUM)
+    org_type_code = models.CharField('Код и наименование типа организации', max_length=2, choices=ORG_TYPE_ENUM)
 
     # Наименование ЮЛ
-    title_full = models.CharField(max_length=2000, db_index=True)
-    title_short = models.CharField(max_length=2000, null=True, blank=True)
+    title_full = models.CharField('Наименование ЮЛ', max_length=2000, db_index=True)
+    title_short = models.CharField('Сокращённое наименование ЮЛ', max_length=2000, null=True, blank=True)
 
     # ИНН, КПП, ОГРН
-    inn = models.CharField(max_length=12, db_index=True, null=True, blank=True)
-    kpp = models.CharField(max_length=9, db_index=True, null=True, blank=True)
-    ogrn = models.CharField(max_length=13, db_index=True, null=True, blank=True)
+    inn = models.CharField('ИНН', max_length=12, db_index=True, null=True, blank=True)
+    kpp = models.CharField('КПП', max_length=9, db_index=True, null=True, blank=True)
+    ogrn = models.CharField('ОГРН', max_length=13, db_index=True, null=True, blank=True)
 
     # Справочник ОКТМО
-    oktmo_code = models.CharField(max_length=11, null=True, blank=True)
-    oktmo_title = models.CharField(max_length=500, null=True, blank=True)
+    oktmo_code = models.CharField('Код ОКТМО', max_length=11, null=True, blank=True)
+    oktmo_title = models.CharField('Наименование ОКТМО', max_length=500, null=True, blank=True)
 
     # Адрес
-    addr_index = models.CharField(max_length=6, null=True, blank=True)
+    addr_index = models.CharField('Адрес', max_length=6, null=True, blank=True)
 
     # Регион
-    addr_area_type = models.CharField(max_length=10, blank=True, null=True)
-    addr_area_title = models.CharField(max_length=1000, blank=True, null=True)
+    addr_area_type = models.CharField('Тип региона', max_length=10, blank=True, null=True)
+    addr_area_title = models.CharField('Наименование региона', max_length=1000, blank=True, null=True)
 
     # Населенный пункт: тип, наименование
-    addr_locality_type = models.CharField(max_length=10, blank=True, null=True)
-    addr_locality_title = models.CharField(max_length=1000, blank=True, null=True)
+    addr_locality_type = models.CharField('Тип населенного пункта', max_length=10, blank=True, null=True)
+    addr_locality_title = models.CharField('Наименование населенного пункта', max_length=1000, blank=True, null=True)
 
     # Улица, дом, корпус, ОФИС
-    addr_street = models.CharField(max_length=1011, null=True, blank=True)
-    addr_building = models.CharField(max_length=50, null=True, blank=True)
-    addr_housing = models.CharField(max_length=50, null=True, blank=True)
-    addr_office = models.CharField(max_length=50, null=True, blank=True)
+    addr_street = models.CharField('Улица', max_length=1011, null=True, blank=True)
+    addr_building = models.CharField('Дом', max_length=50, null=True, blank=True)
+    addr_housing = models.CharField('Корпус', max_length=50, null=True, blank=True)
+    addr_office = models.CharField('Офис', max_length=50, null=True, blank=True)
 
     # Руководитель: должность, имя, дата вступления, фото
-    head_position = models.CharField(max_length=300, null=True, blank=True)
-    head_name = models.CharField(max_length=200, null=True, blank=True)
-    head_accession_date = models.DateField(null=True, blank=True)
-    head_photo_slug = models.CharField(max_length=200, null=True, blank=True)
+    head_position = models.CharField('Должность руководителя', max_length=300, null=True, blank=True)
+    head_name = models.CharField('Имя руководителя', max_length=200, null=True, blank=True)
+    head_accession_date = models.DateField('Дата вступления в должность', null=True, blank=True)
+    head_photo_slug = models.CharField('Фотография', max_length=200, null=True, blank=True)
 
     # Код статуса организации.
-    org_status_code = models.CharField(max_length=1, choices=ORG_STATUS_ENUM, db_index=True)
+    org_status_code = models.CharField('Код статуса организации', max_length=1, choices=ORG_STATUS_ENUM, db_index=True)
 
     # Код наименования специального мероприятия в отношении организации.
-    spec_event_code = models.CharField(max_length=1, choices=SPEC_EVENT_CODE_ENUM, null=True, blank=True)
+    spec_event_code = models.CharField(
+        'Код наименования специального мероприятия в отношении организации',
+        max_length=1,
+        choices=SPEC_EVENT_CODE_ENUM,
+        null=True,
+        blank=True
+    )
 
     # Код бюджета организации
-    budget_code = models.CharField(max_length=8, db_index=True, null=True, blank=True)
-    budget_title = models.CharField(max_length=2000, null=True, blank=True)
+    budget_code = models.CharField('Код бюджета организации', max_length=8, db_index=True, null=True, blank=True)
+    budget_title = models.CharField('Наименование бюджета организации', max_length=2000, null=True, blank=True)
 
     # Код уровня бюджета
     budget_lvl_code = models.CharField(
+        'Код уровня бюджета',
         max_length=2,
         choices=BUDGET_LVL_CODE_ENUM,
         db_index=True,
@@ -138,10 +146,15 @@ class Entity(models.Model):
     )
 
     # Код по справочнику ОКОГУ.
-    okogu_code = models.CharField(max_length=7, db_index=True, null=True, blank=True)
+    okogu_code = models.CharField('Код по справочнику ОКОГУ', max_length=7, db_index=True, null=True, blank=True)
 
     # Подчиненные огранизации (по версии РУБП)
-    subordinates = ArrayField(models.IntegerField(), blank=True, null=True)
+    subordinates = ArrayField(
+        models.IntegerField(),
+        blank=True,
+        null=True,
+        verbose_name='Подчиненные огранизации (по версии РУБП)'
+    )
 
     # Служебные поля
     created = models.DateTimeField(auto_now_add=True)
@@ -149,13 +162,15 @@ class Entity(models.Model):
     title_search = models.CharField(max_length=4001, default='', db_index=True)
 
     # Дата акруальности данных
-    relevance_date = models.DateTimeField(null=True, blank=True)
+    relevance_date = models.DateTimeField('Дата акруальности данных', null=True, blank=True)
 
     # Признак, указывающий, является ли организация Органом государственной власти.
-    is_ogv = models.BooleanField(default=False, db_index=True)
+    is_ogv = models.BooleanField('Является ли организация органом государственной власти', default=False, db_index=True)
 
     class Meta:
         ordering = ['title_full']
+        verbose_name = 'Объект контроля'
+        verbose_name_plural = '5. Объекты контроля'
 
     def __str__(self):
         return '{} - {}'.format(self.inn, self.title_full)

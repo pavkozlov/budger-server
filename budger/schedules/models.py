@@ -95,9 +95,10 @@ EVENT_GROUP_ENUM = [
 
 
 class Annual(models.Model):
-    year = models.PositiveSmallIntegerField(db_index=True)
+    year = models.PositiveSmallIntegerField('Год', db_index=True)
 
     status = models.PositiveSmallIntegerField(
+        'Статус',
         db_index=True,
         choices=ANNUAL_STATUS_ENUM
     )
@@ -107,14 +108,17 @@ class Annual(models.Model):
 
     class Meta:
         ordering = ['-year']
+        verbose_name = 'План мероприятий'
+        verbose_name_plural = '2. Планы мероприятий'
 
 
 class Event(models.Model):
     # Группа меропрития
-    group = models.PositiveSmallIntegerField(choices=EVENT_GROUP_ENUM, blank=True, null=True)
+    group = models.PositiveSmallIntegerField('Группа меропрития', choices=EVENT_GROUP_ENUM, blank=True, null=True)
 
     # Статус мероприятия
     status = models.PositiveSmallIntegerField(
+        'Статус мероприятия',
         db_index=True,
         choices=EVENT_STATUS_ENUM,
         default=EVENT_STATUS_DRAFT,
@@ -123,10 +127,15 @@ class Event(models.Model):
     )
 
     # Вид мероприятия
-    type = models.PositiveSmallIntegerField(db_index=True, choices=EVENT_TYPE_ENUM)
+    type = models.PositiveSmallIntegerField('Вид мероприятия', db_index=True, choices=EVENT_TYPE_ENUM)
 
     # Дополнительные признаки
-    subtype = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM), blank=True, null=True)
+    subtype = ArrayField(
+        models.PositiveSmallIntegerField(choices=EVENT_SUBTYPE_ENUM),
+        blank=True,
+        null=True,
+        verbose_name='Дополнительные признаки'
+    )
 
     # Тип мероприятия
     subject = ArrayField(models.PositiveSmallIntegerField(
@@ -134,35 +143,47 @@ class Event(models.Model):
         size=3,
         null=True,
         blank=True,
-        default=None
+        default=None,
+        verbose_name='Тип мероприятия'
     )
 
     # Наименование мероприятия
-    title = models.CharField(max_length=2000)
+    title = models.CharField('Наименование мероприятия', max_length=2000)
 
     # Основания для проведения мероприятия
-    initiators = ArrayField(models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM), null=True, blank=True)
+    initiators = ArrayField(
+        models.PositiveSmallIntegerField(choices=EVENT_INITIATOR_ENUM),
+        null=True,
+        blank=True,
+        verbose_name='Основания для проведения мероприятия'
+    )
 
     # Проверяемый период
-    period_from = models.DateField(db_index=True, null=True, blank=True)
-    period_to = models.DateField(db_index=True, null=True, blank=True)
+    period_from = models.DateField('Проверяемый период c', db_index=True, null=True, blank=True)
+    period_to = models.DateField('Проверяемый период по', db_index=True, null=True, blank=True)
 
     # Метод проведения
-    method = models.CharField(max_length=250, null=True, blank=True, db_index=True)
+    method = models.CharField('Метод проведения', max_length=250, null=True, blank=True, db_index=True)
 
     # Способ проведения
-    way = ArrayField(models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM), null=True, blank=True)
+    way = ArrayField(
+        models.PositiveSmallIntegerField(db_index=True, choices=EVENT_WAY_ENUM),
+        null=True,
+        blank=True,
+        verbose_name='Способ проведения'
+    )
 
     # Даты проведения мероприятия
-    exec_from = models.DateField(db_index=True)
-    exec_to = models.DateField(db_index=True)
+    exec_from = models.DateField('Дата проведения мероприятия с', db_index=True)
+    exec_to = models.DateField('Дата проведения мероприятия по', db_index=True)
 
     # Ответственный за мероприятие сотрудник
     responsible_employee = models.ForeignKey(
         KsoEmployee,
         on_delete=models.CASCADE,
         blank=True, null=True,
-        related_name='responded_events'
+        related_name='responded_events',
+        verbose_name='Ответственный за мероприятие сотрудник'
     )
 
     # Ответственное за мероприятие структурное подразделение
@@ -170,44 +191,50 @@ class Event(models.Model):
         KsoDepartment1,
         on_delete=models.CASCADE,
         blank=True, null=True,
-        related_name='responded_events'
+        related_name='responded_events',
+        verbose_name='Ответственное за мероприятие структурное подразделение'
     )
 
     # Привлекаемые структурные подразделения
     attendant_departments = models.ManyToManyField(
         KsoDepartment1,
         related_name='participated_events',
-        blank=True
+        blank=True,
+        verbose_name='Привлекаемые структурные подразделения'
     )
 
     # Параллельно привлекаемые КСО
     attendant_ksos_parallel = models.ManyToManyField(
         Kso,
         related_name='parallel_participated_events',
-        blank=True
+        blank=True,
+        verbose_name='Параллельно привлекаемые КСО'
     )
 
     # Совместно привлекаемые КСО
     attendant_ksos_together = models.ManyToManyField(
         Kso,
         related_name='together_participated_events',
-        blank=True
+        blank=True,
+        verbose_name='Совместно привлекаемые КСО'
     )
 
     # Форма проведения
     mode = models.PositiveSmallIntegerField(
+        'Форма проведения',
         choices=EVENT_MODE_ENUM,
-        blank=True, null=True
+        blank=True,
+        null=True
     )
 
     # Проект НПА
-    document_project = models.TextField(blank=True, null=True)
+    document_project = models.TextField('Проект НПА', blank=True, null=True)
 
     # Объекты контроля
-    controlled_entities = models.ManyToManyField(Entity, blank=True)
+    controlled_entities = models.ManyToManyField(Entity, blank=True, verbose_name='Объекты контроля')
 
     # Работник, создавший мероприятие
-    author = models.ForeignKey(KsoEmployee, on_delete=models.CASCADE)
+    author = models.ForeignKey(KsoEmployee, on_delete=models.CASCADE, verbose_name='Работник, создавший мероприятие')
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -216,6 +243,8 @@ class Event(models.Model):
         return '{} - {}'.format(self.exec_from, self.exec_to)
 
     class Meta:
+        verbose_name = 'Мероприятие'
+        verbose_name_plural = '1. Мероприятия'
         ordering = ['exec_from']
         permissions = [
             (PERM_MANAGE_EVENT.split('.')[1], 'Создание и редактирование черновиков.'),
