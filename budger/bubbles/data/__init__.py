@@ -10,15 +10,18 @@ def name_str_to_dict(s):
 
 
 FED = ['межбюджетные трансферты в федеральный бюджет']
-MOSOBL = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
-          'межбюджетные трансферты в МО других субъектов РФ',
-          'свод бюджетов Муниципальных образований, из них',
-          'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
+LOCAL = ['межбюджетные трансферты в бюджеты субъектов РФ', 'межбюджетные трансферты в БС',
+         'межбюджетные трансферты в МО других субъектов РФ',
+         'свод бюджетов Муниципальных образований, из них',
+         'бюджет субъекта, из них', 'межбюджетные трансферты в бюджеты МО']
 GOS = ['межбюджетные трансферты в ТФОМС', 'межбюджетные трансферты из ГВБФ (справочно)',
        'межбюджетные трансферты в ГВБФ']
-VNE = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
-PARENTS = ['межбюджетные трансферты из федерального бюджета (справочно)', 'консолидированный бюджет субъекта, из них',
-           'внебюджетные источники,из них', 'ТФОМС']
+OUT = ['определенные на федеральном уровне', 'привлеченные субъектом РФ']
+
+PARENTS = {'FED': 'межбюджетные трансферты из федерального бюджета (справочно)',
+           'LOCAL': 'консолидированный бюджет субъекта, из них',
+           'OUT': 'внебюджетные источники,из них',
+           'GOS': 'ТФОМС'}
 
 
 class RegProject:
@@ -26,57 +29,56 @@ class RegProject:
 
     @staticmethod
     def get_amount_plan(proj):
-        regproj_amount_plan_fed = 0.0
-        regproj_amount_plan_local = 0.0
-        regproj_amount_plan_gos = 0.0
-        regproj_amount_plan_out = 0.0
+        """
+        Функция принимает Рег. Проект, суммирует деньги по всем задачам проекта и аггрегирует бюджет
+        в 4 источника финансирования
+        """
+        child = defaultdict(float)
+        parent = defaultdict(float)
         other = 0.0
-
-        # parent
-        regproj_amount_plan_fed_p = 0.0
-        regproj_amount_plan_local_p = 0.0
-        regproj_amount_plan_gos_p = 0.0
-        regproj_amount_plan_out_p = 0.0
 
         for res in proj:
             for finsupport in res['finsupports']:
                 for year in range(2019, 2025):
 
-                    if finsupport['finsource'] == 'межбюджетные трансферты из федерального бюджета (справочно)':
-                        regproj_amount_plan_fed_p += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] == 'консолидированный бюджет субъекта, из них':
-                        regproj_amount_plan_local_p += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] == 'внебюджетные источники,из них':
-                        regproj_amount_plan_out_p += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] == 'ТФОМС':
-                        regproj_amount_plan_gos_p += float(finsupport['fo{}'.format(year)])
+                    if finsupport['finsource'] == PARENTS['FED']:
+                        parent['fed'] += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] == PARENTS['LOCAL']:
+                        parent['local'] += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] == PARENTS['OUT']:
+                        parent['out'] += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] == PARENTS['GOS']:
+                        parent['gos'] += float(finsupport['fo{}'.format(year)])
+
                     elif finsupport['finsource'] in FED:
-                        regproj_amount_plan_fed += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] in MOSOBL:
-                        regproj_amount_plan_local += float(finsupport['fo{}'.format(year)])
+                        child['fed'] += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] in LOCAL:
+                        child['local'] += float(finsupport['fo{}'.format(year)])
                     elif finsupport['finsource'] in GOS:
-                        regproj_amount_plan_gos += float(finsupport['fo{}'.format(year)])
-                    elif finsupport['finsource'] in VNE:
-                        regproj_amount_plan_out += float(finsupport['fo{}'.format(year)])
+                        child['gos'] += float(finsupport['fo{}'.format(year)])
+                    elif finsupport['finsource'] in OUT:
+                        child['out'] += float(finsupport['fo{}'.format(year)])
+
                     else:
                         other += float(finsupport['fo{}'.format(year)])
 
-        return [{'title': 'Внебюджетные источники',
-                 'sum': regproj_amount_plan_out if regproj_amount_plan_out_p == 0 else regproj_amount_plan_out_p},
-                {'title': 'Бюджет Московской области',
-                 'sum': regproj_amount_plan_local if regproj_amount_plan_local_p == 0 else regproj_amount_plan_local_p},
-                {'title': 'Бюджеты государственных внебюджетных фондов',
-                 'sum': regproj_amount_plan_gos if regproj_amount_plan_gos_p == 0 else regproj_amount_plan_gos_p},
-                {'title': 'Федеральный бюджет',
-                 'sum': regproj_amount_plan_fed if regproj_amount_plan_fed_p == 0 else regproj_amount_plan_fed_p},
-                {'title': '', 'sum': other, }]
+        return [
+            {'title': 'Внебюджетные источники',
+             'sum': child['out'] if parent['out'] == 0 else parent['out']},
+            {'title': 'Бюджет Московской области',
+             'sum': child['local'] if parent['local'] == 0 else parent['local']},
+            {'title': 'Бюджеты государственных внебюджетных фондов',
+             'sum': child['gos'] if parent['gos'] == 0 else parent['gos']},
+            {'title': 'Федеральный бюджет',
+             'sum': child['fed'] if parent['fed'] == 0 else parent['fed']},
+            {'title': '', 'sum': other, }
+        ]
 
     @staticmethod
     def transform(p):
         """
         Функция принимает региональный проект, трансформирует его в json заданного вида
         """
-
         def _aggregate_results(results):
             """
             Функция аггрегирует finsupports по годам
@@ -91,13 +93,12 @@ class RegProject:
                     'fin': defaultdict(float),
                     'grbs': item['GRBS']
                 }
+
                 for finsupport in item['finsupports']:
-                    result['fin']['2019'] += float(finsupport['fo2019'])
-                    result['fin']['2020'] += float(finsupport['fo2020'])
-                    result['fin']['2021'] += float(finsupport['fo2021'])
-                    result['fin']['2022'] += float(finsupport['fo2022'])
-                    result['fin']['2023'] += float(finsupport['fo2023'])
-                    result['fin']['2024'] += float(finsupport['fo2024'])
+                    if finsupport['finsource'] in [*GOS, *OUT, *FED, *LOCAL]:
+                        for year in range(2019, 2025):
+                            result['fin'][year] += float(finsupport['fo{}'.format(year)])
+
                 generated_results.append(result)
 
             return generated_results
@@ -108,6 +109,7 @@ class RegProject:
             """
             result_total_fin = {
                 'money': defaultdict(float),
+                'fin': RegProject.get_amount_plan(results)
             }
 
             parent = defaultdict(float)
@@ -115,18 +117,15 @@ class RegProject:
 
             for item in results:
                 for finsupport in item['finsupports']:
-
-                    if finsupport['finsource'] in PARENTS:
-                        for year in range(2019, 2025):
+                    for year in range(2019, 2025):
+                        if finsupport['finsource'] in PARENTS.values():
                             parent[year] += float(finsupport['fo{}'.format(year)])
-
-                    elif finsupport['finsource'] in [*FED, *MOSOBL, *VNE, *GOS]:
-                        for year in range(2019, 2025):
+                        elif finsupport['finsource'] in [*FED, *LOCAL, *OUT, *GOS]:
                             child[year] += float(finsupport['fo{}'.format(year)])
 
             for year in range(2019, 2025):
-                result_total_fin['money'][year] += parent[year] if parent[year] != 0 else child[year]
-                result_total_fin['fin'] = RegProject.get_amount_plan(results)
+                result_total_fin['money'][year] += child[year] if parent[year] == 0 else parent[year]
+
             return result_total_fin
 
         return {
