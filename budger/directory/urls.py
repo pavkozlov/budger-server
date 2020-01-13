@@ -3,7 +3,7 @@ from .views import (
     EntityListView, EntityRetrieveView,
     KsoListView, KsoRetrieveView,
     KsoEmployeeListView, KsoEmployeeRetrieveUpdateView, KsoEmployeeUploadPhotoView,
-    EntitySubordinatesView,
+    EntitySubordinatesView, EntityEgrulPdfView,
     KsoResponsiblesView,
     EntityRegionalsView, EntityMunicipalsView,
     EmployeeSuperiorsView,
@@ -23,6 +23,8 @@ urlpatterns = [
     path('entity/municipals/', EntityMunicipalsView.as_view()),
     path('entity/<int:pk>/subordinates/', EntitySubordinatesView.as_view()),
     path('entity/aggregations/', EntityAggregationsView.as_view()),
+
+    path('entity/<int:pk>/egrulpdf/', EntityEgrulPdfView.as_view()),
 
     path('kso/', KsoListView.as_view()),
     path('kso/<int:pk>/', KsoRetrieveView.as_view()),

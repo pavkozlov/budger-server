@@ -6,6 +6,7 @@ from django.views.decorators.cache import cache_page
 import os
 from django.db import connection
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from rest_framework import generics, filters, views, parsers, status
 from rest_framework.response import Response
 from budger.libs.dynamic_fields import DynaFieldsListAPIView
@@ -14,6 +15,7 @@ import budger.app_settings as app_settings
 from .models.entity import Entity, MunicipalBudget, SPEC_EVENT_CODE_ENUM
 from .models.kso import Kso, KsoEmployee, KsoDepartment1
 from .permissions import CanUpdateEmployee
+from .libs.egrul import download_pdf
 
 from .serializers import (
     EntitySubordinatesSerializer, EntityListSerializer, EntitySerializer,
@@ -26,7 +28,7 @@ from .serializers import (
 )
 
 from .filters import EntityFilter, KsoEmployeeFilter
-from .renderers import KsoEmployeeCsvRenderer
+from .renderers import KsoEmployeeCsvRenderer, PdfRenderer
 
 
 class EntityListView(DynaFieldsListAPIView):
@@ -92,7 +94,7 @@ class KsoEmployeeListCsv(DynaFieldsListAPIView):
     GET Список всех сотрудников КСО, отрендеренные в csv
     """
     serializer_class = KsoEmployeeListSerializer
-    renderer_classes = [KsoEmployeeCsvRenderer, ]
+    renderer_classes = (KsoEmployeeCsvRenderer,)
     queryset = KsoEmployee.objects.filter(is_developer=False)
 
 
@@ -205,6 +207,26 @@ class EntitySubordinatesView(views.APIView):
         return Response(serializer.data)
 
 
+class EntityEgrulPdfView(views.APIView):
+    """
+    GET Скачивание PDF с выпиской из ЕГРЮЛ с сайта ФНС.
+    """
+    renderer_classes = (PdfRenderer,)
+
+    def get(self, request, pk):
+        entity = get_object_or_404(Entity, pk=pk)
+        pdf = download_pdf(entity.inn)
+        if pdf:
+            return Response(
+                pdf,
+                headers={
+                    'Content-Disposition': 'attachment; filename="egrul-{}.pdf"'.format(entity.inn)
+                }
+            )
+        else:
+            raise Http404
+
+
 class EmployeeSuperiorsView(views.APIView):
     """
     GET Список руководителей работника.
@@ -263,7 +285,6 @@ class EnumsView(views.APIView):
     """
     GET Список констант
     """
-
     def get(self, request):
         return Response({
             'SPEC_EVENT_CODE_ENUM': SPEC_EVENT_CODE_ENUM
